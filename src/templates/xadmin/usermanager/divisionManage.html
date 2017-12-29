@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <script src="../../dist_vue/plugin/clickEditor/Meditor.js"></script>
+    <style>
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        #division{  padding: 10px;  }
+        .add-user{  float: right;margin-left: 10px;}
+        .title{ width: 200px;display: inline-block;  margin-bottom: 15px;  line-height: 32px;  }
+        .c-input{width: 65%;}
+        .c-btn{padding: 0 0;color:#2DB7F5; }
+        .c-btn:hover{color:#2D8CF0}
+        .c-btn-red{padding: 0 0;color:#ED3F14; }
+        .c-btn-red:hover{ color: darkred;}
+    </style>
+</head>
+<body>
+    <div id="division">
+        <h2 class="title">参建方管理</h2>
+        <i-button class="add-user" type="info" @click="oneRole = true">添加</i-button>
+        <i-input v-model="searchValue" placeholder="查找" style="width: 300px;margin-bottom:10px;float: right;" @on-change="find" icon="ios-search"></i-input>
+        <i-table :columns="divisionColumns" :data="divisionData" @on-sort-change="sortAll"></i-table>
+        <page show-total :total="pages" :page-size="pageSize" @on-change="userTable" style="margin:20px auto;float:right;" show-elevator ref="page"></page>
+        <spin size="large" fix v-if="spinShow"></spin>
+        <modal
+                v-model="oneRole"
+                title="添加参建方"
+                @on-ok="addDivision"
+                @on-cancel="cancelDivision">
+            <i-input v-model="oneDivision" placeholder="填写参建方" style="width: 300px;"></i-input>
+        </modal>
+    </div>
+</body>
+<script>
+    Vue.component('clickInput', MEditor);
+    new Vue({
+        el:'#division',
+        data () {
+            return{
+                divisionName:null,
+                divisionData:[],
+                oneDivision:null,
+                searchValue:null,
+                pages:0,
+                pageSize:15,
+                spinShow:false,
+                divisionColumns:[
+                    {
+                        title: '参建方',
+                        sortable: 'custom',
+                        width:200,
+                        render: (h , param) => {
+                            let that = this;
+                            return  h('clickInput', {
+                                props: {
+                                    type:"input",
+                                },
+                                model:{
+                                    value:param.row.name,
+                                    callback(t){
+                                        if( param.row.name != t ){
+                                            param.row.name = t;
+                                            that.changeName( param.row );
+                                        }
+                                    }
+                                }
+                            },param.row.name)
+                        }
+                    },
+                    {
+                        title:'操作',
+                        align:'right',
+                        render:( h , params ) => {
+                            return  h('Poptip' , {
+                                        props: {title: '您确认删除吗？',placement:'left',confirm:true},
+                                        on: {
+                                            'on-ok': () => {
+                                                this.remove(params);
+                                            }
+                                        }
+                                        },[
+                                            h('Button', {
+                                                props: {
+                                                    type: 'error',
+                                                    size: 'small'
+                                                }
+                                            }, '删除')
+                                        ])
+                        }
+                    }
+                ],
+                oneRole:false
+            }
+        },
+        methods:{
+            sortAll ( value ) {
+                this.userTable(1, (value.order == "asc") ? "name" : "-name");
+            },
+            userTable ( page,order ) {
+                let that = this;
+                $.ajax({
+                    url:"/config/divisions/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        page:page,
+                        search:that.searchValue,
+                        ordering:order
+                    },
+                    beforeSend:function(){
+                        that.spinShow = true;
+                    },
+                    success:function( datas ){
+                        that.spinShow = false;
+                        that.divisionData = datas.results;
+                        that.pages = datas.count;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            addDivision () {
+                let that =  this;
+                $.ajax({
+                    url:"/config/divisions/",
+                    dataType:"json",
+                    type:"post",
+                    data:{
+                        name:this.oneDivision
+                    },
+                    success:function( data ){
+                        if(data.id != ''||data.id != undefined||data.id != null){
+                            that.userTable(1);
+                            that.cancelDivision();
+                        }
+                    },
+                    error:function () {
+                        that.$Message.warning("添加失败");
+                        that.cancelDivision();
+                    }
+                });
+            },
+            cancelDivision () {
+                this.oneDivision = null;
+            },
+            find ( event ) {
+                this.$refs.page.currentPage = 1;
+                this.searchValue = event.target.value;
+                this.userTable(1);
+            },
+            remove ( params ) {
+                let that = this;
+                $.ajax({
+                    url:params.row.url,
+                    dataType:"json",
+                    type:"DELETE",
+                    success:function( data ){
+                        that.$Message.success("删除成功");
+                        that.divisionData.splice(params.index,1);
+                        that.cancelDivision();
+                    },
+                    error:function () {
+                        console.log("删除失败");
+                    }
+                });
+            },
+            changeName ( value ) {
+                let that =  this;
+                $.ajax({
+                    url: value.url ,
+                    dataType:"json",
+                    type:"put",
+                    data:{
+                        name:value.name
+                    },
+                    success:function(){
+                        that.$Message.success("编辑成功");
+                    },
+                    error:function () {
+                        that.$Message.warning("编辑失败");
+                        that.cancelDivision();
+                    }
+                });
+            }
+        },
+        mounted () {
+            this.userTable(1)
+        }
+    })
+</script>
+</html>

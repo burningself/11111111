@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        #container {
+            position: relative;
+            width: 100%;
+            min-width: 980px;
+            padding: 0;
+        }
+        
+        #content {
+            padding: 20px 40px;
+        }
+        
+        .content-head {
+            position: relative;
+            height: 36px;
+        }
+        
+        .content-head h1 {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        
+        .content-head>.ivu-btn-info {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        
+        #content-main>.ivu-table-wrapper {
+            margin-top: 15px;
+        }
+        
+        .ivu-table-body,
+        .ivu-table {
+            overflow: visible;
+        }
+        
+        .perserveData {
+            width: 20%;
+            padding-left: 10px;
+            float: left;
+            height: 32px;
+            line-height: 32px;
+        }
+        
+        .ivu-table-cell>div>.ivu-input-type,
+        .ivu-table-cell .ivu-select,
+        .ivu-table-cell .ivu-cascader {
+            float: left;
+            width: 80%;
+            max-width: 190px;
+        }
+        
+        .ivu-table-row>td {
+            position: relative;
+        }
+        
+        .perserveData>div {
+            width: 17.5px;
+            height: 100%;
+            float: left;
+        }
+        
+        .perserveData .ivu-btn {
+            padding: 0;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-checkmark-round {
+            color: #2DB7F5;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-close-round {
+            color: #ED3F14;
+        }
+        
+        .perserveData>div:nth-child(1):hover .ivu-icon-checkmark-round {
+            color: #2D8CF0
+        }
+        
+        .perserveData>div:nth-child(2):hover .ivu-icon-close-round {
+            color: #8b0706;
+        }
+        
+        .ivu-table-cell>div .ivu-tooltip {
+            float: left;
+            padding-right: 10px;
+        }
+        
+        .ivu-page {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .ivu-tooltip {
+            width: 100%;
+        }
+        
+        .ivu-modal-body {
+            padding: 16px 40px 16px 16px;
+        }
+        
+        .ivu-icon {
+            font-size: 14px;
+        }
+        
+        .ivu-modal-footer {
+            padding: 0;
+            height: 60px;
+            line-height: 60px;
+        }
+        
+        .ivu-modal-footer .ivu-col {
+            text-align: center;
+            height: 100%;
+        }
+        
+        .ivu-modal-footer .ivu-btn-long {
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="content" class="flex">
+            <div id="content-main">
+                <div class="content-head">
+                    <h1>质量验收提醒管理</h1>
+                    <i-button type="info" @click="updata_value(true)">添加质量验收提醒</i-button>
+                </div>
+                <i-table border :columns="columns" :data="data"></i-table>
+                <Spin size="large" fix v-if="spinShow"></Spin>
+                <Page :total="count" @on-change="changeData" show-elevator show-total :page-size="page_one_count" :current.sync="current"></Page>
+
+                <!--弹窗-->
+                <Modal v-model="modal" @updata:modal="val=>modal=val" width="450" @on-visible-change="changeStatus">
+                    <p slot="header" style="text-align:left">
+                        <span>添加质量验收提醒</span>
+                    </p>
+                    <div style="text-align:left">
+                        <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+                            <Form-item label="触发状态" prop="cascader">
+                                <Cascader :data="cascaderArray" v-model="formValidate.cascader" :render-format="label => label.join('-')" :load-data="loadData">
+                                </Cascader>
+                            </Form-item>
+                            <Form-item label="验收类型" prop="acceptancetype">
+                                <i-select v-model="formValidate.acceptancetype">
+                                    <i-option v-for="item,index in selectArray" :key="index" :value="item.value">{{ item.value }}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="时间间隔" prop="time_span">
+                                <i-input v-model="formValidate.time_span" />
+                            </Form-item>
+                        </i-form>
+                    </div>
+                    <div slot="footer">
+                        <Row>
+                            <i-col span="12">
+                                <i-button type="success" size="large" long @click="add_still" :loading="modal_loading">保存并持续添加</i-button>
+                            </i-col>
+                            <i-col span="12">
+                                <i-button type="primary" size="large" long @click="add_component" :loading="modal_loading">保存</i-button>
+                            </i-col>
+                        </Row>
+                    </div>
+                </Modal>
+                <!--弹窗end-->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var cookieValue = null;
+        (function() {
+            var name = 'csrftoken';
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = $.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+        })()
+
+        //获取当前域名
+        Vue.prototype.$location = window.location.origin;
+
+
+        /**
+         * @module 加载级联第二级数据
+         * @params item 当前行数据
+         * @params callback 加载完数据之后执行的iview自带的回调函数
+         */
+        Vue.prototype.$loadData = function(item, callback) {
+            item.loading = true;
+            var id = item.id;
+            $.ajax({
+                url: '/task/pbstatuss/?pbtype__major=&pbtype=' + id,
+                type: 'get',
+                success: function(res) {
+                    var result = res.results;
+                    if (result.length != 0) {
+                        result.forEach(value => {
+                            item.children.push({
+                                value: value.statusname,
+                                label: value.statusname,
+                                id: value.id
+                            })
+                        })
+
+                    } else {
+                        item.children.push({
+                            value: "暂无数据",
+                            label: "暂无数据"
+                        })
+                    }
+                    callback();
+                    item.loading = false;
+                }
+            });
+        }
+
+        /**
+         * @module 编辑修改数据ajax
+         * @params id 数据的id
+         * @params data 提交的数据参数
+         * @params callback 提交成功的回调函数
+         */
+        Vue.prototype.$ajax = function(id, data, callback) {
+            $.ajax({
+                url: '/task/acceptancereminds/' + id + '/',
+                type: 'put',
+                headers: {
+                    'X-CSRFTOKEN': cookieValue,
+                },
+                data: data,
+                success: function() {
+                    callback();
+                }
+            })
+        }
+
+        /**
+         * @module 获取验收类型提交时候对应的id链接
+         * @params array 所有验收类型的集合数组
+         * @params value 当前选择的验收类型
+         * @params obj 赋值给上传数据的对象
+         * @params location 当前域名
+         */
+        Vue.prototype.$acceptType = function(array, value, obj, location) {
+            array.forEach((val, index) => { //提交验收类型数据
+                if (val.value == value) {
+                    obj.acceptancetypename = value;
+                    obj.acceptancetype = location + '/task/acceptancetypes/' + val.id + '/';
+                }
+            })
+        }
+
+        /**
+         * @module 获取触发状态提交时候对应的id链接
+         * @params array 所有触发状态的第一级联集合数组
+         * @params value 当前选择的触发状态
+         * @params obj 赋值给上传数据的对象
+         * @params location 当前域名
+         */
+        Vue.prototype.$pbstatus = function(array, pbtypename, pbstatusname, obj, location) {
+                array.forEach((value, index) => { //提交pbstatus
+                    if (value.value == pbtypename) {
+                        value.children.forEach(val => {
+                            if (val.value == pbstatusname) {
+                                obj.pbstatus = location + '/task/pbstatuss/' + val.id + '/';
+                            }
+                        })
+                    }
+                })
+            }
+            //输入框组件
+        var inputText = {
+                template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="editing" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-input  v-model="currentValue" ref="pip"/>
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div> 
+                </div>
+            `,
+                data() {
+                    return {
+                        edit: false,
+                        currentValue: '',
+                    }
+                },
+                props: ['value', 'dataAll', 'type'],
+                methods: {
+                    editing() {
+                        this.edit = true;
+                    },
+                    perserve() {
+                        var obj = this.dataAll,
+                            that = this,
+                            val = this.currentValue;
+
+                        var reg = /^[0-9]+.?[0-9]*$/;
+
+                        if (this.type = "time_span") {
+                            if (!reg.test(val)) {
+                                this.$Message.error('时间间隔必须为数字值');
+                                return false;
+                            }
+                        }
+
+                        obj.time_span = val;
+                        this.$ajax(this.dataAll.id, obj, function() {
+                            that.edit = false;
+                            that.$Message.success('修改成功');
+                            that.$nextTick(() => {
+                                that.$emit('input', obj);
+                                that.$slots.default[0].elm.innerText = val;
+                            })
+                        })
+
+                    },
+                    cancel() {
+                        this.currentValue = this.value;
+                        this.edit = false;
+                    }
+                },
+                mounted() {
+                    this.currentValue = this.value;
+                }
+            }
+            //下拉单选组件
+        var sele = {
+            template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="edit=true" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-select v-model="value" @updata:value="val=>value=val">
+                        <i-option v-for="item,index in list" :key="index" :value="item.value">{{ item.value }}</i-option>
+                    </i-select>
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    edit: false,
+                    value: ''
+                }
+            },
+            props: {
+                list: {
+                    type: Array,
+                    default: function() {
+                        return []
+                    }
+                },
+                data: {
+                    type: String
+                },
+                valueAll: {
+                    type: Object,
+                    default: function() {
+                        return {};
+                    }
+                },
+            },
+            methods: {
+                perserve() {
+                    var obj = this.valueAll,
+                        location = this.$location,
+                        value = this.value,
+                        that = this;
+
+                    this.$acceptType(this.list, value, obj, location); //提交验收类型数据
+
+                    this.$ajax(obj.id, obj, function() {
+                        that.edit = false;
+                        that.$Message.success('修改成功');
+                        that.$nextTick(() => {
+                            that.$emit('input', obj);
+                            that.$slots.default[0].elm.innerText = value;
+                        })
+
+                    })
+                },
+                cancel() {
+                    this.value = this.data;
+                    this.edit = false;
+                }
+            },
+            created() {
+                this.value = this.data;
+            }
+        }
+
+        //级联组件
+        var cascader = {
+            template: `
+                    <Tooltip content="单击编辑" v-if="!edit" @click.native="editClick" placement="top">
+                        <span class="m-span">
+                            <slot></slot>
+                        </span>
+                    </Tooltip>
+                    <div  v-else-if="true" >
+                        <Cascader 
+                            :data="data" 
+                            v-model="value" @updata:value="val=>value=val"
+                            :render-format="label => label.join('-')"
+                            :load-data="loadData"
+                            >
+                        </Cascader>
+                        <div class="perserveData">
+                            <div @click="perserve">
+                                <Button type="text" icon="checkmark-round"></Button>
+                            </div>
+                            <div @click="cancel">
+                                <Button type="text" icon="close-round"></Button>
+                            </div>  
+                        </div>
+                    </div>
+                    
+            `,
+            data() {
+                return {
+                    edit: false,
+                    value: [],
+                }
+            },
+            props: {
+                data: {
+                    type: Array,
+                    default: function() {
+                        return [];
+                    }
+                },
+                pro: {
+                    default: {}
+                }
+            },
+            methods: {
+                loadData(item, callback) {
+                    this.$loadData(item, callback);
+                },
+                editClick() {
+                    this.edit = true;
+                    this.$emit('showPerserve');
+                },
+                cancel() {
+                    this.value = [];
+                    this.edit = false;
+                },
+                perserve() {
+                    var pbtypename = this.value[0],
+                        pbstatusname = this.value[1],
+                        that = this,
+                        dataAll = this.pro,
+                        acceptancetypename = dataAll.acceptancetypename,
+                        acceptancetype = dataAll.acceptancetype,
+                        location = this.$location;
+
+                    if (this.value[0] == undefined) {
+                        this.$Message.error('请完整填写触发状态');
+                        return false;
+                    }
+                    if (this.value[1] == "暂无数据") {
+                        this.$Message.error('请完整填写触发状态');
+                        return false;
+                    }
+
+                    var data = {
+                        pbtypename,
+                        time_span: dataAll.time_span,
+                        acceptancetype,
+                        pbstatusname: pbstatusname,
+                    };
+
+
+                    this.$pbstatus(this.data, pbtypename, pbstatusname, data, location);
+
+                    this.$ajax(dataAll.id, data, function() {
+                        that.edit = false;
+                        that.$Message.success('修改成功');
+                        that.$nextTick(() => {
+                            that.$emit('input', data);
+                            that.$slots.default[0].elm.innerText = that.value.join('-');
+                        })
+
+                    })
+                }
+            },
+        }
+
+        //删除组件
+        var operation = {
+            template: `
+                <div>
+                    <Poptip confirm title="您确认删除这条内容吗？" @on-ok="ok" placement="left-start" :transfer="true">
+                        <Button type="error">删除</Button>
+                    </Poptip>
+                </div>
+            `,
+            methods: {
+                ok() {
+                    this.$emit('del');
+                },
+            }
+        }
+
+        var app = new Vue({
+            el: '#container',
+            data: {
+                columns: [{
+                    title: '触发状态',
+                    key: 'trigger_condition',
+                    render(h, params) {
+
+                        var allData = app.data[params.index].value,
+                            res = allData.pbtypename + '-' + allData.pbstatusname;
+
+                        var props = {
+                            data: app.cascaderArray, //级联第一级数据
+                            pro: allData, //当前行的数据
+                        };
+                        return h('div', {}, [
+                            h(cascader, {
+                                props: props,
+                                on: {
+                                    'input': function(value) {
+                                        allData.pbstatus = value.pbstatus;
+                                        allData.pbtypename = value.pbtypename;
+                                        allData.pbstatusname = value.pbstatusname;
+                                    }
+                                }
+                            }, [
+                                h('p', res)
+                            ]),
+                        ])
+                    }
+                }, {
+                    title: '验收类型',
+                    key: 'accept_type',
+                    render(h, params) {
+                        var allData = app.data[params.index].value,
+                            result = allData.acceptancetypename;
+                        return h(sele, {
+                            props: {
+                                list: app.selectArray,
+                                data: result,
+                                valueAll: allData,
+                            },
+                            on: {
+                                input(value) {
+                                    allData.acceptancetypename = value.acceptancetypename;
+                                    allData.acceptancetype = value.acceptancetype;
+                                }
+                            }
+                        }, [
+                            h('p', result)
+                        ])
+                    },
+                }, {
+                    title: '时间间隔',
+                    key: 'time_interval',
+                    render(h, params) {
+                        var result = app.data[params.index].value,
+                            time_span = result.time_span;
+                        return h(inputText, {
+                            props: {
+                                value: time_span,
+                                dataAll: result,
+                                type: 'time_span'
+                            },
+                            on: {
+                                input(value) {
+                                    result.time_span = value.time_span;
+                                }
+                            }
+                        }, [
+                            h('p', time_span)
+                        ])
+
+                    },
+                }, {
+                    title: '操作',
+                    key: 'action',
+                    width: 100,
+                    align: 'center',
+                    render(h, params) {
+                        return h(operation, {
+                            on: {
+                                del: function(index) {
+                                    app.del(params.index);
+                                }
+                            }
+                        })
+
+                    }
+                }],
+                data: [],
+                count: 0, //数据总数量
+                page_one_count: 15, //单页数据数量
+                page: 1,
+                current: 1, //页码当前第几页
+                spinShow: true,
+                modal: false, //添加弹窗显示是否
+                modal_loading: false, //添加构件按钮的动画显示是否
+                formValidate: {
+                    cascader: [],
+                    acceptancetype: '',
+                    time_span: ''
+                },
+                ruleValidate: {
+                    cascader: [{
+                        required: true,
+                        message: '触发状态不能为空'
+                    }, {
+                        validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (value[0] == undefined) {
+                                callback('请完整填写触发状态....');
+                            } else if (value[1] == "暂无数据") {
+                                callback('请完整填写触发状态....');
+                            }
+                            callback(errors);
+                        }
+                    }],
+                    acceptancetype: [{
+                        required: true,
+                        message: '验收类型不能为空',
+                        trigger: 'change'
+                    }],
+                    time_span: [{
+                        required: true,
+                        message: '时间间隔不能为空',
+                        trigger: 'blur'
+                    }, {
+                        validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (!/^[0-9]+$/.test(value)) {
+
+                                callback('时间间隔必须为数字值....');
+                            }
+
+                            callback(errors);
+                        }
+                    }]
+                },
+                selectArray: [],
+                cascaderArray: [], //级联数据
+            },
+            created() {
+                var that = this;
+                this.getPageData();
+                $.ajax({
+                    url: '/task/acceptancetypes/',
+                    type: 'get',
+                    success: function(res) {
+                        var result = res.results;
+                        result.forEach(val => {
+                            that.selectArray.push({
+                                value: val.name,
+                                id: val.id
+                            });
+                        })
+                    }
+                });
+
+
+                $.ajax({
+                    url: '/task/pbtypes/?isAll=true&perPage=1000',
+                    type: 'get',
+                    success: function(res) {
+                        var result = res.results;
+                        if (result.length != 0) {
+                            result.forEach((val, index) => {
+                                that.cascaderArray.push({
+                                    value: val.name,
+                                    label: val.name,
+                                    id: val.id,
+                                    children: [],
+                                    loading: false,
+                                    index: index
+                                })
+                            })
+                        }
+                    }
+                })
+            },
+            methods: {
+                changeStatus() {
+                    this.$refs.formValidate.resetFields();
+                },
+                updata_value() { //添加质量窗口
+                    this.modal = true;
+                },
+                changeData(page) { //点击不同页码，切换数据
+                    this.page = page;
+                    this.getPageData(page);
+                },
+                loadData(item, callback) {
+                    this.$loadData(item, callback);
+                },
+                del(index) { //删除某行数据
+                    var id = this.data[index].value.id,
+                        that = this;
+
+                    $.ajax({
+                        url: '/task/acceptancereminds/' + id + '/',
+                        type: 'delete',
+                        headers: {
+                            'X-CSRFTOKEN': cookieValue,
+                        },
+                        success: function(res) {
+                            that.count--;
+                            that.data.splice(index, 1);
+                            that.$Message.success('删除成功');
+                        }
+                    })
+                },
+                add(status) {
+                    var that = this;
+                    this.$refs.formValidate.validate((valid) => {
+                        if (valid) {
+                            that.modal_loading = true;
+                            var formValidate = that.formValidate,
+                                pbtypename = formValidate.cascader[0],
+                                pbstatusname = formValidate.cascader[1];
+
+                            var data = {
+                                pbtypename,
+                                pbstatusname,
+                                time_span: formValidate.time_span
+                            };
+
+                            that.$acceptType(this.selectArray, formValidate.acceptancetype, data, this.$location); //获取验收类型提交数据的id链接
+
+                            that.$pbstatus(this.cascaderArray, pbtypename, pbstatusname, data, this.$location); //获取pbstatus提交数据的id链接
+
+                            $.ajax({
+                                type: 'post',
+                                url: '/task/acceptancereminds/',
+                                data,
+                                headers: {
+                                    'X-CSRFTOKEN': cookieValue,
+                                },
+                                success: function(res) {
+                                    that.modal = status;
+                                    that.modal_loading = false;
+                                    that.$Message.success('添加成功');
+                                    that.$refs.formValidate.resetFields();
+                                    if (!that.modal) {
+                                        that.getPageData();
+                                    } else {
+                                        that.data.push({
+                                            value: res
+                                        });
+                                        that.count++;
+                                    }
+                                },
+                            })
+                        }
+                    })
+                },
+                add_component() { //添加质量验收
+                    this.add(false);
+                },
+                add_still() { //持续添加质量验收
+                    this.add(true);
+                },
+                //@ params page 页数
+                getPageData(page) { //请求质量数据
+                    this.spinShow = true;
+                    var page = page || 1,
+                        that = this;
+                    $.ajax({
+                        url: '/task/acceptancereminds/?page=' + page,
+                        type: 'get',
+                        success: function(res) {
+                            that.count = res.count;
+                            that.data = [];
+                            var result = res.results;
+                            if (result.length != 0) {
+                                result.forEach(value => {
+                                    that.data.push({
+                                        value: value
+                                    })
+                                })
+                            }
+                            that.spinShow = false;
+                        }
+                    })
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

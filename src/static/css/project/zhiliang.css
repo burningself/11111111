@@ -1,0 +1,50 @@
+body{overflow:hidden;}
+td{text-align:center;vertical-align:middle;}
+
+	#viewerContent {
+		width: calc(100% - 480px);
+		height: calc(100vh - 90px);
+		display: inline-block;
+		border: solid 1px#ddd;
+		color:white;
+	}
+	
+	#viewer {
+		padding:0;
+		width: 100%;
+		height: calc(100vh - 135px);
+	}
+
+.panel-group {padding:5px 10px;}
+.panel-group .panel{border:none;}
+.panel-group .panel-heading{background: #337AB7; color:white; font-weight:bold;}
+.panel-group .panel-heading .caret {float:none!important; margin-left:10px; }
+.panel-group .panel-body{background: white; padding:5px 5px; text-align:left; }
+
+.more{font-size:10px; font-weight:normal; position:absolute; text-decoration:underline;right:20px;}
+
+
+
+.newIssue{position:fixed; bottom:150px; right:60px;
+	height:80px; width:80px; border-radius: 50px;
+	background:#a94442; color:white; font-weight:bold; font-size:22px;outline:none;
+}
+
+.newIssue:active{border:none;}
+
+footer{display:none;}
+
+.row{width:100%; margin:2px 0.1% 0 0.1%; padding: 0 0px 0 0px; border-radius:5px; display:inline-block; background: white; min-height:600px;}
+.header-row{width:100%; margin:5px 0 5px 5px; padding-left: 5px;text-align:left;font-size: 18px;font-weight:bold;color: #2e6da4;}
+.header-row h3{font-weight:bold; margin-bottom:10px; text-align:center; width:100%; }
+.content-row{ 
+}
+
+
+.nav_tool{display: none;}
+
+.cebiangundong{height:calc(50vh - 120px); overflow:auto;}
+
+.issuetable, .yanshoutable{font-size: 0.8em;}
+.issuetable>tbody>tr>td{padding: 8px 0px;}
+.yanshoutable>tbody>tr>td{padding: 8px 0px;}

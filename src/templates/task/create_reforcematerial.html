@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+   <ul class="breadcrumb">
+            <li><a href="index.html">材料管理</a> <span class="divider">/</span></li>
+            <li class="active">录入钢筋材料</li>
+        </ul>
+
+        <div class="container-fluid"  >
+            <div class="row-fluid">
+                
+<div class="well">
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane active in" id="home">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+    <form id="tab" action="" method="POST"> {% csrf_token %}
+		<table border="0" cellpadding="0" cellspacing="0" style="width:100%">
+		<TR>
+			<TD width="100%">
+				<fieldset style="height:100%;">
+					  <table border="0" cellpadding="2" cellspacing="1" style="width:100%">
+					 
+					  <tr>
+					    <td nowrap align="left" width="10%">批次号：</td>
+					    <td width="40%">
+							<input type="text" class="input-xlarge" name="number" value="{{number}}">
+						</td>
+					    <td align="left" width="10%">等级：</td>
+						<td width="40%">
+							{{ form.grade.errors }}
+							{{ form.grade }}
+						</td>
+					    </tr>
+
+					   <tr>
+					    <td nowrap align="left">质保书：</td>
+					    <td>
+							{{ form.qualityguarantee.errors }}
+							{{ form.qualityguarantee }}
+						</td>
+					    <td align="left">检验证书：</td>
+					    <td>
+							{{ form.checkreport.errors }}
+							{{ form.checkreport }}
+						</td>
+					  </tr>
+					  <tr>
+					    <td nowrap align="left">直径：</td>
+					    <td>
+							{{ form.diameter.errors }}
+							<input type="text" class="input-xlarge" name="diameter" value="{{diameter}}">
+						</td>
+					    <td align="left">入库时间：</td>
+					    <td>
+							{{ form.faketime.errors }}
+							<div class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+							<input class="input-xlarge" type="text"  value="{{faketime|date:"Y-m-d"}}" name="faketime">
+							<span class="add-on"><i class="icon-remove"></i></span>
+							<span class="add-on"><i class="icon-th"></i></span>
+							</div>
+						</td>
+					  </tr>
+		
+					  </table>
+				</fieldset>		
+				</TD>
+		</TR>
+		
+		</TABLE>
+		
+  
+      </div>
+  </div>
+
+</div>
+
+<div class="btn-toolbar" align="right">
+    <button type="submit" class="btn btn-primary" ><i class="icon-save"></i> 保存</button>
+    <a href="/task/reforcematerial/list/" class="btn">返回</a>
+  <div class="btn-group">
+  </div>
+</div>
+  </form>
+		
+		
+		
+				
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        body{  position: absolute;  top:0px;  left:0px;  right:0px;  bottom: 0px;  }
+        .content{  width:800px;  min-width: 900px;  margin: 30px auto;  padding: 20px;  background-color: #fff;  border-radius: 5px;  }
+        .header{  font-size: 20px;  font-weight: 600;  display: inline-block;  }
+        .mark{  color: #7D4A10;  margin: 20px auto;  height: 50px;  line-height: 50px;  background-color: #FFFAE2;  border-radius: 5px;  border:1px solid #FBDF80;  padding: 0px 15px;  }
+        .down{  float: right;  margin-top: 8px;  }
+        .back{  margin: 9px;  float: right;  }
+        .error{  color: #ed3f14;  }
+        .dis{  display: none;  }
+        .mar{  margin-top: 30px;  }
+        .line{  margin: 20px;  height: 1px;border: 1px solid #EFF0F2;  }
+    </style>
+</head>
+<body>
+    <div id="guide">
+        <card class="content">
+            <p class="header">批量导入</p><a class="back" type="info" href="javascript:history.go(-1);location.reload()">关闭窗口</a>
+            <p class="line"></p>
+            <div style="margin: 20px">
+                <div class="mark">导入说明：请先下载模板 <i-button class="down"><a href="/doctemplate/用户导入模板.xlsx" download="">下载用户导入模板</a></i-button></div>
+                <upload
+                        ref="upload"
+                        :show-upload-list="false"
+                        :format="['xlsx']"
+                        name="Filedata"
+                        :on-success="handleSuccess"
+                        type="drag"
+                        action="/importusersfile/" style="margin: 0 auto;">
+                    <div style="padding:38px 0;">
+                        <icon type="ios-cloud-upload" size="52" style="color: #3399ff"></icon>
+                        <p>将文件拖拽至此，或点击上传</p>
+                    </div>
+                </upload>
+                <alert show-icon class="mar" :class="{dis:isTrue}">总上传 [[total]] 条</alert>
+                <alert type="success" show-icon :class="{dis:isTrue}">上传成功 [[suctotal]] 条</alert>
+                <alert type="warning" show-icon :class="{dis:isTrue}">上传失败 [[erro]] 条</alert>
+                <alert type="error" show-icon :class="{dis:isTable}">失败列表</alert>
+                <i-table :columns="columns1" :class="{dis:isTable}" :data="dataError"></i-table>
+            </div>
+        </card>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:'#guide',
+        delimiters:['[[',']]'],
+        data () {
+          return {
+              columns1: [
+                  {
+                      title: '用户名',
+                      key: 'username'
+                  },
+                  {
+                      title: '实际姓名',
+                      key: 'truename'
+                  },
+                  {
+                      title: '联系方式',
+                      key: 'contract'
+                  },
+                  {
+                      title: '所属企业',
+                      key: 'company'
+                  },
+                  {
+                      title: '专业',
+                      key: 'major'
+                  },
+                  {
+                      title:'角色',
+                      key:'roles'
+                  },
+                  {
+                      title:'初始密码',
+                      key:'password'
+                  },
+                  {
+                      title:'错误内容',
+                      key:'error',
+                      className:'error',
+                      width:'150',
+                      align:'center'
+                  }
+              ],
+              dataError:[],
+              isTrue:true,
+              total:0,
+              suctotal:0,
+              erro:0,
+              isTable:true
+          }
+        },
+        methods:{
+            handleSuccess (  response) {
+                console.log( response  )
+                if( response.issuc == true ){
+                    if( response.faillist.length != 0 ){
+                        this.isTrue = false;
+                        this.isTable = false;
+                        this.total = response.total;
+                        this.suctotal = response.suctotal;
+                        this.erro = response.faillist.length;
+                        this.dataError = response.faillist;
+                    }else {
+                        this.isTrue = false;
+                        this.total = response.total;
+                        this.suctotal = response.suctotal;
+                        this.erro = response.faillist.length;
+                        this.$Message.success('导入成功');
+                    }
+                }
+            }
+        }
+    })
+</script>
+</html>

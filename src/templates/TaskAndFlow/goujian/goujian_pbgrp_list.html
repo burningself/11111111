@@ -1,0 +1,166 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<script src="/js/commonopr.js" type="text/javascript"></script>
+<script src="/js/common/goujian.js" type="text/javascript"></script>
+<link href="/css/project/goujian.css" media="all" rel="stylesheet" type="text/css" /> {% endblock %} {% block content %}
+
+<div>
+	<div class="header-v2">
+		<div class="header-bg-v2">
+			<span class="title-v2">构件分组</span>
+			<a href="javascript:PrintPbQrcode();"><i class="profont pro-font-ccgl-dayinliebiao-3 pointer font18 margin_left15"></i></a>
+			<form class="pull-right" id="tab" action="" method="get"> {% csrf_token %}
+				<label>分组编号：</label>
+				<input style="margin-right: 15px;" type="text" name="grpnumber" maxlength="20" class="c-form" value="{{grpnumber}}">
+				<label>分组名称：</label>
+				<input style="margin-right: 15px;" type="text" name="grpname" maxlength="20" class="c-form" value="{{grpname}}">
+				<label>类别：</label>
+				<select name="gtype" class="c-form" style="margin-right: 15px;">
+					<option value="0" selected>全部</option>
+					{% for type in typeList %}
+					{% ifequal type.id gtype %}
+					<option value="{{type.id}}" selected>{{type.name}}</option>
+					{% else %}
+					<option value="{{type.id}}">{{type.name}}</option>
+					{% endifequal %}
+					{% endfor %}
+				</select>
+				<button type="submit" class="display-inline-block" style="background-color: transparent;border: 0px;"><i class="profont pro-font-chaxun font22"></i></button>
+			</form>
+		</div>
+	</div>
+	<div>
+		<table class="table table-bordered table-striped " id="dataTables-example">
+			<thead>
+				<tr>
+					<th id="number">分组编号<span class="pull-right" id="span_id"><img src="/images/sort_both.png"></span></th>
+					<th id="name">分组名称<span class="pull-right" id="span_name"><img src="/images/sort_both.png"></span></th>
+					<th id="pbtype">类别<span class="pull-right" id="span_pbtype"><img src="/images/sort_both.png"></span></th>
+					<th id="curstatus">当前状态<span class="pull-right" id="span_curstatus"><img src="/images/sort_both.png"></span></th>
+					<th id="zone">所属分区<span class="pull-right" id="span_zone"><img src="/images/sort_both.png"></span></th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% ifequal listcount 0 %}
+				<tr>
+					<td colspan="5">
+						<h3>没有相关记录！</h3></td>
+				</tr>
+				{% endifequal %} 
+				{% for item in list_items %}
+				<tr>
+					<td>{{item.number}}</td>
+					<td>{{item.name}}</td>
+					<td>{% ifequal item.pbtype None %} 未知 {% else %}{{item.pbtype}}{% endifequal %}</td>
+					<td>{% ifequal item.curstatus None %} 没有记录 {% else %}{{item.curstatus.statusname}}{% endifequal %}</td>
+					<td>{% ifequal item.zone None %} 没有记录 {% else %}{{item.zone.name}}{% endifequal %}</td>
+					<td>
+						<a href="/task/goujian/?pbgrp={{item.id}}" title="查看分组详细" style="cursor: pointer;" target="_blank">[查看详情]</a>
+						<!--<a href="javascript:deleteGroup({{item.id}})" title="删除分组" style="cursor: pointer;">[删除分组]</a>-->
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	
+	<div class="widget-content padded text-center" style="text-align: center;">
+		<ul class="pagination pagination-lg">
+			<li>
+				<a onclick="FunChangePage(1)">首页</a>
+			</li>
+			{% if list_items.has_previous %}
+			<li>
+				<a onclick="FunChangePage({{ list_items.previous_page_number }})">前一页</a>
+			</li>
+			{% endif %}
+			<li>
+				<a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a>
+			</li>
+			<li>
+				<a>
+					<input id="pageJump" style="width:30px;border:0; font-size: 16px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+				</a>
+				<a id="jumpBTN">
+					跳转
+				</a>
+			</li>
+			{% if list_items.has_next %}
+			<li>
+				<a onclick="FunChangePage({{ list_items.next_page_number }})">下一页</a>
+			</li>
+			{% endif %}
+			<li>
+				<a onclick="FunChangePage({{paginator.num_pages}})">尾页</a>
+			</li>
+
+		</ul>
+	</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		var id = "#span_{{orderby}}";
+		if({{clickcount}} == 0) {
+			$(id).html('<img src="/images/sort_desc.png">')
+		} else {
+			$(id).html('<img src="/images/sort_asc.png">')
+		}
+
+		$("#dataTables-example th").click(function() {
+			var curOrder = $(this).attr("id");
+			if(curOrder != undefined) {
+				if("{{orderby}}" != curOrder) {
+					clickcount = 0;
+				} else {
+					clickcount = ({{clickcount}} + 1) % 2
+				}
+
+				window.location.href = "?page=1&grpnumber={{grpnumber}}&grpname={{grpname}}&gtype={{gtype}}&orderby=" + curOrder + "&clickcount=" + clickcount;
+			}
+		});
+
+
+	});
+	
+	function PrintPbGrpQrcode()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+
+		if(window.ActiveXObject)
+		{ //IE  
+			var dlgResult = window.showModalDialog("/task/goujian/grpqrcode/?grpnumber={{grpnumber}}&grpname={{grpname}}&gtype={{gtype}}", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		}
+		else
+		{  //非IE  
+			window.open("/task/goujian/grpqrcode/?grpnumber={{grpnumber}}&grpname={{grpname}}&gtype={{gtype}}", 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+		} 	
+		
+	}
+
+	$('#pageJump').bind('input propertychange', function() {
+		var tgtPage = $('#pageJump').val();
+		if(tgtPage) {
+			$("#jumpBTN").attr("onclick", "FunChangePage(" + tgtPage + ")");
+		}
+	});
+
+
+	function FunChangePage(page) {
+		var oldpbnumber = $('<div/>').text('{{grpnumber}}').html();
+		var pbnumber = oldpbnumber.replace("#", "%23");
+		var href = "?page=" + page + "&grpnumber=" + pbnumber + "&grpname={{grpname}}&gtype={{gtype}}&orderby={{orderby}}&clickcount={{clickcount}}";
+
+		window.location.href = href;
+	}
+	
+	
+</script>
+
+</div>
+
+{% endblock %}

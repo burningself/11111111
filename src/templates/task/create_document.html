@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+   <ul class="breadcrumb">
+            <li><a href="index.html">材料管理</a> <span class="divider">/</span></li>
+            <li class="active">添加文档</li>
+        </ul>
+
+        <div class="container-fluid"  >
+            <div class="row-fluid">
+                
+<div class="well">
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane active in" id="home">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+    <form id="tab" action="" method="POST"> {% csrf_token %}
+		<table border="0" cellpadding="0" cellspacing="0" style="width:100%">
+		<TR>
+			<TD width="100%">
+				<fieldset style="height:100%;">
+					  <table border="0" cellpadding="2" cellspacing="1" style="width:100%">
+					 
+					  <tr>
+					    <td nowrap align="left" width="10%">名称：</td>
+					    <td width="40%">
+							<input type="text" class="input-xlarge" name="name" value="{{name}}">
+						</td>
+					    <td align="left" width="10%">类型：</td>
+						<td width="40%">
+							{{ form.type.errors }}
+							{{ form.type }}
+						</td>
+					    </tr>
+
+					   <tr>
+					    <td nowrap align="left">对应文件：</td>
+					    <td>
+							{{ form.content.errors }}
+							{{ form.content }}
+						</td>
+					  </tr>
+		
+					  </table>
+				</fieldset>		
+				</TD>
+		</TR>
+		
+		</TABLE>
+		
+  
+      </div>
+  </div>
+
+</div>
+
+<div class="btn-toolbar" align="right">
+    <button type="submit" class="btn btn-primary" ><i class="icon-save"></i> 保存</button>
+	<a href="#" class="btn">保存并继续录入</a>
+    <a href="/task/concretematerial/list/" class="btn">返回</a>
+  <div class="btn-group">
+  </div>
+</div>
+  </form>
+		
+		
+		
+				
+        </div>
+    </div>
+{% endblock %}
+

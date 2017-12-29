@@ -1,0 +1,87 @@
+{% extends "base_mobile.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<style type="text/css">
+.row_data{background:white; padding:1px 0 1px 0; margin-top:20px; border-radius: 15px; color:#408CE9; font-weight:bold;}
+.title_row {text-align:center;}
+td{text-align:center;}
+</style>
+<div class="row_data">
+
+	<div class="title_row">
+		<h3><i class="fa fa-th">&nbsp</i> 堆场统计</h3>
+	</div>
+	<table class="table table-filters" align="center">
+		<tbody>
+		  <tr>
+		    <td class='col-xs-3'>
+		      	类型
+		    </td>
+		    <td class='col-xs-3'>
+		      	数量
+		    </td>
+		    <td class='col-xs-3'>
+		       	占用率
+		    </td>
+		    <td class='col-xs-3'>
+		       	堆场
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		      	立柱
+		    </td>
+		    <td>
+		      {{lizhu.num}}
+		    </td>
+		    <td>
+		      {{lizhu.rate}}
+		    </td>
+		    <td>
+		      {{lizhu.duichang}}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		      	盖梁
+		    </td>
+		    <td>
+		      {{gailiang.num}}
+		    </td>
+		    <td>
+		    	{{gailiang.rate}}
+		    </td>
+		    <td>
+		      {{gailiang.duichang}}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td>
+		      	承台
+		    </td>
+		    <td>
+		      {{chengtai.num}}
+		    </td>
+		    <td>
+		    	{{chengtai.rate}}
+		    </td>
+		    <td>
+		      {{chengtai.duichang}}
+		    </td>
+		  </tr>
+		  <tr> <td></td><td></td><td></td><td></td> </tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+$("td").each(function(){
+      if( $(this).text().indexOf("%")>0 && parseInt($(this).text().substr(0,$(this).text().indexOf("%")) ) > 85 ){
+      	$(this).css("color","red");
+      }
+      else if($(this).text().indexOf("%")>0 && parseInt($(this).text().substr(0,$(this).text().indexOf("%")) ) > 65){
+      	$(this).css("color","green");
+      }
+    });
+</script>
+{% endblock %}

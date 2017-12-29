@@ -1,0 +1,35 @@
+
+		
+.crEvent .widget-container {background:white; min-height:calc(100vh - 160px); margin-top:2px; padding:15px 0px 10px 0px;font-family: 微软雅黑;}
+.crEvent tr{width:100%}
+.crEvent .widget-container li{margin:10px 0 10px 0; text-align:center; display:block;}
+
+.crEvent .widget-container label{width:35%; text-align:right; line-height:20px; font-size:16px; font-weight:bold; margin-right:1%;}
+.crEvent .widget-container select, .widget-container input,.widget-container textarea{width:50%; text-align:left; line-height:20px; font-size:16px;}
+
+.crEvent .submitBtn{text-align:center;  height:40px;  font-size: 20px;  margin:20px auto 20px auto; border-radius:5px; border:none;}
+
+.crEvent .widget-container li a{font-size:30px;  margin:-5px -33px auto; position:absolute; }
+.crEvent #id_photoUrl{background-color: #ddd;}
+.crEvent .errorlist{height:20px; margin:10 auto; color: red;display: table-row;text-align: left;}
+.crEvent .errorlist li{height:20px; margin:10px auto; color: red; min-height:20px; display:list-item; width:150px;}
+
+.crEvent .res{ text-align:center;}
+.crEvent .res-fail{color: red;}
+.crEvent .res-success{color: dodgerblue;}
+
+
+.row-fluid{
+	background-color:white;
+	margin-top:2px;
+	margin-bottom:5%;
+	display:inline-block; 
+	border: 5px solid white;
+	#border-radius: 20px;
+	text-align:right;
+	min-height:calc(100vh - 160px); 
+}
+.row-fluid .input-group{ width:96%;margin-left:2%; margin-top:10px; }
+
+.row-fluid .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.row-fluid .input-group .fa { margin-right:2px; }

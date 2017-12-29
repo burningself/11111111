@@ -1,0 +1,126 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link href="/css/project/biaodan.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.config.biaodan.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.all.min.js"> </script>
+<!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+<!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/biaodanedit.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %} {% block content %}
+	<div class="header-v2">
+	 		<div class="header-bg-v2">
+				<span class="title-v2">表单</span>
+			</div>
+	</div>  
+	<div class="content-row">
+		<div class="col-lg-12 task-from form-inline" style="text-align: center;color:black;margin-top: 20px;">
+			<div class="form-group"  >
+				<label class="control-label" >表单名称：</label>
+				<input placeholder="输入表单名称" name="mname" id="mname" type="text" class="form-control" >
+			</div>
+		   <div class="form-group" style="margin-left: 20px;">
+				<label class="control-label"  >专业：</label>
+				<select id="major-s" class="major-s form-control" >
+				{% for temp in majorList %}
+				<option value="{{temp.id}}">{{temp.name}}</option>
+				{% endfor %}
+				</select>
+			</div>
+		   <div class="form-group" style="margin-left: 20px;">
+				<label class="control-label"  >类型：</label>
+				<select id="formtype-s" class="formtype-s form-control" >
+					{% for temp in formtypeList %}
+						<option value="{{temp.id}}">{{temp.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			
+			<button id="save" onclick="saveTable()" class="btn btn-danger" style="margin-left: 20px;">保存表单</button>
+		</div>
+
+
+	    <script id="editor" type="text/plain" style="width:1024px;height:500px;margin: auto;"></script>
+
+	</div>
+
+
+
+
+
+
+<script type="text/javascript">
+	$(function(){
+
+		mbId = GetQueryString('mbId');
+		bdId = GetQueryString('bdid');
+		glys = GetQueryString('glys');
+		kj = GetQueryString('kj');
+		step = GetQueryString('step');
+		rijidate= GetQueryString('rijidate');
+		readonly = GetQueryString('readonly');
+		if(readonly=="true"){
+			$("#save").css("display",'none');
+		}
+		biaodantype = GetQueryString('biaodantype');
+		
+		initUE();
+		ue.ready(function() {
+			console.log('ready');
+			if(!glys){
+				glys='[]'
+			}
+			if(mbId){
+				ShowTableById(mbId,glys,kj,"/assist/biaodanmuban/",readonly);
+			}
+		    else if(bdId){
+		    	ShowTableById(bdId,glys,kj,"/assist/biaodan/",readonly);
+		    	id = bdId;
+		    }
+		});
+		// setDisabled();
+	});
+	
+	function ShowTableById(id,glys,kj,ur,readonly){
+
+		var dat = {
+			"id":id,
+			'glys':decodeURI(glys),
+			'kj':kj,
+			'rijidate':rijidate,
+			'from':'createissue'
+		}
+		$.ajax({
+		  url:ur,
+		  data: dat,
+		  async: false,
+		  success: function(data){
+		  	var jdata = JSON.parse(data);
+		  	$("#mname").val(jdata.name);
+		  	$("#major-s").val(jdata.major);
+		  	$("#formtype-s").val(jdata.formtype);
+		  	$("#major-s").attr("disabled","disabled");
+			$("#formtype-s").attr("disabled","disabled");
+			setContent(jdata.content,step);
+			if(readonly=="true"){
+				$("#mname").attr("disabled","disabled");
+				setDisabled();
+			}
+	 	  }
+	//	  dataType: dataType
+		});
+	}
+    window.onresize = function(){
+        editWidth();
+    }
+    editWidth();
+    function editWidth(){
+		if(window.innerWidth <= 1390){
+			$(".header-v2").width( $("#editor").width() )
+		}else {
+			$(".header-v2").width("100%")
+		}
+	}
+</script>
+{% endblock %}

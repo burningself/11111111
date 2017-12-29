@@ -1,0 +1,99 @@
+th,td{ text-align:center;}
+    .time-week{list-style-type: none;padding: 10px;padding-bottom: 0px;margin-bottom: 0px;}
+    .time-day{list-style-type: none;padding: 10px;padding-bottom: 0px;margin-bottom: 0px;}
+    .time-week li {display: inline-block;    margin-top: 10px;}
+    .time-day li {display: inline-block;    margin-top: 10px;}
+    .row{width:98%; margin:20px 0 0 0; padding: 0; border-radius:15px; display:inline-block; color:#337ab7; }
+    .search-row {height:200px; text-align:center; background: #FDFDFD; vertical-align:middle; }
+    .search-row .widget-container{width:95%; display:inline-block;}
+    .search-row h3{width:20%; display: inline-block; font-weight:bold; max-height:100%; color:#007aff;}
+    .serarch-tab .form-group {display:inline-block; vertical-align:middle;}
+    #item-donut{height:150px; margin-top:-50px; width:170px;}
+    .serarch-tab .draw-group{width:10%; display:inline-block;}
+    .serarch-tab .search-group {width: 100%; text-align:left;}
+    .serarch-tab .search-group .search-item {vertical-align: middle; height:40px; width:30%; max-width:350px; display:inline-block;}
+    .serarch-tab .search-group .search-itemsingle{vertical-align: middle; height:40px; width:100%; max-width:700px; display:inline-block;}
+    .serarch-tab .col-md-1 {width:40%; padding:0; line-height:30px;}
+    .serarch-tab .col-md-3 { width: 60%; min-width:100px; max-width:300px;}
+    .serarch-tab .col-md-2 {width:20%; padding:0; line-height:40px;}
+    .serarch-tab .col-md-4 { width: 60%; min-width:100px; max-width:700px;}
+    .serarch-tab .btn-group {width: 10%; max-width:150px; text-align:left;height:40px;margin-bottom:0px;margin-left: 35px;}
+    .serarch-tab .btn-group .col-md-3{width: 100%; height:40px;}
+    .serarch-tab .btn-group .col-md-3 button{width:100px;}
+    .content-row{min-height:300px; background: #FDFDFD; padding-top:20px;}
+    .content-row .widget-container {width:95%; min-height:200px;}
+    .content-row .widget-container table {font-size:1.2em;}
+    .header-row {
+        margin: 0px 0 5px 5px;
+        padding-left: 5px;
+        text-align: left;
+        font-size: 18px;
+        font-weight: bold;
+        color: #2e6da4;
+    }
+    .table-striped{text-align: center;table-layout:fixed;}
+    .nav_tool{
+        display: none;
+    }
+    #muban{min-height: 400px;}
+    #biaodan{min-height: 400px;}
+    #deletehuiyiModal .modal-dialog{
+        width:300px;
+        height:200px;
+        margin-top:15%;
+    }
+    #huiyidetail .modal-dialog{
+        margin-top: 6%;
+    }
+    #common_show .modal-dialog{
+        margin-top:15%;
+    }
+    .search-diva{
+        height: 90px;width: 100%;margin-top: 2px; border-radius: 0px; padding-top: 10px;
+    }
+    .tishi{
+        color: #ca0404;
+    }
+    .prev:before{
+        content:"";
+    }
+    .zhoutimeselect{
+        /*width: 53.32%; */
+        /* position: absolute; */
+        z-index: 100;
+        background-color: #ffffff;
+        opacity: 1;
+        /* margin-top: 34px; */
+        /* margin-left: 27.6%; */
+        border-radius: 5px;
+        border: 1px solid #cccccc;
+    }
+    .zhoutimeselect:before{
+
+    }
+    input.labelauty + label{
+            padding: 2px;
+    }
+    input.labelauty + label > span.labelauty-unchecked-image{
+        display: none;
+    }
+    input.labelauty + label > span.labelauty-checked-image{
+        display: none;
+    }
+
+    input.labelauty + label > span.labelauty-unchecked-image + span.labelauty-unchecked, input.labelauty + label > span.labelauty-checked-image + span.labelauty-checked{
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-left: 0px;
+    }
+
+    .active{
+        display: block;
+    }
+    .unactive{
+        display: none;
+    }
+
+    .jFiler-item{
+        width:100%;
+    }

@@ -1,0 +1,68 @@
+{% extends "base_mobile.html" %}
+{% block content %}
+<label class="titleLabel"><i class="fa fa-cloud-download" ></i> 构件扫码查询</label>
+<button id="qidong" class="btn btn-info saomaBtn" > 点击开始扫码</button>
+
+<link href="/css/project/goujian_mobile.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/js/common/jweixin-1.0.0.js" type="text/javascript"></script>
+<script defer>
+	wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'scanQRCode',
+      ]
+	});
+	
+	wx.ready(function(){
+		document.querySelector('#qidong').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        keyword=res["resultStr"];
+		        $.ajax({
+					  type:"post",
+					  url:"/task/goujian/search/",
+					  cache:false,
+					  dataType:"json",
+					  data:{"keyword": keyword},
+					  success: function(data){
+					  	if(data.status=="Succeed"){
+					  		window.location.href=data.rePath;
+					  	}
+					  	else{
+					  		alert("没有匹配构件信息！");
+					  	}
+					  },
+					  error:function(data){
+					  	if(e.status==403){
+							alert("您没有权限追踪构件，请联系管理员！");
+						}else{
+							alert("服务器错误");
+						}	
+				      	return false;
+				      },
+				      complete:function(data){
+					  }
+				});
+		      }
+		    });
+		};
+	    
+  	});
+	
+	wx.error(function(res){
+		alert("授权失败！");
+	});
+
+	$(window).ready(function() {
+		$(".saomaBtn").css("top" ,(screen.height-$(".saomaBtn").height() )/4);
+	});
+</script>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %}
+<link href="/css/project/common_mobile.css?ver=2222" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %}
+	<div class="row-fluid">
+			<label class="titleLabel"><i class="fa fa-bookmark"></i> 会议信息 </label>
+	<div class="weui-form-preview">
+            <div class="weui-form-preview-hd">
+                <label class="weui-form-preview-label">会议名称</label>
+                <em class="weui-form-preview-value">{{meetitem.name}}</em>
+            </div>
+            <div class="weui-form-preview-bd">
+                <p>
+                    <label class="weui-form-preview-label">会议类型</label>
+                    <span class="weui-form-preview-value">{{meetitem.meetingtype.name}}</span>
+                </p>
+                 <p>
+                    <label class="weui-form-preview-label">会议室</label>
+                    <span class="weui-form-preview-value">{{meetitem.roomname}}</span>
+                </p>
+                <p>
+                    <label class="weui-form-preview-label">会议主题</label>
+                    <span class="weui-form-preview-value">{{meetitem.description}}</span>
+                </p>
+                <p>
+                    <label class="weui-form-preview-label">开始时间</label>
+                    <span class="weui-form-preview-value">{{meetitem.begin_time|date:"Y-m-d H:i:s"}}</span>
+                </p>
+                 <p>
+                    <label class="weui-form-preview-label">结束时间</label>
+                    <span class="weui-form-preview-value">{{meetitem.end_time|date:"Y-m-d H:i:s"}}</span>
+                </p>
+                 <p>
+                    <label class="weui-form-preview-label">参会人员</label>
+                    <span class="weui-form-preview-value">
+                    &nbsp;
+                     {% for useritem in meetingusers %}
+	 					{% ifequal useritem.isattend 0%}
+							<span style="color:blue">{{useritem.user.truename}}（未确认）&nbsp;</span>
+						{% endifequal %}
+						{% ifequal useritem.isattend 1%}
+							<span style="color:green">{{useritem.user.truename}}（参加）&nbsp;</span>
+						{% endifequal %}
+						{% ifequal useritem.isattend 2%}
+							<span style="color:red">{{useritem.user.truename}}（不参加）&nbsp;</span>
+						{% endifequal %}
+	                {% endfor %}
+                    </span>
+                </p>
+
+            </div>
+
+       </div>
+
+
+    <div id="dohuiyi" style="margin-top:10px;">
+	    <div  id="collapseExample">
+	        <input type="text" name="meetid" id="meetid" value="{{meet_id}}" style="display:none">
+	        <textarea class="form-control" style="width:90%;margin-left: 5%;" id="reason" rows="3" placeholder="输入不能参加原因(不超过50字)" ></textarea>
+	    </div>
+	    <div style="margin-bottom:10px;margin-top:10px;text-align: center;">
+	        <button type="button" id="attend" class="btn btn-success" style="margin-right:30px">我可以参加</button>
+	        <a class="btn btn-danger" id="noattend" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="collapseExample">
+	         	 我不能参加
+	        </a>
+	    </div>
+    </div>
+	</div>
+
+
+
+
+<script type="text/javascript">
+    window.alert = function(name){
+        var iframe = document.createElement("IFRAME");
+        iframe.style.display="none";
+        iframe.setAttribute("src", 'data:text/plain,');
+        document.documentElement.appendChild(iframe);
+        window.frames[0].window.alert(name);
+        iframe.parentNode.removeChild(iframe);
+    }
+    $(function(){
+        $("#attend").bind("click",function(){
+            $.ajax({
+                type:'get',
+                dataType:'json',
+                url:'/assist/managerattend/',
+                data:{
+                    meetid:$("#meetid").val(),
+                    reason:'',
+                    status:1
+                },
+                success:function(data){
+                    if(data.issuc){
+                        alert("提交成功");
+                        window.location.reload();
+                    }else{
+                        alert("提交失败请重试");
+                    }
+                },
+                error:function(data){}
+            });
+        });
+        $("#noattend").bind("click",function(){
+            var reason = $("#reason").val();
+            if(reason==null||reason==''){
+                alert("请输入缺席原因");
+                return ;
+            }
+            $.ajax({
+                type:'get',
+                dataType:'json',
+                url:'/assist/managerattend/',
+                data:{
+                    meetid:$("#meetid").val(),
+                    reason:reason,
+                    status:2
+                },
+                success:function(data){
+                    if(data.issuc){
+                        alert("提交成功");
+                        window.location.reload();
+                    }else{
+                        alert("提交失败请重试");
+                    }
+                },
+                error:function(data){}
+            });
+        });
+    });
+</script>
+
+{% endblock %}
+

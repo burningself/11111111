@@ -1,0 +1,683 @@
+
+	{% extends "base_v2.html" %}
+	{% block content %}
+	<link href="https://cdn.bootcss.com/iview/2.7.3/styles/iview.css" rel="stylesheet">
+	<link href="/css/project/introduce.css" media="all" rel="stylesheet" type="text/css" />
+	<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2">项目概述</span>
+        <a class="btn btn-danger pull-right" href="/task/notice/list/" style="margin-top: -7px;"><i class="fa fa-bullhorn"></i>发布公告</a>
+    </div>
+	</div>
+	<div id = "intro" class="introclass">
+		<template>
+			<row :gutter='16' style="height: 100%;margin:0px">
+				<i-col span="13" class="introleft" style="padding: 0px 10px 0px 0px">
+					<div class="lefttop">
+						<div v-if="usercanedit" style="width: 100%;background-color: #f4f4f4;padding-left: 10px;">
+							<i-input v-if="edtitle" height="40" class="edtitle edtitleclass" v-model="INTRO.obj.objtitle"></i-input>
+							<Tooltip content="单击编辑" placement="right" v-else class="edithover">
+		                        <p v-text="INTRO.obj.objtitle" @click="edtitle=true;INTRO.obj.backtitle = INTRO.obj.objtitle"></p>
+		                    </Tooltip>
+		                    <template v-if="edtitle">
+		                                <a href="javascript:void 0" style="color: #57a3f3" @click="edtitle = false;changetitle();"><Icon type="checkmark-round"></Icon></a>
+		                                <a href="javascript:void 0" style="color: rgba(208, 83, 85, 1)" @click="edtitle = false;INTRO.obj.objtitle = INTRO.obj.backtitle"><Icon type="close-round"></Icon></a>
+		                    </template>
+						</div>
+						<div class="noedittitle" v-else>
+							<p v-text="INTRO.obj.objtitle"></p>
+						</div>
+						<div style="height:calc(100% - 30px)" v-if="usercanedit">
+							<i-input v-if="edcontent" class="edcontent" type="textarea" v-model="INTRO.obj.objdes"></i-input>
+		                    <Tooltip content="单击编辑" placement="top" v-else  style="height:100%;padding-bottom: 10px;padding-top: 5px;overflow-y: auto;">
+		                        <p v-text="INTRO.obj.objdes" style="text-indent: 20px;cursor: pointer;" @click="edcontent=true;INTRO.obj.backdes = INTRO.obj.objdes"></p>
+		                    </Tooltip>
+		                    <template v-if="edcontent">
+		                    	 		<a href="javascript:void 0" style="color: rgba(208, 83, 85, 1);float: right;" @click="edcontent = false;INTRO.obj.objdes = INTRO.obj.backdes;"><Icon type="close-round"></Icon></a>
+		                                <a href="javascript:void 0" style="color: #57a3f3;float: right;margin-right: 10px;" @click="edcontent = false;changetitle();"><Icon type="checkmark-round"></Icon></a>
+		                               
+		                    </template>
+						</div>
+						<div v-else style="height:100%;padding-bottom: 20px;">
+							<p v-text="INTRO.obj.objdes" style="text-indent: 20px;"></p>
+						</div>
+						
+	                    
+					</div>
+					<div id="leftbottom" class="leftbottom">
+						
+					</div>
+					
+				</i-col>
+
+				<i-col span="11" class="introright">
+					<div class="righttop" v-if="usercanedit">
+						<div style="height: 40px;line-height: 40px;background-color:#fff;" class="introlist">
+								<i-input v-if="rightedtop" class="rightedtitle" v-model="INTRO.obj.objdet" style="width: 30%"></i-input>
+								<Tooltip content="单击编辑" placement="right" v-else style="font-weight: 700;">
+			                        <span v-text="INTRO.obj.objdet" @click="rightedtop = true;INTRO.obj.backdet = INTRO.obj.objdet;"></span>
+			                    </Tooltip>
+			                    <template v-if="rightedtop">
+		                                <a href="javascript:void 0" style="color: #57a3f3" @click="rightedtop = false;changetitle();"><Icon type="checkmark-round"></Icon></a>
+		                                <a href="javascript:void 0" style="color: rgba(208, 83, 85, 1)" @click="rightedtop = false;INTRO.obj.objdet = INTRO.obj.backdet;"><Icon type="close-round"></Icon></a>
+		                    </template>
+		                    <i-button type="text" v-if="!usercansort" class="addit" @click="usercansort = true;hideall()">点击排序</i-button>
+		                    <i-button type="text" v-else class="addit" @click="usercansort = false;">锁定排序</i-button>
+						</div>
+						<!-- <draggable v-model="INTRO.objlist" @end="e=>{sortEnd(e,INTRO.objlist)}" :options="{filter:'.ivu-poptip-popper,.ivu-color-picker-picker'}"> -->
+
+						<!-- <transition-group tag="ul" class="infolist"> -->
+							<draggable v-show="usercansort" v-model="INTRO.objlist" @end="e=>{sortEnd(e,INTRO.objlist)}" :options="{filter:'.ivu-poptip-popper,.ivu-color-picker-picker'}">
+								<transition-group tag="ul" class="infolist">
+									<li v-for="i,index in INTRO.objlist" class="introlist" :key="index">
+										<span v-text="index + 1" style="color: #d9534f;display: inline-block;width: 20px;"></span>
+										<span v-text="i.name" style="width: 28%;" class="usercaneditclass"></span>
+										<span v-text="i.objdis" class="usercaneditclass" style="max-width: 60%;"></span>
+									</li>
+								</transition-group>
+							</draggable>
+
+							<ul class="infolist infolistshow" v-show="usercansort != true">
+							<li v-for="i,index in INTRO.objlist" class="introlist">
+			                        
+			                        <span style="display: inline-block;width: 28%;vertical-align: top;height: 100%;">
+					                    <i-input v-if="i.edconleft" class="edconleft" v-model="i.name" style="width: calc(100% - 40px);display: inline-block;" ref="keyleft"></i-input>
+										<Tooltip content="单击编辑" placement="top-start" v-else style="width: calc(100% - 40px);display: inline-block;position: relative;">
+					                        <span v-text="i.name" class="linewidth"  @click="openchangeleft(i,index)"></span>
+					                    </Tooltip>
+					                    <template v-if="i.edconleft">
+		                                <a href="javascript:void 0" style="color: #57a3f3" @click="changeitleft(i,index);"><Icon type="checkmark-round"></Icon></a>
+		                                <a href="javascript:void 0" style="color: rgba(208, 83, 85, 1)" @click="nochaneitleft(i,index);"><Icon type="close-round"></Icon></a>
+		                            	</template>
+			                    	</span>
+			                        <span style="display: inline-block;width: 60%;vertical-align: top;height: 100%;">
+					                    <i-input v-if="i.edconright" class="edconright" v-model="i.objdis" style="width: calc(100% - 40px);display: inline-block;" ref="keyright"></i-input>
+										<Tooltip content="单击编辑" placement="top-start" v-else style="display: inline-block;position: relative;width: calc(100% - 40px)">
+					                        <span v-text="i.objdis" @click="i.edconright = true;i.testcontent = i.objdis;openchangeright(i,index);" class="linewidth"></span>
+					                    </Tooltip>
+										<template v-if="i.edconright">
+		                                <a href="javascript:void 0" style="color: #57a3f3" @click="changeit(i,index);"><Icon type="checkmark-round"></Icon></a>
+		                                <a href="javascript:void 0" style="color: rgba(208, 83, 85, 1)" @click="nochaneit(i,index);"><Icon type="close-round"></Icon></a>
+		                            	</template>
+			                    </span>
+		                            <Poptip placement=left title="确认删除？" confirm @on-ok="okdelete(i,index);i.edit = false" @on-cancel="i.edit = false" style="float: right;position: relative;">
+		                                <a href="javascript:void 0" v-show="i.penging || i.edit" style="color: rgba(208, 83, 85, 1);margin-right: 5px;" @click="hideall();i.edit = true;">删除</a>
+		                            </Poptip>
+
+							</li>
+
+							
+						</ul>
+						<!-- </draggable> -->
+							<Modal v-model = "addedit" title="添加项目详情">
+								<i-form :label-width="60" ref="formValidate" :model="formValidate" :rules="ruleValidate">
+									 <Form-item label="名称" prop="name">
+									 	<i-input v-model="formValidate.name"></i-input>
+									 </Form-item>
+									 <Form-item label="描述" prop="desc">
+									 	<i-input v-model="formValidate.desc"></i-input>
+									 </Form-item>
+								</i-form>
+								<div slot="footer">
+			                        <Row>
+			                                <i-button type="success" size="large" @click="chanceladdline()">取消</i-button>
+			                                <i-button type="primary" size="large" @click="addline()">保存</i-button>
+			                            
+			                        </Row>
+			                    </div>
+							</Modal>
+								<i-button type="text" class="addit" @click="addedit = true;add()" v-if="usercansort == false">添加</i-button>
+							
+
+							
+					</div>
+					<div class="righttop" v-else>
+						<div style="height: 40px;line-height: 40px;font-weight: 700;">
+							<span v-text="INTRO.obj.objdet"></span>
+						</div>
+						<ul class="infolist" >
+							<li v-for="i,index in INTRO.objlist" class="introlist">
+								<span v-text="i.name" style="width: 28%;" class="usercaneditclass"></span>
+								<span v-text="i.objdis" class="usercaneditclass" style="max-width: 60%;"></span>
+							</li>
+						</ul>
+					</div>
+				</i-col>
+
+			</row>
+		</template>
+	</div>
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+	<!--<script src="/js/vue/vue.min.js"></script>-->
+	<script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
+	<script src="https://cdn.bootcss.com/iview/2.7.3/iview.min.js"></script>
+	<!--<script src="/js/sortable/Sortable.min.js"></script>-->
+	<script src="https://cdn.bootcss.com/Sortable/1.6.0/Sortable.min.js"></script>
+	<script src="/js/vuedraggable/vuedraggable.min.js"></script>
+	<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=f6b774e1b8596873dd3862036609a9d1"></script>
+	<script>
+		!function () {
+        	initVue();
+	    }();
+	    function initVue() {
+	    	ii = new Vue({
+	    		el:"#intro",
+	    		data(){
+	    			return {
+	    				edtitle:false,
+	    				edcontent:false,
+	    				rightedtop:false,
+	    				addedit:false,
+	    				showbutton:true,
+	    				map:null,
+	    				markers:[],
+	    				responselist:null,
+	    				requestlist:null,
+	    				placeSearch:null,
+	    				whereistrue:false,
+	    				usercansort:false,
+	    				usercanedit:{{usercanedit}},
+	    				projectwhere:"点击输入工程建设地点",
+	    				projectname:"工程名称",
+	    				INTRO: {
+	    					obj:{},
+	    					objlist:[]
+	    				},
+	    				formValidate: {
+	    					name: '',
+	    					desc: ''
+	    				},
+	    				ruleValidate: {
+	    					name: [
+	    						{required: true, message: '名称不能为空',trigger: 'blur'}
+	    					],
+	    					desc: [
+	    						{required: true, message: '描述不能为空',trigger: 'blur'}
+	    					]
+	    				}
+	    				
+	    			}
+	    		},
+	    		methods: {
+	    			
+	    			init:function() {
+	    				var that = this;
+			            this.map = new AMap.Map('leftbottom',{
+			                resizeEnable: true,
+			            });
+			            
+			          	
+		        	},
+		        	jj(val){
+		        		console.log(val);
+		        		debugger;
+		        	},
+		        	openchangeleft(k,index){
+		        		for(var i = 0;i<this.INTRO.objlist.length;i++) {
+		        			this.INTRO.objlist[i].edconleft = false;
+		        			this.INTRO.objlist[i].edconright = false;
+		        			this.INTRO.objlist[i].edit = false;
+		        			this.INTRO.objlist[i].name = this.INTRO.objlist[i].testname;
+		        			this.INTRO.objlist[i].objdis = this.INTRO.objlist[i].testcontent;
+		        			if(k.key == this.INTRO.objlist[i].key) {
+		        				this.INTRO.objlist[i].edconleft = true;
+		        				this.$nextTick(function(){
+		        					this.$refs.keyleft[0].focus();
+		        				})
+		        					this.INTRO.objlist[i].name = this.INTRO.objlist[i].testname;
+
+		        			}
+ 		        		}
+		        	},
+		        	openchangeright(k,index){
+		        		for(var i = 0;i<this.INTRO.objlist.length;i++) {
+		        			this.INTRO.objlist[i].edconleft = false;
+		        			this.INTRO.objlist[i].edconright = false;
+		        			this.INTRO.objlist[i].edit = false;
+		        			this.INTRO.objlist[i].name = this.INTRO.objlist[i].testname;
+		        			this.INTRO.objlist[i].objdis = this.INTRO.objlist[i].testcontent;
+		        			if(k.key == this.INTRO.objlist[i].key) {
+		        				this.INTRO.objlist[i].edconright = true;
+		        				this.$nextTick(function(){
+		        					this.$refs.keyright[0].focus();
+		        				})
+		        				
+		        				if(this.INTRO.objlist[i].objdis.indexOf("点击输入") >= 0) {
+		        					this.INTRO.objlist[i].objdis = "";
+		        				}else {
+		        					this.INTRO.objlist[i].objdis = this.INTRO.objlist[i].testcontent;
+		        				}
+		        				
+		        			}
+ 		        		}
+		        	},
+		        	hideall(){
+		        		for(var i = 0;i<this.INTRO.objlist.length;i++) {
+		        			this.INTRO.objlist[i].edconleft = false;
+		        			this.INTRO.objlist[i].edconright = false;
+		        			this.INTRO.objlist[i].edit = false;
+		        			this.INTRO.objlist[i].name = this.INTRO.objlist[i].testname;
+		        			this.INTRO.objlist[i].objdis = this.INTRO.objlist[i].testcontent;
+		        		}
+		        		
+		        	},
+		        	poiwhere(where){
+		        			var that = this;
+		        			var newresult = null;
+			        		AMap.service(["AMap.PlaceSearch"],function(){
+
+			        		  	var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+					                city: "",//城市
+					            });
+
+					            placeSearch.search(where,function(status,result){
+					             	if(status == "complete" && result.poiList.pois.length) {
+					             		newresult = result.poiList.pois[0];
+
+					             		that.markerin(newresult);
+					             	}else{
+					             		that.$Message.warning('请输入正确地址');
+					             	}
+					             });
+			        		 });
+
+			        		
+
+		        	},
+		        	markerin(newlist) {
+
+		        		var that = this;
+		        		if(this.markers.length) {
+		        			for(var j = 0;j<this.markers.length;j++) {
+		        				this.map.remove(this.markers[j]);
+		        			}
+		        			this.markers = [];
+		        		}
+		        		
+		        		var marker = new AMap.Marker({
+		                    position: [newlist.location.lng,newlist.location.lat]
+		                });
+		                that.map.setCenter(marker.getPosition());
+		                var infoWindow = new AMap.InfoWindow({
+		                    isCustom:true,
+		                    offset: new AMap.Pixel(10,-30)
+		                });
+		                marker.setMap(this.map);
+		                this.markers.push(marker);
+		                that.map.setZoom(16);
+		                infoWindow.setContent(that.createInfoWindow(that.projectname,that.projectwhere));
+                    	infoWindow.open(that.map, marker.getPosition());
+
+
+		        	},
+		        	createInfoWindow(title, content){
+			        		 var that = this;
+				                let Id = title; 
+				                var info = document.createElement("div");
+				                info.className = "info";
+
+				                var top = document.createElement("div");
+				                var titleD = document.createElement("div");
+				                top.className = "info-top";
+				                titleD.innerHTML = title;
+
+				                top.appendChild(titleD);
+				                info.appendChild(top);
+
+				                var middle = document.createElement("div");
+				                var middlein = document.createElement("div");
+				                middlein.className = "middleone";
+				                    var middlein = document.createElement("div");
+				                    middlein.className = "middleone";
+				                    middlein.innerHTML = "<span class='middlec'>地址： "+"<span style = 'font-weight:normal'>" +content+"</span>"+"</span>";
+				                    middle.appendChild(middlein);
+				                middle.className = "info-middle";
+				                info.appendChild(middle);
+				                return info;
+
+			        },
+		        	moveonlist(){
+		        		var that = this;
+		        		console.log($(".infolistshow"));
+		        		$(".infolistshow").on('mouseover','li',function(){
+		        			var index = $(this).index();
+		        			for(var i = 0;i<that.INTRO.objlist.length;i++) {
+		        				that.INTRO.objlist[i].penging = false;
+		        				if(index == i) {	
+		        					that.INTRO.objlist[i].penging = true;
+		        					
+
+		        				}
+
+		        			}
+
+		        		});
+		        		$(".infolistshow").on('mouseout',function(){
+
+		        			for(var i = 0;i<that.INTRO.objlist.length;i++) {
+		        				that.INTRO.objlist[i].penging = false;
+		        			}
+		        		})
+		        	},
+		        	okdelete(i,index){
+		        		var that = this;
+		        		var testIntro = this.INTRO;
+		        		testIntro.objlist.splice(index,1);
+		        		this.requestlist = JSON.stringify(testIntro);
+		        		this.responselist.content = this.requestlist;
+		        		var newurl = this.responselist.url;
+		        		var test =  newurl.split("user");
+		        		newurl = "/user"+test[1];
+		        		$.ajax({
+		        			url:newurl,
+		        			type:"PUT",
+		        			data: that.responselist,
+		        			success:function(response){
+		        				
+		        				that.$Message.success('删除成功');
+		        			},
+		        			error:function(){
+		        				that.$Message.warning('删除失败');
+		        			}
+		        		})
+		        	},
+		        	changeit(k,index) {
+		        		var that = this;
+		        		// if(k.objdis == "") {
+		        		// 	k.objdis = k.testcontent;
+		        		// }
+		        		
+		        		var newurl = this.responselist.url;
+		        		var test =  newurl.split("user");
+		        		newurl = "/user"+test[1];
+		        		
+		        		if(k.key == "jsdd") {
+		        				if(k.objdis != "点击输入工程建设地点" && k.objdis != "") {
+			        				that.projectwhere = k.objdis;
+			        				new Promise(function(resolve,reject){
+					        			var newresult = null;
+						        		AMap.service(["AMap.PlaceSearch"],function(){
+
+						        		  	var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+								                city: "",//城市
+								            });
+
+								            placeSearch.search(k.objdis,function(status,result){
+								             	if(status == "complete" && result.poiList.pois.length) {
+								             		newresult = result.poiList.pois[0];
+
+								             		that.markerin(newresult);
+								             		that.whereistrue = true;
+								             		resolve(that.whereistrue);
+								             		
+								             	}else{
+								             		that.$Message.warning('请输入正确地址');
+								             		that.whereistrue = false;
+								             		resolve(that.whereistrue);
+								             	}
+								             });
+						        		 });
+					        			
+			        				}).then(
+			        						function(val){
+			        							if(val) {
+						        					k.edconright = false;
+						        					that.requestlist = JSON.stringify(that.INTRO);
+			        								that.responselist.content = that.requestlist;
+							        				$.ajax({
+									        			url:newurl,
+									        			type:"PUT",
+									        			data: that.responselist,
+									        			success:function(response){
+									        				that.INTRO.objlist[index].testname = that.INTRO.objlist[index].name
+									        				that.INTRO.objlist[index].testcontent = that.INTRO.objlist[index].objdis;
+
+									        			},
+									        			error:function(){
+
+									        			}
+									        		})
+						        					
+						        				}else{
+						        					k.edconright = true;
+						        					
+						        					
+						        				}
+
+			        						}
+			        					);
+			        				// this.poiwhere(k.objdis);
+			        				// if(that.whereistrue) {
+			        				// 	k.edconright = false;
+			        				// }else{
+			        				// 	k.edconright = true;
+			        				// }
+		        				}
+		        				if(k.objdis == "") {
+				        			
+				        			k.edconright = false;
+									that.requestlist = JSON.stringify(that.INTRO);
+									that.responselist.content = that.requestlist;
+									
+									$.ajax({
+										url:newurl,
+										type:"PUT",
+										data: that.responselist,
+										success:function(response){
+											that.INTRO.objlist[index].testname = that.INTRO.objlist[index].name
+											that.INTRO.objlist[index].testcontent = that.INTRO.objlist[index].objdis;
+										},
+										error:function(){
+
+										}
+									})
+				        		}		
+		        			
+		        		}
+		        		if(k.key == "gcmc") {
+		        			that.projectname = k.objdis;
+		        			console.log(this.INTRO.objlist);
+		        			for(var i = 0;i<this.INTRO.objlist.length;i++) {
+		        				if(this.INTRO.objlist[i].key == "jsdd"){
+		        					if(this.INTRO.objlist[i].objdis != "点击输入工程建设地点" && this.INTRO.objlist[i].objdis != "") {
+		        						that.poiwhere(this.INTRO.objlist[i].objdis);
+		        					}
+		        				}
+		        				
+		        			}
+		        		}
+		        		
+		        		if(k.key != "jsdd"){
+		        			k.edconright = false;
+		        			this.requestlist = JSON.stringify(this.INTRO);
+		        			this.responselist.content = this.requestlist;
+		        			
+			        		$.ajax({
+			        			url:newurl,
+			        			type:"PUT",
+			        			data: that.responselist,
+			        			success:function(response){
+			        				that.INTRO.objlist[index].testname = that.INTRO.objlist[index].name
+			        				that.INTRO.objlist[index].testcontent = that.INTRO.objlist[index].objdis;
+
+			        			},
+			        			error:function(){
+
+			        			}
+			        		})
+		        		}
+		        		
+
+
+		        	},
+		        	changeitleft (k,index) {
+		        		var that = this;
+		        		k.edconleft = false;
+		        		this.requestlist = JSON.stringify(this.INTRO);
+		        		this.responselist.content = this.requestlist;
+		        		var newurl = this.responselist.url;
+		        		var test =  newurl.split("user");
+		        		newurl = "/user"+test[1];
+			        		$.ajax({
+			        			url:newurl,
+			        			type:"PUT",
+			        			data: that.responselist,
+			        			success:function(response){
+			        				that.INTRO.objlist[index].testname = that.INTRO.objlist[index].name
+			        				that.INTRO.objlist[index].testcontent = that.INTRO.objlist[index].objdis;
+			        				
+			        			},
+			        			error:function(){
+			        			}
+			        		})
+		        	},
+		        	nochaneit(i,index) {
+		        		i.objdis = i.testcontent;
+		        		i.edconright = false;
+		        		
+		        	},
+		        	nochaneitleft(i,index) {
+		        		i.edconleft = false;
+		        		i.name = i.testname;
+		        	},
+		        	changetitle(){
+		        		var that = this;
+		        		this.requestlist = JSON.stringify(this.INTRO);
+		        		this.responselist.content = this.requestlist;
+		        		var newurl = this.responselist.url;
+		        		var test =  newurl.split("user");
+		        		newurl = "/user"+test[1];
+		        		$.ajax({
+		        			url:newurl,
+		        			type:"PUT",
+		        			data: that.responselist,
+		        			success:function(response){
+		        			},
+		        			error:function(){
+
+		        			}
+		        		})
+		        	},
+	    			chanceladdline(){
+		    			this.showbutton = true;
+		    			this.addedit = false;
+		    			this.formValidate.name = "";
+		    			this.formValidate.desc = "";
+	    			},
+	    			addline(){
+		    			var that = this;
+		    			var newurl = this.responselist.url;
+						var test =  newurl.split("user");
+		    			var obj = {
+		    				name:this.formValidate.name,
+		    				objdis:this.formValidate.desc,
+		    				edconright:false,
+		    				edconleft:false,
+		    				edit:false,
+		    				penging:false,
+		    				testcontent:this.formValidate.desc,
+		    				key:this.formValidate.name,
+		    				testname:this.formValidate.name,
+
+		    			};
+		    			this.$refs.formValidate.validate((valid) => {
+		    			if(valid){
+		    				this.INTRO.objlist.push(obj);
+		    				this.addedit = false;
+							this.requestlist = JSON.stringify(this.INTRO);
+							this.responselist.content = this.requestlist;
+							// that.addedit = false;
+					    	that.formValidate.name = "";
+					    	that.formValidate.desc = "";
+							newurl = "/user"+test[1];
+							$.ajax({
+								url:newurl,
+								type:"PUT",
+								data: that.responselist,
+								success:function(response){
+									that.formValidate.name = "";
+		    						that.formValidate.desc = "";
+									that.showbutton = true;
+					    			
+								},
+								error:function(){
+
+								}
+							})
+		    			}else{
+		    				
+		    				this.addedit = true;
+
+		    			}
+		    			})
+
+	    			},
+	    			sortEnd(e,data){
+	    				console.log(this.INTRO);
+	    				var that = this;
+	    				this.requestlist = JSON.stringify(this.INTRO);
+						this.responselist.content = this.requestlist;
+						var newurl = this.responselist.url;
+						var test =  newurl.split("user");
+						newurl = "/user"+test[1];
+						$.ajax({
+							url:newurl,
+							type:"PUT",
+							data: that.responselist,
+							success:function(response){
+								console.log(response);
+				    			
+							},
+							error:function(){
+
+							}
+						})
+	    			}
+	    		},
+	    		created(){
+	    			var that = this;
+	    			$.ajax({
+	    				url:"/user/project/?curProject=True",
+	    				type:"GET",
+	    				success:function(response) {
+	    					that.responselist = response.results[0];
+	    					that.INTRO = JSON.parse(that.responselist.content);
+	    					console.log(that.INTRO);
+	    					for(var i = 0;i<that.INTRO.objlist.length;i++) {
+	    						if(that.INTRO.objlist[i].key == "gcmc") {
+	    							
+	    							if(that.INTRO.objlist[i].objdis.indexOf("点击输入") < 0 && that.INTRO.objlist[i].objdis != "") {
+						            	that.projectname = that.INTRO.objlist[i].objdis;
+						            }
+	    						}
+	    						if(that.INTRO.objlist[i].key == "jsdd") {
+	    							
+	    							if(that.INTRO.objlist[i].objdis.indexOf("点击输入") < 0 && that.INTRO.objlist[i].objdis != "") {
+	    								that.projectwhere = that.INTRO.objlist[i].objdis;
+						            	that.poiwhere(that.projectwhere);
+						            }
+	    						}
+	    						that.INTRO.objlist[i].testname = that.INTRO.objlist[i].name;
+		        				that.INTRO.objlist[i].testcontent = that.INTRO.objlist[i].objdis;
+	    						
+	    					}
+	    				}
+	    			});
+	    		},
+	    		mounted(){
+	    			this.init();
+	    			this.moveonlist();
+
+	    		},
+	    		directives: {
+				  focus: {
+				    // 指令的定义
+				    inserted: function (el) {
+				      el.focus()
+				    }
+				  }
+				}
+	    	})
+	    }
+	</script>
+	{% endblock %}

@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<style type="text/css">
+	.dropdown-menu li:hover{
+	}
+	
+	.btn-group{
+		width:100%; 
+		text-align:center; 
+		margin-top:-10px;
+	}
+	
+	#chooseBTN{
+		width:10%; 
+		font-size:1.5em;
+		margin-left:-1px; 
+		border-left:solid 1px;
+	}
+	
+	.btn-group > .dropdown-menu li a{
+		font-size:1.5em; 
+		color:white; 
+		padding:0; 
+		margin:0;
+	}
+	
+	.btn-group > .dropdown-menu{
+		max-width:700px;
+		width:90%;
+		background-color:#39BBF8;
+	}
+	
+	
+	.paintView_bangza{
+			background-color:#FCD209;
+			color:black
+		}
+	.paintView_weiqiyong{
+			background-color:#A2B5CD;
+			color:black
+		}	
+		
+	.paintView_hege{
+			background-color:#6AEC87;
+			color:black
+		}	
+		
+	.paintView_yichang{
+			background-color:red;
+			color:black
+		}	
+	
+	.listArea{
+		width:47.5%;
+		margin-left:1%;
+		height:80px;
+		display: inline-block;
+		border: double 4px;
+		vertical-align: middle;
+		text-align:center;
+		background-color:cadetblue;
+		background-color: white;
+		margin-top:8px;
+		border-radius:15px;
+	}
+	
+	.listArea > div {
+		height:50%; 
+		width:100%;  
+		text-align:center; 
+		margin-top:10px;
+	}
+	
+	.listArea > div > label{
+		margin-top:0;
+		width: 100%;
+		position: relative;
+		top:15%;
+		font-weight: bold;
+		text-align: center;
+		font-size:18px;
+		font-weight:bold;
+	}
+	
+	.listArea > div > label > a{
+		color:black;
+	}
+
+	.listArea > .pdID{
+		margin-top:0;
+		text-align:center;
+		border: none;
+		font-weight: bold;
+		font-size:20px;
+		color: black;
+		position: relative;
+		top:3%;
+	}
+	
+	.listView{
+		margin-top:-5px;
+		margin-bottom:30px;
+		
+	}
+	
+	.infoState{
+		text-align:center;
+		background-color:whitesmoke;
+	}
+	
+	.infoState thead tr th{
+		text-align:center;
+		font-size:1.5em;
+	}
+	
+	.infoState tbody tr td{
+		font-weight:bold;
+		font-size:1.2em;
+	}
+	
+	.navbar{
+		margin-bottom: 0px;
+	}
+	
+	</style>
+	
+</style>
+<label class="btn btn-primary" style="width:100%; font-size:1.5em; margin-bottom:0px;color: white;background-color: #007aff;"> 钢筋绑扎台信息</label>
+<div style="width:100%;">
+   <table class="table table-striped infoState">
+	   <thead>
+	      <tr>
+	         <th>状态</th>
+	         <th>数量</th>
+	         <th>标示</th>
+	      </tr>
+	   </thead>
+	   <tbody>
+	      <tr>
+	         <td>钢筋绑扎中</td>
+	         <td>{{totalState.bangza}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#FCD209;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>绑扎合格</td>
+	         <td>{{totalState.hege}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#6AEC87;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>未启用</td>
+	         <td>{{totalState.weiqiyong}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#A2B5CD;"></div></td>
+	      </tr>
+	   </tbody>
+	</table>
+</div>
+<div class="listView">
+	{% for item in list_items.object_list %} 
+			<div class="listArea" align="center">	
+		  		{% if item.pb %}
+		  			{% ifequal item.pb "error" %}
+		  				<div class="paintView_yichang">	
+						<label>数据异常 </label>
+		  			{% else %}
+		  				{% if item.pb.status_id = 2 %}						
+							<div class="paintView_bangza">	
+							<a href="/task/precastbeam/trace/{{item.id}}/">{{item.number}}</a>
+								<label><a href="/task/precastbeam/trace/{{item.pb.id}}/">{{item.pb.number}}</a> </label>
+						{% elif item.pb.status_id = 3 %}		
+							<div class="paintView_hege" >	
+								<label><a href="/task/precastbeam/trace/{{item.pb.id}}/">{{item.pb.number}}</a></label>
+						{% else %}
+							<div class="paintView_yichang">	
+							<label><a href="/task/precastbeam/trace/{{item.pb.id}}/">{{item.pb.number}}</a> </label>
+						{% endif %}	
+					{% endifequal %}
+					</div>
+				{% else %}
+					<div class="paintView_weiqiyong">	
+						<label >
+							空闲
+						</label>
+					</div>
+				{% endif %}				
+				<h6 style="font-size:20px; margin-top:2px; font-weight:bold; color:black">{{item.name}}</h6>	
+			</div>									
+	{%endfor%}
+</div>
+
+
+
+{% endblock %}

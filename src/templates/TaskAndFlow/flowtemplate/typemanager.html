@@ -1,0 +1,81 @@
+{% extends "baseadmin.html" %} 
+{% block ownerhead %}
+<link rel="stylesheet" href="css/project/typemanager.css" />
+<script src="js/common/typemanager.js"></script>
+{% endblock %} 
+{% block content %}
+<div class="constant">
+	<div class="header-row" style="background: white;">
+		<i class="fa fa-tachometer"></i>类型设置
+	</div>
+	
+	<div>
+		<ul class="nav nav-tabs chooseGLYS" style="padding-left: 5px;">
+		
+			<li class="active">
+				<a href="#guanjiandian" data-toggle="tab">质量关键点类型</a>
+			</li>
+			<!--<li>
+				<a href="#xx" data-toggle="tab"></a>
+			</li>
+		
+			<li>
+				<a href="#xxxx" data-toggle="tab"></a>
+			</li>-->
+		
+		</ul>
+	</div>
+	<div class="tab-pane active" id='guanjiandian'>
+		<div style="padding: 5px;">
+			<a href="#" class="btn btn-success pull-right" onclick="addnew()">
+				<i class="fa fa-plus"></i>
+				添加
+			</a>
+		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>
+						编号
+					</th>
+					<th>
+						类型名称
+					</th>
+					<th>
+						表单模板类型
+					</th>
+					<th>
+						专业
+					</th>
+					<th>
+						操作
+					</th>
+				</tr>
+			</thead>
+			<tbody id="guanjiandiantbody">
+
+			</tbody>
+		</table>
+	</div>
+	<div class="tab-pane" id='xx'>
+	</div>
+	<div class="tab-pane" id='xxxx'>
+	</div>
+</div>
+
+<div id="allbdmb" style="display: none;">
+	<select  class="form-control">
+		<option value="null" selected="selected">空</option>
+		{% for each in mubanlist%}
+			<option value="{{each.id}}" >{{each.name}}</option>
+		{% endfor %}
+	</select>
+</div>
+<div id="allmajor" style="display: none;">
+	<select  class="form-control">
+		{% for each in majorlist%}
+			<option value="{{each.id}}">{{each.name}}</option>
+		{% endfor %}
+	</select>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="dist_vue/css/modelview.css">
+
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<link href="/js/web3d/style.min.css" rel="stylesheet" />
+<script src="/js/web3d/three.min.js"></script>
+<script src="/js/web3d/viewer3D.min.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.resize.js"></script>
+<style>
+	.panel{  border-radius: 0px;  }  .panel-heading{  border-bottom: 1px solid #DDDDDD;  }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2" style="line-height: 32px;">{{title}}</span>
+    </div>
+</div>
+<div style="overflow: hidden;min-height:556px;background-color:#E7E0DC ">
+    <div id="left" class="pull-left" >
+    <div class="panel-group" id="accordion">
+         <div class="panel">
+                <div class="panel-heading">
+                      <div class="panel-title">
+                        <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+                            空间结构<i class="profont pro-font-xiangyou" style="float: right"></i>
+                        </a>
+                      </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseOne">
+                      <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_jstree">
+                         <div id="jstree_div" > </div>
+
+                      </div>
+                        <div class="ResizeBottombar" id="Bottombar1" ></div>
+                </div>
+          </div>
+          <div class="panel">
+                <div class="panel-heading">
+                      <div class="panel-title">
+                        <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">
+                          <span>构件分类</span><i class="profont pro-font-xiangyou" style="float: right"></i>
+                        </a>
+                      </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseTwo">
+                  <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_pb_type">
+                     <div id="jstree_div_pbtype" > </div>
+
+                  </div>
+                  <div class="ResizeBottombar" id="Bottombar2" ></div>
+                </div>
+          </div>
+    </div>
+</div>
+    <div class="col-lg-9 Div3dViewer" style="padding-left: 0px;padding-right: 0px;height: calc(100vh - 205px);color: white;">
+        <div id="viewer" style="height: calc(100vh - 205px);"></div>
+    </div>
+    <div class="col-lg-3" style="background-color:#E7E0DC;padding-right: 0px; ">
+        <div class="panel">
+            <div class="panel-heading">构件属性</div>
+            <table class="table">
+                <tr><td><span>编号</span></td><td><span  id="pbnumber" ></span ></td></tr>
+                <tr><td><span>任务</span></td><td><span id="pbtask" ></span ></td></tr>
+                <tr><td><span>状态</span></td><td><span id="pbstatus" ></span ></td></tr>
+                <tr><td><span>工作量</span></td><td><span id="statuspercent" ></span ></td></tr>
+                <tr><td><span>计划完成时间</span></td><td><span id="plantime" ></span ></td></tr>
+                <tr><td><span>实际完成时间</span></td><td><span id="realtime" ></span ></td></tr>
+            </table>
+            <div class="pbwell-operator">
+                <a href="#" id="pbtrace"  class="c-btn c-btn-red model-from"><i class="fa fa-truck"></i>过程追踪</a>
+            </div>
+        </div>
+        <div class="panel" style="margin-bottom: 0px;height: calc(100vh - 483px);overflow: auto;">
+            <div class="panel-heading">进度信息</div>
+            <div class="col-lg-12" id="item-donut" style="height:37vh;padding:0px;"> </div>
+            <div style="margin-left: 10px;">
+                <p id="progressdsc"></p>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+<script src="js/datastruct.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTask/Autodesk.ADN.Viewing.Extension.SampleTask.js?ver=(2017-10-31)"></script>
+<script src="js/web3d/scripts/LoadModelTask.js"></script>
+<script src="js/web3d/scripts/getObjectTree.js"></script>
+<script src="js/web3d/scripts/modelcommon.js"></script>
+<script type="text/javascript">
+
+
+
+$(document).ready(function(){
+
+loadInitialModel();
+
+
+});
+
+
+
+		$("#btnGetTaskStatus").click(function(){
+			getpbstatuslist();
+		});
+		
+		function TracePbStatus()
+		{
+			var dwidth=window.screen.width;
+			var dheight=window.screen.height;
+			if(arguments[0])
+			{
+				var pbid = arguments[0];
+				window.open("/task/goujian/trace/?pbid="+pbid);
+			}
+		}
+		
+  </script>
+  
+{% endblock %}
+

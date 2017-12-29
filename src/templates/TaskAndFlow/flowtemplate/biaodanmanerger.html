@@ -1,0 +1,283 @@
+{% extends "baseadmin.html" %} {% block ownerhead %}
+
+
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.config.muban.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.all.min.js"> </script>
+<!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+<!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/biaodan.js?ver=1111" type="text/javascript" charset="utf-8"></script>
+{% endblock %} {% block content %}
+<style type="text/css">
+	#bb2{
+		display: none;
+	}
+	
+	.form-control {
+		float: left;
+		margin-left: 0.5%;
+		width: 15%;
+	}
+	
+	#lb {
+		float: left;
+		margin-left: 1%;
+	}
+	
+	.inp {
+		width: 15%;
+	}
+	.header-row {
+	    margin: 0px 0 5px 5px;
+	    padding-left: 5px;
+	    text-align: left;
+	    font-size: 18px;
+	    font-weight: bold;
+	    color: #2e6da4;
+	    
+	}
+	.nav_tool{display: none;}
+	.table-striped{text-align: center;table-layout:fixed ; }
+	table>thead>tr>th{text-align: center;}
+	.form-group>select {
+	    width: 6em;
+	    padding: 0.2em 0.4em 0.2em 0.4em;
+	    border: 1px solid #94c1e7;
+	    border-radius: 0.2em;
+	    -webkit-appearance: none;
+	    background: #ffffff;
+	    border: 1px solid #ccc;width: 100%;
+	}
+	.edui-editor-breadcrumb{display: none}
+	
+	.header-row {
+	width: 100%;
+	margin: 0 0 5px 5px;
+	padding: 0;
+	text-align: left;
+	font-size: 18px;
+	font-weight: bold;
+	color: #2e6da4;
+}
+
+
+</style>
+	<div class="header-row">
+		 <i class="fa fa fa-align-justify"></i> 表单管理
+	</div>
+<div class="bb1" id="bb1" style="width: 100%;background: white;padding-top: 15px;padding-bottom: 15px;margin-top: 2px;">
+	<div class="widget-content padded">
+		<form class="serarch-tab" action="" method="get"> {% csrf_token %}
+			<div>
+				<label class="control-label" id="lb">名称</label>
+				<input class="form-control inp form-control" placeholder="输入名称" name="qname" id="qname" type="text" maxlength="40">
+			</div>
+
+			<div>
+				<label id="lb">专业</label>
+				<select class="form-control inp form-control" name="qformmajor" id="qformmajor">
+					<option value="0">全部</option>
+					{% for temp in majorList %}
+					<option value="{{temp.id}}" lrc="{{temp}}">{{temp.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div>
+				<label id="lb">分类</label>
+				<select class="form-control inp form-control" name="qformtype" id="qformtype">
+					<option value="0">全部</option>
+					{% for temp in formtypeList %}
+					<option value="{{temp.id}}" lrc="{{temp}}">{{temp.name}}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<button class="btn btn-primary" type="submit" role="button"><i class="fa fa-search"></i>搜索</button>
+			<a href="#" onclick="addMb()" class="btn btn-success"><i class="fa fa-plus"></i> 新增模板 </a>
+		</form>
+	</div>
+		
+</div>
+<div class="row content-row bb1" id="bb1" align="center" style="width: 100%;margin-top: 2px;border-radius: 2px;min-height: 77vh;background: white;margin-left: 0px;">
+	<div class="widget-container fluid-height clearfix">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>编号</th>
+					<th>名称</th>
+					<th>创建人</th>
+					<th>专业</th>
+					<th>模板类型</th>
+					<th>最后修改时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for ea in biaodanList %}
+					<tr>
+						<td>{{ea.id}}</td>
+						<td>{{ea.name}}</td>
+						<td>{{ea.creater.truename}}</td>
+						<td>{{ea.major.name}}</td>
+						<td>{{ea.formtype.name}}</td>
+						<td>{{ea.createdate|date:"Y-m-d"}}</td>
+						<td>
+							<a href="#" title="删除模板" onclick="deleteMb(this)"> [删除] </a>
+							<a href="#" title="编辑模板" onclick="editMb(this)" style="cursor: pointer;">[编辑]</a>
+							<!--<a href="#" title="查看质量单" onclick="deleteRow(this)" style="cursor: pointer;">[查看]</a>-->
+						</td>
+					</tr>
+				{% endfor %}
+
+			</tbody>
+		</table>
+	</div>
+
+		<div class="widget-content padded text-center" >
+			<ul class="pagination pagination-lg">
+				<li>
+					<a href="?page=1&qname={{qname}}&qformmajor={{qformmajor}}&qformtype={{qformtype}}">首页</a>
+				</li>
+				{% if biaodanList.has_previous %}
+				<li>
+					<a href="?page={{ biaodanList.previous_page_number }}&qname={{qname}}&qformmajor={{qformmajor}}&qformtype={{qformtype}}">前一页</a>
+				</li>
+				{% endif %}
+				<li>
+					<a>第 {{ biaodanList.number }} 页，共 {{ biaodanList.paginator.num_pages }}页</a>
+				</li>
+				<li>
+					<a>
+						<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+					</a>
+					<a id="jumpBTN">
+						跳转
+					</a>
+				</li>
+				{% if biaodanList.has_next %}
+				<li>
+					<a href="?page={{ biaodanList.next_page_number }}&qname={{qname}}&qformmajor={{qformmajor}}&qformtype={{qformtype}}">下一页</a>
+				</li>
+				{% endif %}
+				<li>
+					<a href="?page={{paginator.num_pages}}&qname={{qname}}&qformmajor={{qformmajor}}&qformtype={{qformtype}}">尾页</a>
+				</li>
+
+			</ul>
+		</div>
+
+</div>
+
+<div id="bb2" class="col-md-12 column bb2" style="background:white;margin-top:2px;min-height: 85vh;padding-top: 15px;padding-bottom: 10px;">
+	<div>
+	    <div class="header-row">
+	       	<i class="fa fa-file-word-o"></i>表单模板编辑
+	    </div>
+
+    	<form role="form" style="width: 18vw;float: left;padding-left: 25px;padding-right: 25px">
+				<div class="form-group" style="text-align: left;">
+					 <label for="mname">模板名称</label>
+					 <input placeholder="输入模板名字" class="form-control" name="mname" id="mname" type="text" style="width: 100%;">
+				</div>
+				<div class="form-group"  style="text-align: left;">
+					<label for="major-s" >专业</label>
+					<select id="dealTemplate" class="major-s form-control">
+						
+						{% for temp in majorList %}
+						<option value="{{temp.id}}">{{temp.name}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-group"  style="text-align: left;">
+					<label for="formtype-s" >类型</label>
+					<select id="dealTemplateformtype" class="formtype-s form-control">
+						{% for temp in formtypeList %}
+						<option value="{{temp.id}}">{{temp.name}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-group" style="margin-top: 45px;">
+					<button class="btn btn-primary " type="button" onclick="saveMuban() ">保存模板</button>	
+					<a class="btn btn-default" onclick="fanhui()" role="button " >取消</a>
+				</div>
+		</form>
+	   	<div style="width: 75vw;float: left;text-align: left;">
+	    	<script id="editor" type="text/plain" style="width:1024px;height:500px;margin: auto;"></script>
+	    </div>
+	</div>
+
+</div>
+</div>
+<div class="modal fade" id="shujuyuan" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: 340px;min-width: 600px;">
+			<div class="modal-header" style="padding: 10px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择数据源</h4>
+			</div>
+			<div class="modal-body">
+				{% for s in shujuyuan %}
+				<div class="radio">
+				   <label>
+				      <input type="radio" name="optionsRadios" id="optionsRadios1" 
+				         value="{{s.id}}" content="{{s.tagname}}"> {{s.tagname}}
+				   </label>
+				</div>
+				{% endfor %}
+			</div>
+			
+			<div class="modal-footer">
+				<a class="btn btn-default btn" role="button" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="FunXuanShuJuYuanOK()" data-dismiss="modal">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="quanxianshezhidlg" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left" style="font-weight: bold; ">
+					权限设置
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div class="widget-content padded">
+					<form class="form-horizontal" id="addhuiyiForm" action="#" align="left">
+						<div class="form-group">
+							<label class="control-label  col-md-3">关联流程步骤：</label>
+							<div class="col-md-7">
+								<select class="form-control" name="sel_relatedflowstep" id="sel_relatedflowstep" style="width: 90%;;">
+	
+								</select>
+							</div>
+						</div>
+		
+					</form>
+				</div>
+			</div>
+				<div class="modal-footer">
+					<a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+					<button class="btn btn-primary" type="button" onclick="SheZhiQuanXianOK()" data-dismiss="modal" aria-hidden="true">确认设置</button>
+				</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		initUE();
+		$('#qformmajor').val({{qformmajor}});
+		$('#qformtype').val({{qformtype}});
+		$('#qname').val({{qname}});
+		$('#pageJump').bind('input propertychange', function() {
+			var tgtPage = $('#pageJump').val();
+			if(tgtPage){
+				$("#jumpBTN").attr("href","?page=" + tgtPage + "&qname={{qname}}&qformmajor={{qformmajor}}&qformtype={{qformtype}}");
+			}
+		});
+	});
+</script>
+{% endblock %}

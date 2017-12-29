@@ -1,0 +1,159 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+<!--<link href="/css/zhiliang/zhiliangyanshou.css" media="all" rel="stylesheet" type="text/css" />-->
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="/js/common/zhiliangyanshou.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+{% block content %}
+<style type="text/css">
+.form-group{
+	margin-bottom: 0px;
+}
+</style>
+<div class="header-v2">
+	<div class="header-bg-v2">
+		<span class="title-v2 line_height32">工序验收</span>
+		<form class="form-right" action="" method="get" onsubmit="return check1();"> {% csrf_token %}
+			<div class="form-group">
+				<label class="control-label col-md-4" align="right" for="timerange" style="line-height: 29px;">结束时间段：</label>
+				<div class="col-md-4">
+					<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						<input type="text" name="gxdeadlineTimerange" value="{{gxdeadlineTimerange}}"  id="gxdeadlineTimerange" class="form-control" />
+					</div>
+					<span class="prompt1"></span>
+				</div>
+				<button type="submit" class="btn btn-danger"><i class="fa fa-search"></i> 查询 </button>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="tabbable" >
+			<div class="content-row" align="center" style="width: 100%;border-radius: 0px;min-height: 64.1vh;padding-top: 0px;">
+					<div class="widget-container fluid-height clearfix">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>类型</th>
+									<th>状态</th>
+									<th>提醒时间</th>
+									<th>结束时间</th>
+									<th>关联监控元素</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for gx in gongxu %}
+									<tr>
+										<td>{{gx.status.pbtype}}</td>
+										<td>{{gx.status.statusname}}</td>
+										<td>{{gx.warntime|date:"Y-m-d H:i:s"}}</td>
+										<td>{{gx.deadline|date:"Y-m-d H:i:s"}}</td>
+										<td>
+											{{gx.monitoring.typetable}}：{{gx.monitoring.qrcode}}
+										</td>
+										<td><a href="#" onclick="funGxyanshou({{gx.id}})" title="验收">[录入]</a>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+							{% ifnotequal gongxu.paginator.num_pages 1%}
+								<div class="widget-content padded text-center" >
+									<ul class="pagination pagination-lg">
+										<li>
+											<a href="?pagegx=1&gxdeadlineTimerange={{gxdeadlineTimerange}}">首页</a>
+										</li>
+										{% if gongxu.has_previous %}
+										<li>
+											<a href="?pagegx={{ gongxu.previous_page_number }}&gxdeadlineTimerange={{gxdeadlineTimerange}}">前一页</a>
+										</li>
+										{% endif %}
+										<li>
+											<a>第 {{ gongxu.number }} 页，共 {{ gongxu.paginator.num_pages }}页</a>
+										</li>
+										<li>
+											<a>
+												<input id="pageJumpgx" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+											</a>
+											<a id="jumpBTNgx">
+												跳转
+											</a>
+										</li>
+										{% if gongxu.has_next %}
+										<li>
+											<a href="?pagegx={{ gongxu.next_page_number }}&gxdeadlineTimerange={{gxdeadlineTimerange}}">下一页</a>
+										</li>
+										{% endif %}
+										<li>
+											<a href="?pagegx={{gxpaginator.num_pages}}&gxdeadlineTimerange={{gxdeadlineTimerange}}">尾页</a>
+										</li>
+							
+									</ul>
+								</div>
+							{% endifnotequal %}
+				</div>
+
+
+
+</div>
+
+<script type="text/javascript">
+
+	$('#pageJumpgx').bind('input propertychange', function() { 
+		var tgtPage = $('#pageJumpgx').val();
+		if(tgtPage){
+			$("#jumpBTNgx").attr("href","?pagegx=" + tgtPage + "&gxdeadlineTimerange={{gxdeadlineTimerange}}");
+		}
+	});
+
+	$('#gxdeadlineTimerange').daterangepicker({
+		ranges: {
+			'今天': [moment(), moment()],
+			'昨天': [moment().subtract('days', 1), moment().subtract('days', 1)],
+			'最近7天': [moment().subtract('days', 6), moment()],
+			'最近30天': [moment().subtract('days', 29), moment()],
+			'本月': [moment().startOf('month'), moment().endOf('month')],
+			'上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+		},
+		locale: {
+			applyLabel: '确定',
+			cancelLabel: '取消',
+			fromLabel: '起始时间',
+			toLabel: '结束时间',
+			customRangeLabel: '自定义',
+			daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+			monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+				'七月', '八月', '九月', '十月', '十一月', '十二月'
+			],
+			firstDay: 1
+		},
+	});
+	
+	
+	function check1() {
+		var flag = true;
+		var time = /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\s+-\s+\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+		var data = $("#gxdeadlineTimerange").val();
+		if (time.test(data)||data=="") {
+			flag = true;
+		} else {
+			$(".prompt1").css("color", "red").text("请输入正确日期格式");
+			flag = false;
+		}
+		return flag;
+	};
+	$(function() {
+	$("#gxdeadlineTimerange").focus(function() {
+		$(".prompt1").text("");
+	});
+});
+</script>
+
+{% endblock %}

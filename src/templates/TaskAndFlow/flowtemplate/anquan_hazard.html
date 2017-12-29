@@ -1,0 +1,171 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="/js/common/weixianyuan.js?ver=555" ></script>
+<link rel="stylesheet" type="text/css" href="/css/project/hazard.css"/>
+<style>
+	.table td{
+		word-break: break-all;
+	}
+    td>div{outline: none;}
+</style>
+{% endblock %}
+{% block content %}
+
+<div style="background: white;width: 100%;text-align: center;">
+			<div class="col-md-2 column" id="jstree_div_hazard" style="text-align: left; overflow:auto;margin-top: 20px;max-height:calc(100vh - 125px);"> </div>
+			<div class="col-md-10 column" style="padding-top: 20px;border-left:1px solid #7C7479; height: calc( 100vh - 129px);">
+				<a href="/task/anquan/hazard/task/" class="btn btn-danger pull-right" title="危险源策划">危险源策划</a>
+				<h3 style="width: 50%;margin: 10px auto;text-align: center">今日已选危险源</h3>
+                <p class="pull-right" style="margin-right: 10%;color: red">注意:持续天数输入范围0~500;备注最多256个字</p>
+				<table class="table table-bordered table-striped" style="width:90%; margin:20px auto;table-layout:fixed;" id='today_hazard_table'>
+					<tr>
+                		<th style="width:100px;">等级</th>
+                		<th>危险源</th>
+                		<th style="width:100px;">持续天数</th>
+                		<th>空间</th>
+                		<th style="width:100px;">专业</th>
+                		<th style="width:100px;">状态</th>
+                		<th>备注</th>
+                		<th style="width:100px;">操作</th>
+                	</tr>
+                	{% for each in hazardlist %}
+                	<tr class='{{each.weixianku}}' id='{{each.id}}'>
+                		<td>{{each.ji}}</td>
+                		<td class="myleft">{{each.wxy}}</td>
+                        <td ><div title='点击输入持续天数' contentEditable='true'> {{each.duration}} </div></td>
+                		<td><a href='#' val={{each.val}} onclick='ChooseKJ(this)'>{{each.kjys}}</a></td>
+                		<td>{{each.major}}</td>
+                		<td>
+                				<select  class="issk" autocomplete="off">
+									{% for s in hazard_status_list %}
+										{% ifequal each.isctr s.id %}
+											<option value='{{s.id}}' selected="selected">{{s.statusname}}</option>
+										{% else %}
+											<option value='{{s.id}}'>{{s.statusname}}</option>
+										{% endifequal %}
+									{% endfor %}
+								</select>
+                		</td>
+                        <td class="myleft"><div class="describe_div" title='点击输入危险源备注' contentEditable='true'> {{each.describe}} </div></td>
+                		<td><a href="#" onclick="delerow(this)" title="" style="cursor: pointer;">[删除]</a></td>
+                	</tr>
+                	</tr>
+                	{% endfor %}
+                </table>
+                <div id="div_harzrad_ctl">
+                	<button class="btn btn-primary" onclick="saveall()">保存修改</button>
+                	<!--<button class="btn btn-danger" onclick="qingkong()">清空</button>-->
+                </div>
+          
+                      	<br>
+				<h3>历史记录</h3>
+                <table class="table  table-bordered table-striped" style="width:90%; margin:20px auto;table-layout:fixed;" id='tongjiClosed'>
+					<tr>
+						<th>危险源 </th>
+						<th style=" width: 110px;">关闭时间</th>
+						<th>受控时间段</th>
+						<th>不受控时间段</th>
+					</tr>
+                </table>
+                
+			</div>
+</div>
+
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: 600px;min-width: 600px;">
+			<div class="modal-header" style="padding: 10px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择空间结构</h4>
+			</div>
+			<div style="padding: 10px">
+				<select class="pull-right" name="guanlianyuansumajor" id="guanlianyuansumajor">
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				</select>
+			</div>
+			<div style="margin-top: 15px;">
+
+					<div class="tab-pane" id="kongjianjiegou">
+						<div style="float:left;width: 45%;margin-left: 15px;">
+							<div id="jstree_kongjian" style="width: 100%;border: 1px solid darkgrey;overflow:auto;height: 422px;text-align: left;">
+
+							</div>
+							<!--<select class="kongjianselect" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" style="width: 100%;" ondblclick="moveright('kj')">
+
+							</select>-->
+						</div>
+						<div style="float:left;width: 5%;height: 422px;padding-top:175px;font-size: 25px;color: rgba(51,122,183,0.85);">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div style="float:left;width: 45%;">
+							<select class="choosekongjian" multiple name="right" id="right" size="20" style="width: 100%;height: 422px;">
+
+							</select>
+						</div>
+
+					</div>
+			</div>
+			<div style="float: left;margin-top: 10px; width: 100%;padding-left: 350px;">
+				<a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseKJfromTree()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<div id="selectmajor" style="display:none">
+	<select name="">
+		{% for m in MajorChoices %}
+			<option value='{{m.id}}'>{{m.name}}</option>
+		{% endfor %}
+	</select>
+</div>
+<div id="selectshoukong" style="display:none">
+	<select name="" class="issk">
+		{% for s in hazard_status_list %}
+			<option value='{{s.id}}'>{{s.statusname}}</option>
+		{% endfor %}
+	</select>
+</div>
+
+
+
+<script type="text/javascript">    
+	var flagLeft=true;
+	var flagRight=true;
+
+
+    $(document).ready(function() {
+
+    	
+		intweixianyuan();
+		init_tree({{curMajorId}});
+		tongjiClosedHazard();
+    });
+    
+    	$('#guanlianyuansumajor').change(function() {
+		var major = $("#guanlianyuansumajor").val();
+		if(major!='0'){
+			init_tree(major,'');
+		}
+
+	});
+
+</script>
+
+
+{% endblock %}

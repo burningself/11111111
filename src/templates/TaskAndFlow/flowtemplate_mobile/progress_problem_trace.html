@@ -1,0 +1,373 @@
+{% extends "base_mobile.html" %}
+{% block content %}
+<link href="/css/project/progress_problem_trace.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/swipercss/swiper.min.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/js/swiperjs/swiper.min.js" type="text/javascript"></script>
+<script src="/js/bootstrap/bootstrap-datetimepicker.js" type="text/javascript"></script>	
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="/js/jquery/jquery.form-3.51.0.js"></script>
+<script src="/js/common/progress_problem_trace.js?ver=(20171032)"></script>
+
+<link rel="stylesheet" type="text/css" href="/js/touchTouchLbt/css/styles.css">
+<link rel="stylesheet" type="text/css" href="/js/touchTouchLbt/css/touchTouch.css">
+<script src="/js/touchTouchLbt/js/touchTouch.jquery.js"></script>
+<style>
+	.placeholder {
+		margin: 0;
+	}
+</style>
+
+<div class="btn-group topBtn">
+  <button type="button" class="btn btn-primary col-xs-6 active" onclick="loadTab(this,0)">问题处理</button>
+  <button type="button" class="btn btn-primary col-xs-6" onclick="loadTab(this,1)">处理记录</button>
+</div>
+
+<div class="swiper-container" style="background-color: white; margin-bottom: 60px;overflow: auto;">
+	<div class="swiper-wrapper">
+		<div class="swiper-slide tab-pane fade in active" id="updateTab">
+			<div id="recordUpdateBg" style="display:none; z-index:1001; background:RGBA(1,1,1,.778); position:absolute; width:100%; height:100%; text-align:center;">
+				<a class="btn btn-primary " id="dealStopRecord" style="border-radius: 15px; background: url(/images/bgs/voice.gif); background-size:contain; height:60px; padding:0; left:calc(50% - 120px); font-size: 40px; width:240px; line-height:60px; position:absolute; bottom:200px;"> 结束录音</a>
+			</div>
+			<div class="mainContent">
+				<div class="section title" align="center">
+					<h3>
+						<i class="fa fa-edit"></i> 处理问题
+					</h3>
+				</div>
+				<input id="id_EventId" name="id_EventId" type="hidden" value="{{projectevent_instance.id}}"/>
+				<div class="section basicInfo" align="left">
+					<label>
+						<span>编号：{{projectevent_instance.number}} </span>   
+					</label>
+					<label>	
+						<span>发起人：{{projectevent_instance.createuser.truename}}｜ </span>
+						<span>创建时间：{{projectevent_instance.createtime|date:"Y-m-d"}} </span>
+					</label>
+					<label>	
+						<span>状态：{{projectevent_instance.curflowstep.name}} ｜  </span>
+						<span>截止时间：{{projectevent_instance.deadline|date:"Y-m-d"}}  </span>
+					</label>
+					<label>	
+						<span>关联元素：{{guanlianyuansudis}}  </span>
+					</label>
+				</div>
+			    {% for eachStep in eventStepsRecord %}
+			     
+			    {% if forloop.last %}
+			    	<div class="section recordStepSection" align="left">
+			    	{% for eachOpera in eachStep.operationRecord %}
+			    			{% if forloop.last %}
+								<label class="recordDetail">
+								{% if eachOpera.operaName %}
+										<span>{{eachOpera.operaName}}  ｜  </span>
+									{% endif %}
+									{% if eachOpera.comment %}
+										<span>{{eachOpera.comment}} </span>
+									{% endif %}
+								</label>
+							<label class="recordAttach">
+									<span class="imgattach">
+									{% for each in eachOpera.docList %}
+										<a href="/{{each.document.filepath}}{{each.document.name}}"><img src="/{{each.document.filepath}}{{each.document.name}}"  width="25%"  /></a>	
+									{% endfor %}
+								</span>
+								{% for each in eachOpera.voiceList %}
+									<a onclick="playVoice('voice_{{each.id}}');" style="position:relative; font-size:30px; float:right; right:50px; top:10px;">
+										<i class='fa fa-microphone' ></i>
+										<audio id='voice_{{each.id}}' src="/{{each.document.filepath}}{{each.document.name}}" controls="controls" style="display:none;"  /></audio>
+									</a>
+								{% endfor %}
+							</label>	
+							 {% endif %}
+						{% endfor %}
+						</div>
+			     {% endif %}
+					
+				{% endfor %}
+				<div class="input-group" >
+		        <span class="input-group-addon">
+		        	处理意见
+		        </span>
+		       <textarea class="form-control" type="text"  id="id_comment" rowspan="2" placeholder="添加处理意见" >
+		       	{% ifequal projectevent_instance.curflowstep.defaultcomment None %}{% else %}{{projectevent_instance.curflowstep.defaultcomment}}{% endifequal %}
+		       </textarea>
+		        <span class='input-group-addon' id='dealStartRecord' style='margin:-5px -26px auto;'><i class='fa fa-microphone' ></i></span>
+					 <input id="voiceid" name="voiceid" type="text" style="display:none;"/>
+		    </div>
+
+		    <div class="input-group">
+		         <input id="photoNum" type="text" class="form-control" placeholder="选取照片" readonly="readonly"> 
+		         <a id='clearchoosephoto' style='margin:-5px -26px auto; position:relative; z-index:2; right:15px; font-size:25px;'><i class='fa fa-close'></i></a>
+		         <span class="input-group-addon" id="chooseImage"><i class="fa fa-camera" ></i></span>
+				</div>
+
+				<div class=" btnSection section " align="center">
+					<p class="updateRes" style="color:red;"></p>
+					  <button class="btn weui_btn bg-blue weui_btn_inline saveSubmit operatorbtn" onclick="submitUpdate(this);" id="save" style="margin:0 5px 0 0px;font-size: 14px;" type="button"> 保存 </button>
+						{% for each in operaList %}
+							<button class="btn btn-primary updateSubmit operatorbtn" onclick="submitUpdate(this);" style="margin:0 5px 0 0px;" type="button" id="{{each.id}}"> {{each.name}} </button>
+						{% endfor %}
+					<button class="btn btn-default-outline" onclick="javascript:history.back(1)" >取消</button>	  
+				</div>
+			</div>
+		</div>
+		
+		<div class="swiper-slide tab-pane fade in" id="recordTab">
+			<div class="mainContent">
+			    <div class="section title" align="center">
+					<h3><i class="fa fa-rss"></i> 历史处理记录</h3>
+				</div>
+			    
+			    {% for eachStep in eventStepsRecord %}
+				    <div class="section recordStepSection" align="left">
+						<label class="stepInfo"> <span> {{eachStep.stepName}} </span>  </label>
+						{% for eachOpera in eachStep.operationRecord %}
+							<label class="recordDetail">
+								<span>{{eachOpera.oprtime | date:"m-d H:i"}} ｜ </span>
+								<span>{{eachOpera.actorName}} ｜ </span>
+								{% if eachOpera.comment %}
+									<span>{{eachOpera.comment}}  ｜ </span>
+								{% endif %}
+								{% if eachOpera.operaName %}
+									<span>{{eachOpera.operaName}}  </span>
+								{% endif %}
+							</label>
+							<label class="recordAttach">
+								<span class="imgattachhis">
+								{% for each in eachOpera.docList %}
+									<a href="/{{each.document.filepath}}{{each.document.name}}"><img src="/{{each.document.filepath}}{{each.document.name}}" height="80" width="80"  /></a>
+								{% endfor %}
+								</span>
+								{% for each in eachOpera.voiceList %}
+									<a onclick="playVoice('voice_{{each.id}}');" style="position:relative; font-size:30px; float:right; right:50px; top:10px;">
+										<i class='fa fa-microphone' ></i>
+										<audio id='voice_{{each.id}}' src="/{{each.document.filepath}}{{each.document.name}}" controls="controls" style="display:none;"  /></audio>
+									</a>
+								{% endfor %}
+							</label>	
+						{% endfor %}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" 
+				   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+               		提交中，请稍等！
+            </h4>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+	{% if not enableStatus %}
+		$(".updateSubmit").attr("disabled","true");
+		$(".cancelSubmit").attr("disabled","true");
+	{% endif %}
+
+	$(function(){
+	    $(".imgattach a").touchTouch();
+	    $(".imgattachhis a").touchTouch();
+	       
+	});
+
+	function playVoice(voiceName){
+		 var playAudio=document.getElementById(voiceName);
+		 playAudio.play();
+	}
+
+	wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'openLocation',
+        'getLocation',
+        'scanQRCode',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+      ]
+	});
+	
+	var images = {
+	    localId: [],
+	    serverId: []
+	  	};
+	 
+	var voice = {
+	    localId: '',
+	    serverId: ''
+	};
+	
+	wx.ready(function(){
+		document.querySelector('#dealStartRecord').onclick = function () {
+		    wx.startRecord({
+		      success: function (res) {
+		      	$("#recordUpdateBg").css("display","block");
+		      },
+		      cancel: function () {
+		        alert('用户拒绝授权录音');
+		      }
+		    });
+		};
+		
+		document.querySelector('#dealStopRecord').onclick = function () {
+		    wx.stopRecord({
+		      success: function (res) {
+		        voice.localId = res.localId;
+		        
+		        wx.translateVoice({
+			      	localId: voice.localId,
+			      	complete: function (res) {
+			        	if (res.hasOwnProperty('translateResult')) {
+			          		$("#id_comment").val($("#id_comment").val()+res.translateResult);
+			        	}                                                                                                                                                                                                                                                                                                                                                                                                                                           
+			        	$("#recordUpdateBg").css("display","none");
+			      	}
+			    });
+			    
+			    		        
+		      wx.uploadVoice({
+			      localId: voice.localId,
+			      success: function (res) {
+			        voice.serverId = res.serverId;
+			        $("#voiceid").val(voice.serverId);
+			      }
+			    });
+			    
+		      },
+		      fail: function (res) {
+		        alert(JSON.stringify(res));
+		      }
+		    });
+		};
+		
+
+		
+		 document.querySelector('#clearchoosephoto').onclick = function () {
+		 		  images.localId=[];
+	  			images.serverId=[];
+	  			$("#photoNum").val("");
+		 }
+		
+	  document.querySelector('#chooseImage').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+		    wx.chooseImage({
+		      success: function (res) {
+		        images.localId = res.localIds;
+		        var length = images.localId.length;
+		        $("#photoNum").val("已选取"+ length.toString() + "图片！");
+		        
+		        var i = 0, length = images.localId.length;
+		        function upload() {
+			      wx.uploadImage({
+			        localId: images.localId[i],
+			        isShowProgressTips: 1,
+			        success: function (res) {
+			          i++;
+			          images.serverId.push(res.serverId);
+			          if (i < length) {
+			            upload();
+			          }
+			        },
+			        fail: function (res) {
+			          alert(JSON.stringify(res));
+			        }
+			      });
+			    }
+			    upload();
+		        
+		      }
+	        });
+	  	};
+	  	
+  	});
+	
+	wx.error(function(res){
+		alert("授权失败！");
+	});
+	
+
+	function submitUpdate(obj) {
+		
+		
+		var comment = $("#id_comment").val();
+		if(!comment){
+			alert("处理意见必须填写！");
+			return;
+		}
+		
+		if(images.serverId.length==0){
+			alert("处理照片必须选择！");
+			return;
+		}
+		
+		
+		if($(obj).attr("id")) {
+			var operId = $(obj).attr("id");
+		} else {
+			var operId = 0;
+		}
+		
+		var curEventId = $("#id_EventId").val();
+		
+		var i = 0,length = images.localId.length;
+
+$('.operatorbtn').attr("disabled", true); 
+			$.ajax({
+				type: "POST",
+				url: location.href + 'update/',
+				cache: false,
+				dataType: "json",
+				data: {
+					'imgList': images.serverId.join(";"),
+					"curEventId": curEventId,
+					"comment": comment,
+					"operId": operId,
+					"voiceId": $("#voiceid").val()
+				},
+				success: function(data) {
+					if(data.status == 1) {
+						alert(data.msg);
+						location.href="/task/progress/problem/";
+					} else {
+						$(".updateRes").html(data.msg);
+					}
+					
+					$('.operatorbtn').attr("disabled", false); 
+				},
+				error: function() {
+					alert("服务器出错！");
+					location.href = "/login/";
+				}
+			});
+
+	};
+	
+</script>
+
+{% endblock %}

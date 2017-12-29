@@ -1,0 +1,163 @@
+{% extends "base_v2.html" %} 
+{% block ownerhead %}
+<script src="/js/echarts/echarts.min.js"></script>
+<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />
+<style>
+		#num,#now-pro,#grade,#ontime{width: 96%; padding: 2% 2%; background-color:#fff!important; border: 1px solid #E4E5E7;position: absolute;bottom: 0px; top: 30px;    height: 96%;    overflow: auto;} 
+		.static-pro{position: relative; min-height: 250px;}
+		.static-loader{position: absolute; top: 50%; left: 50%; margin-left: -65px; z-index: 200; }
+		.static-loader-table{position: absolute; top: 50%; left: 50%; margin-left: -65px; z-index: 200; }
+		
+</style>
+<script type = "text/javascript">
+var _filterCode='';
+function loadTableData(filterCode, page, querytype) {
+
+
+	_filterCode = filterCode;
+
+	var unitPro = $(".unitProject").children('option:selected').val();
+	var pbelevation = $(" .pbelevation").children('option:selected').val();;
+	
+					
+	$.ajax({
+		type: "POST",
+		url: "/progress/goujian/count_mobile/",
+		cache: false,
+		dataType: "json",
+		data: {
+			"filterCode": filterCode,
+			"unitProject": unitPro,
+			"pbelevation":pbelevation,
+		},
+		 beforeSend:function(XMLHttpRequest){ 
+                $(".static-loader-table").show();
+          }, 
+		success: function(data) {
+			$(".static-loader-table").hide();
+			if(data.status == 1) {
+					var tmpStr = "";
+					for(var each in data.countinfolist) {
+						tmpStr += "<tr>"
+							for(var row in data.countinfolist[each]) {
+								if("单位工程"==data.countinfolist[each][row]){
+									tmpStr += `<td>
+												 <select class="unitProject"  onchange="unitPrjChange()">`
+												$.ajax({
+													type: "get",
+													url: "/task/unitprojects/?format=json",
+													cache: false,
+													dataType: "json",
+													async: false,
+													success: function(unitPros) {
+														for(var unitPro in unitPros.results){
+															if(unitPros.results[unitPro].id==data.unitProject){
+																tmpStr += "<option value="+unitPros.results[unitPro].id+" selected>"+unitPros.results[unitPro].name+"</option>";
+															}else{
+																tmpStr += "<option value="+unitPros.results[unitPro].id+">"+unitPros.results[unitPro].name+"</option>";
+															}
+															
+														}
+													}
+												});		
+									tmpStr += `</select></td>`;
+								}else if("楼层"==data.countinfolist[each][row]){
+									tmpStr += `<td>
+												 <select class="pbelevation"  onchange="pbelevationChange()">`
+													$.ajax({
+														type: "POST",
+														url: "/progress/goujian/loadElevation/",
+														cache: false,
+														dataType: "json",
+														async: false,
+														data: {
+															"unitProject": data.unitProject
+														},
+														success: function(data2) {
+															console.log("11111");
+															tmpStr += '<option value="0">全部楼层</option>';
+															for(var each in data2.elevationList) {
+																if(data2.elevationList[each].id==data.pbelevation){
+																	tmpStr += '<option value="' + data2.elevationList[each].id.toString() + '" selected>' + data2.elevationList[each].name + '</option>';
+																}else{
+																	tmpStr += '<option value="' + data2.elevationList[each].id.toString() + '">' + data2.elevationList[each].name + '</option>';
+																}
+																
+															}
+														}
+												});
+												
+									tmpStr += `</select></td>`;
+								}else{
+									tmpStr += "<td>"+data.countinfolist[each][row]+"</td>";
+								}
+								
+							}		
+						tmpStr += "</tr>";
+					}
+					console.log(tmpStr);
+					$(".count_table").html(tmpStr);
+
+			} else {
+				alert(data.error);
+			}
+			
+		}
+	});
+	
+}
+
+function unitPrjChange(){
+	console.log("11111");
+	loadTableData(_filterCode, 1, "00");
+}
+
+function pbelevationChange(){
+	loadTableData(_filterCode, 1, "00");
+}
+
+function majorChange(){
+	_filterCode = $("#sel-Major").children('option:selected').val();
+	loadTableData(_filterCode, 1, "00");
+}
+ 	$(function(){
+ 		
+		majorChange();
+ 	})
+</script>
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+	<div class="header-bg-v2">
+		<span class="title-v2 line_height32">进度统计</span>
+		<div class=" pull-right">
+			 <select class="form-control"  style="width: 200px;" id="sel-Major" onchange="majorChange()">
+			{% for each in MajorList %}
+			{% ifequal each.id major%}
+			<option value="{{each.id}}" selected>{{each.name}}</option>
+			{% else %}
+			<option value="{{each.id}}">{{each.name}}</option>
+			{% endifequal %}
+			{% endfor %}
+			</select>
+		</div>
+	</div>
+ </div>
+
+	<div class="content-row">
+	<div class="static-loader-table" style="display: block;">
+			<div class="loader-inner ball-pulse">
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+			</div>
+		</div>
+		
+			
+			<table class="table count_table">
+						
+			</table>
+
+</div>
+
+{% endblock %}

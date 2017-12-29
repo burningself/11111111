@@ -1,0 +1,41 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<script defer src="/js/skycons/skycons.js" type="text/javascript"></script>
+<script src="/js/morris.js-0.5.1/raphael-min.js"></script>
+<script src="/js/morris.js-0.5.1/morris.min.js" type="text/javascript"></script>
+<script src="/dist_vue/plugin/echarts/echarts.min.js" type="text/javascript"></script>
+
+<script src="js/web3d/three.min.js"></script>
+<script src="js/web3d/wgs.min.js"></script>
+<script src="js/web3d/viewer3D.min.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskStatus/Autodesk.ADN.Viewing.Extension.SampleTaskStatus.js"></script>
+<script src="js/web3d/scripts/LoadModelGeneral.js"></script>
+<script src="js/web3d/scripts/modelcommon.js"></script>
+<link href="js/web3d/style.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="/dist_vue/css/general.css">
+<script src="/dist_vue/js/general.js?v=(20171030)"></script>
+{% endblock %}
+{% block content %}
+<div style="width: 100%;">
+    <div class="modal_container  pull-right" id="modal_draw" style="width: 100%;">
+        <div class="title_row" style="width: 100%; vertical-align: bottom; padding: 5px 10px;height: 48px;">
+            <div style=" float: left;">
+                <span style="font-size: 26px;">4D施工状态</span>
+                <span class="fenge"></span>
+                <select class="add-on" id="selUnitproject"  style="border: white;"></select>
+            </div>
+        </div>
+        <div class="col-md-8"  id="viewer" style="height: calc(100vh - 177px);padding: 0px;float: left;width: 75%"></div>
+        <div class="right-model col-md-4" style="padding: 0px;">
+            <div class="right-model-top">
+                <p>安全问题总数<span id="anquan_sum"></span></p>
+                <div id="echarts_anquan"></div>
+            </div>
+            <div class="right-model-bottom">
+                <p>质量问题总数<span id="zhiliang_sum"></span></p>
+                <div id="echarts_zhiliang"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

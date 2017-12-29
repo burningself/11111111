@@ -1,0 +1,282 @@
+{% extends "baseadmin.html" %} {% block content %}
+<link href="/css/bootstrap/bootstrap-switch3.3.2.min.css" rel="stylesheet" type="text/css" />
+<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="/js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="/js/web3d/scripts/libs/jstree/dist/jstree3.3.4.min.js"></script>
+<script src="/js/bootstrap/bootstrap-switch3.3.2.min.js" type="text/javascript"></script>
+</head>
+<style>
+	.all {
+		width: 100%;
+		background-color: white;
+		height: 800px;
+		margin: 3px auto auto -11px;
+		padding-top: 5px;
+		padding-left: 5px;
+	}
+	
+	.all h4 {
+		font-weight: bold;
+	}
+	
+	.header-row {
+		width: 100%;
+		margin: 5px 0 5px 5px;
+		padding: 0;
+		text-align: left;
+		font-size: 18px;
+		font-weight: bold;
+		color: #2e6da4;
+	}
+	
+	.left {
+		width: 25%;
+		height: 95%;
+		overflow: auto;
+	}
+	
+	.panel-body {
+		text-align: left;
+	}
+	
+	.right {
+		width: calc(60% - 0px);
+		border-radius: 3px;
+		color: #337ab7;
+		height: 95%;
+		border-left: 1px solid #337ab7;
+	}
+	
+	#content_3 {
+		width: 750px;
+	}
+	
+	.right_header {
+		text-align: center;
+		margin: 10px auto;
+	}
+
+	.save{
+		width: 100px;
+	}
+	
+	.authlable{
+		margin-right: 10px;
+		color: darkblue;
+	}
+	.authlistsel{
+		background-color: #F1F1F1;
+	}
+</style>
+<div class="all">
+	<div class="header-row"><i class="fa fa-tree"></i>文件夹权限编辑</div>
+	<div class="left  col-lg-2 col-md-3 col-sm-3">
+		<div class="panel-body">
+			<div id="dirtree_div"></div>
+		</div>
+	</div>
+	<div class="right col-lg-10 col-md-9 col-sm-9">
+			<div class="right_header"><h3>修改设置</h3></div>
+			<div class="col-md-12">
+					<input type="hidden" id="hidden_uploaddir" />
+					<div class="col-md-5" style="margin-bottom: 10px;font-weight: bold;">当前文件夹：<span id="curdirectory">未选择</span></div>
+					<div class="col-md-7" style="margin-bottom: 10px;font-weight: bold;">选择权限：
+						<label class="checkbox-inline">
+							<input type="radio" name="optionsRadiosAuth" id="RadiosAuthRead" value="4" checked="">只读
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="optionsRadiosAuth" id="RadiosAuthRW"  value="6">读写
+						</label>
+						<label class="checkbox-inline">
+							<input type="radio" name="optionsRadiosAuth" id="RadiosAuthNo"  value="0">无权限
+						</label>
+					</div>
+					<div id="divusertree" class="col-md-5" style="height: 400px;border: solid 1px #ccc;overflow: auto;"></div>
+					<div class="col-md-7" style="height: 400px;border: solid 1px #ccc;overflow: auto; padding: 5px;">
+						<ul class="list-group" id="authuserlist">
+
+						</ul>
+					</div>
+			</div>
+			<div class="pull-right" style="margin-right: 30px;margin-top: 10px;">
+				<button class="save btn btn-primary">保存设置</button>
+			</div>
+			
+	</div>
+</div>
+<script>
+
+	$("#dirtree_div").jstree({
+	   		"core": {
+	   			'data': {
+	   				'url': '/task/ziliao/getdirtree/',
+	   				'data': function(node) {
+	   					return {
+	   						'id': node.id
+	   					};
+	   				}
+	   			}
+	   		},
+	   		"plugins": ["themes", "json_data"],
+	// 		"checkbox": {
+	// 			"three_state": false
+	// 		}
+	});
+	$('#dirtree_div').bind("select_node.jstree", function (obj, data) {
+	  	console.log(data.node.id);
+	  	var node = data.node;
+		if(data.node.id != "#") {
+			$("#authuserlist").html('');
+			$("#hidden_uploaddir").val(node.id)
+			$("#curdirectory").text(node.text)
+			
+				$.ajax({
+				type: "post",
+				//url: "/xadmin/navigat/savemenu/",
+				data: {
+					"dirId": node.id,
+					"opt": 'get',
+				},
+				success: function(data) {
+					if(data.issuc=="true"){
+						for(var each in data.authuserlist){
+								var newLi = "<li class='list-group-item' onclick='setOption(this)' value='"+data.authuserlist[each].userId+"' id='"+data.authuserlist[each].userId+"'>"+data.authuserlist[each].userName;
+								newLi +=		"<span class='pull-right'>";
+								newLi +=				"<span class='authlable' value='"+data.authuserlist[each].auth+"'>"+getAuthDesc(data.authuserlist[each].auth)+"</span>";
+								newLi +=				"<a href='#' onclick='deleteOption(this)' style='color: red;'><i class='fa fa-trash'>删除</i></a>";
+								newLi +=		"</span>";
+								newLi +=	"</li>";
+								$("#authuserlist").append(newLi);	
+						}
+
+					}else{
+						alert("操作失败！");
+					}
+				},
+				error: function(data) {
+					alert("服务器错误");
+				}
+			});
+		}
+	});
+	
+	$("#divusertree").jstree({
+		   		"core": {
+		   			'data': {
+		   				'url': '/user/prjusertree/',
+		   				'data': function(node) {
+		   					return {
+		   						'id': node.id
+		   					};
+		   				}
+		   			}
+		   		},
+		   		"plugins": ["themes", "json_data"],
+		});
+		$('#divusertree').bind("select_node.jstree", function (evt, data) {
+			
+		    // 处理代码
+		    if(data.node.id != "#" && data.node.id!="rootprjusertree"&& data.node.id.indexOf("_")==-1) {
+		    	
+		    	var bHasUser = false;
+		    	$("#authuserlist>li").each(function(index){
+		    		console.log($(this).find(".authlable").attr("value"));
+				 	 if($(this).val()==data.node.id){
+				 	 	bHasUser = true;
+				 	 }
+				 });
+		    	
+		    	var val= parseInt($('input:radio[name="optionsRadiosAuth"]:checked').val());
+		    	if(!bHasUser){
+		    		var newLi = "<li class='list-group-item' onclick='setOption(this)' value='"+data.node.id+"' id='"+data.node.id+"'>"+data.node.text;
+					newLi +=		"<span class='pull-right'>";
+					newLi +=				"<span class='authlable' value='"+val+"'>"+getAuthDesc(val)+"</span>";
+					newLi +=				"<a href='#' onclick='deleteOption(this)' style='color: red;'><i class='fa fa-trash'>删除</i></a>";
+					newLi +=		"</span>";
+					newLi +=	"</li>";
+					$("#authuserlist").append(newLi);	
+		    	}
+	
+		    }
+			
+		});	
+		
+	function getAuthDesc(auth){
+		var desc="未知";
+		switch (auth){
+			case 4:
+				desc="只读"
+				break;
+			case 6:
+				desc="读写"
+				break;
+			case 0:
+				desc="无权限"
+				break;
+			default:
+				break;
+		}
+		return desc;
+	}
+		
+	function deleteOption(obj) {
+		
+		$(obj).parents("li").remove();
+
+	}
+		
+	function setOption(obj) {
+		$("#authuserlist>li").removeClass("authlistsel");
+		$(obj).addClass("authlistsel");
+		$("input[name='optionsRadiosAuth']").prop('checked',false); 
+		var val = $(obj).find(".authlable").attr("value");
+		$("input[name='optionsRadiosAuth'][value='"+val+"']").prop("checked",true);  
+	}
+
+	  $("input[name='optionsRadiosAuth']").click(function(){
+//	    	alert("您是..." + $(this).val());
+	    	var val  =  $(this).val();
+	    	var desc = this.parentElement.textContent.trim();
+	    	$("#authuserlist .authlistsel").find(".authlable").attr("value",val);
+	    	$("#authuserlist .authlistsel").find(".authlable").text(desc);
+	   });
+	   
+		
+		$('.save').bind("click", function() {
+			var dirId = $("#hidden_uploaddir").val()
+			if(!dirId){
+				alert("请先选择文件夹！");
+				return;
+			}
+			
+			var authuserlist=[];
+			$("#authuserlist>li").each(function(index){
+		    	var authuser = {};
+		    	authuser["user"]=$(this).val();
+		    	authuser["auth"]=$(this).find(".authlable").attr("value");
+				authuserlist.push(authuser);
+			});
+			
+			$.ajax({
+				type: "post",
+				//url: "/xadmin/navigat/savemenu/",
+				data: {
+					"dirId": dirId,
+					"authuserlist": JSON.stringify(authuserlist),
+					"opt": "set",
+				},
+				success: function(data) {
+					if(data.issuc=="true"){
+						alert("保存成功");
+					}else{
+						alert("保存失败");
+					}
+				},
+				error: function(data) {
+					alert("服务器错误");
+				}
+			});
+			
+	});
+</script>
+{% endblock %}

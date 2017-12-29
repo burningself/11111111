@@ -1,0 +1,210 @@
+	.row{width:99.8%; margin:2px 0.1% 0 0.1%; padding: 0 5px 0 5px; border-radius:5px; display:inline-block; background: white; color: #007aff;min-height:600px;}
+	.content-row{text-align: left;}
+	.border-gray{
+			border: 1px solid #C1C1C1;
+		}
+		.padding-top{
+			padding-top: 20px;
+		}
+		.padding{
+			padding: 20px;
+		}
+		.padding5{
+			padding: 50px;
+		}
+		.margin-top{
+			margin-top: 20px;
+		}
+		body{
+			background-color: #E4E4E4;
+		}
+		.header{
+			color: #0E79FE;
+			background-color: #F9FAFB;
+		}
+		.header-up{
+			overflow: hidden;
+			border-bottom: 1px solid #EBECEC;
+		}
+		.header-left{
+			float: left;
+			font-size: 20px;
+		}
+		.header-left img{
+			width: 50px;
+		}
+		.header-right{
+			float: right;
+			font-size: 16px;
+			margin-top: 15px;
+		}
+		.ul-algin{
+			margin: 0 auto;
+			width: 660px;
+			border-bottom: 1px solid #EBECEC;
+		}
+		.body-title{
+			min-width: 650px;
+			height: 40px;
+			border-radius: 20px;
+			background-color:#F9FAFB ;
+			text-align: center;
+			line-height: 40px;
+			font-weight: 600;
+			margin: 20px auto;
+		}
+		h5{
+			font-weight: 600;
+			margin:20px 0;
+		}
+		.first{
+			background-color: #FFFFFF;
+			margin-bottom: 10px;
+			    border: 1px solid gray;
+		}
+		.first-title{
+			padding: 10px 10px;
+			font-weight: 600;
+		}
+		.first-left{
+			float: left;
+			width: 60%;
+			overflow: hidden;
+		}
+		.first-right{
+			height: calc(100vh - 205px);
+			float: right;	
+			width: 40%;
+			padding: 5px;
+		}
+		.righttitle{
+			height: 40px;
+    		line-height: 30px;
+    		padding: 5px;
+    		font-size: 20px;
+		}
+		.rightbody{
+			height: calc(100vh - 245px);
+		}
+		
+		.first{
+			overflow: hidden;
+		}
+		.body-total{
+			padding: 0px 20px;
+		}
+		.situation>p{
+			text-indent: 20px;
+		}
+		
+		.second{
+			width: 100%;
+			background-color: #fff;
+			height: 600px;
+		    overflow: hidden;
+		}
+		.secondhead{
+			height: 55px;
+		}
+		.secondbody{
+			height: calc(100vh - 75px);
+			overflow-y: auto;
+		}
+		.descdefine{
+			height: calc(40% - 30px);
+			margin-bottom: 5px;
+		}
+		.descdefinebody{
+			height: calc(60% - 30px);
+		}
+		
+		.third{
+			width: 100%;
+			background-color: #fff;
+			height: 360px;
+		    overflow: hidden;
+		}
+		
+		.hour{
+			width: 100%;
+			background-color: #fff;
+		    overflow: hidden;
+		}
+	    .hourhead{
+			height: 55px;
+		}
+		.hourdbody{
+			height: calc(100vh - 190px);
+			overflow-y: auto;
+		}
+		
+		.font-weight{
+			font-weight:600;
+		}
+		table tr td{
+			border:1px solid #C1C1C1;
+			height: 35px;
+		}
+		table tr th{
+			border:1px solid #C1C1C1;
+			height: 35px;
+		}
+		.table-height{
+			min-height: 262px;
+		}
+		
+		.tdseq{
+			width: 30px;
+		}
+		.tdstatus{
+			width: 100px;
+		}
+		.tdopr{
+			width: 100px;
+		}
+		
+		.td41{
+			width: 8%;
+		}
+		.td42{
+			width: 75%;
+		}
+		
+		.weeklytitle{
+			color: #0C398A;
+			line-height: 55px;
+		}
+		
+		h3{
+			color:#0C398A ;
+		}
+
+.editable-click, a.editable-click, a.editable-click:hover{
+	border-bottom: none !important;
+}
+
+.editable{
+	overflow: auto;
+	padding: 10px 20px;
+}
+    
+.editdivdesc{
+	height: calc(100vh - 90px);
+}
+
+.viewer{
+	height: calc(100vh - 195px);
+}
+
+.shotviewer{
+	height: calc(100vh - 195px);
+	width: 100%;
+}
+
+.pbwell-simaple{
+	font-size: 20px;
+}
+
+.weeklypanel{
+	height: calc(100vh - 20px);
+}

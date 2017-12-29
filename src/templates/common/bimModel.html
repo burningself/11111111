@@ -1,0 +1,473 @@
+﻿{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<link href="/css/bim.css" media="all" rel="stylesheet" type="text/css" />
+
+<div class="bimContain" >
+	<div class="bimNav">
+		<ul class="nav nav-pills nav-stacked">
+		   <li><a class="i-border" onclick="loadBimContent(1);">泥洲水道桥</a></li>
+           <li><a class="i-border" onclick="loadBimContent(2);">大沙水道桥</a></li>
+           <li><a class="i-border" onclick="loadBimContent(3);">东涌互通</a></li>
+		   <li><a onclick="loadBimContent(4);">骝东主线</a></li>
+		   <li><a onclick="loadBimContent(5);">西引桥</a></li>
+		   <li><a onclick="loadBimContent(6);">中引桥</a></li>
+		   <li><a onclick="loadBimContent(7);">东引桥</a></li>
+		   <li><a onclick="loadBimContent(8);">海鸥互通</a></li>
+		   <li><a onclick="loadBimContent(9);">沙田互通</a></li>
+		   <li class="active"><a class="i-border" onclick="loadBimContent(10);">全线模型</a></li>
+		</ul>
+		<img src="/images/logo_rioh.png" style="width:80px; margin-top:40px;"/>
+	</div>
+	
+	<div class="bimContent">
+		<div class="optContain">
+			<button type="button" class="btn btn-info optBtn" style="" title="显示信息" onclick="loadInfo(1);">信息</button>
+			<button type="button" class="btn btn-warning optBtn" style="" title="显示状态" onclick="loadInfo(2);">状态</button>
+		</div>
+		<div class="contentContain_info"  >
+			<a></a>
+		</div>
+		<div class="contentContain_data" style="display:none;">
+			<table class="table">	
+				<tr><td>总预支梁段:<td> <td>0<td>   <tr>
+				<tr><td>已预制完成:<td> <td>0<td>   <tr>
+				<tr><td>已安装完成:<td> <td>0<td>   <tr>
+				<tr><td>存梁区数量:<td> <td>0<td>   <tr>
+				<tr><td><td><td><td><tr>
+			</table>
+			<div class="summerize_donut">
+				<div id="hero-donut-total" style="height: 200px; "></div>
+				<div id="hero-donut-pass" style="height: 200px;"></div>
+			</div>
+		</div>
+		
+	</div>
+	<div class="SCALE">
+		<div class="scalBtn" style="border:solid 1px; margin-left:-8px; border-left:solid 1px white; background-color:white;"  >
+			<a class="fa fa-chevron-left" title="缩放展示栏" onclick="scaleContent();"></a>
+		</div>
+	</div>
+	
+	<div class="bimFrame">
+		<!--iframe id="frameDiv" style="min-height:800px;" src="http://182.92.131.28:8080/8343552-hthrvt/" frameBorder=0 marginwidth=0 marginheight=0 scrolling=no ALLOWTRANSPARENCY="true" >
+		</iframe-->
+		<div class="frameDiv">
+		</div>
+	</div>
+</div>
+
+<script src="/js/jquery.flot.js"></script>
+<script src="/js/jquery.flot.stack.js"></script>
+<script src="/js/jquery.flot.resize.js"></script>
+<script src="/js/exportword.js"></script>
+<script type="text/javascript" src="/js/cross-domain-ajax/jquery.xdomainajax.js"></script>
+
+<link type="text/css" rel="stylesheet" href="/css/bim/viewer3DStyle.css">
+<script src="/js/bim/three.min.js"></script>
+<script src="/js/bim/viewer3D.min.js"></script>
+
+<script type="text/javascript" >	
+		activeFlag = 1;	        
+        function scaleContent(){
+        	if ($(".bimContent").css('display') == 'none'){
+        		$(".bimContent").css('display','inline-block');
+        		$(".scalBtn a").removeClass();
+        		$(".scalBtn a").addClass("fa fa-chevron-left");
+        		$(".scalBtn").css('margin-left',"-8px");
+        		$(".scalBtn").css('border-left',"solid 1px white");
+        		$(".adsk-viewing-viewer").css("width",fulWid-450);
+        		}
+        	else{
+        		$(".bimContent").css('display',"none");
+        		$(".scalBtn a").removeClass();
+        		$(".scalBtn a").addClass("fa fa-chevron-right");
+        		$(".scalBtn").css('margin-left',"-5px");
+        		$(".scalBtn").css('border-left',"none");
+        		$(".adsk-viewing-viewer").css("width",fulWid-150);
+        	}
+        }
+        
+        function loadBimContent(id){
+        	activeFlag = id;
+        	var image1="";
+        	var image2="";
+        	var image3="";
+        	var info1="";
+        	var info2="";
+        	var info3="";
+        	var firline="";
+        	var secline="";
+        	var thdline="";
+        	var forline="";
+        	
+        	var docs = [{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+        	switch(id)
+        	{
+        	case 10:
+			  srcLink="http://182.92.131.28:8080/8343552-hthrvt/";
+			  info1="虎门二桥路线起于广州市南沙区东涌镇，顺接国道主干线广州绕城公路南环段，同时与广珠北线高速公路连接。";
+			  info2="虎门二桥工程主线两座双塔双跨悬索；引桥主要采用30m～62.5m跨径的预应力混凝土桥，全长12.886km。";
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  t1="1.桥型布置";
+			  t2="2.结构形式";
+			  var image1="/images/humenerqiaopingmiantu.jpg";
+			  var image2="/images/humenerqiaojiegouxingshi.jpg";
+			 
+			  break;
+			case 1:    
+			  srcLink="http://182.92.131.28:8080/17225888-nizhoufbx/";
+			  info1="承台采用圆端哑铃型，承台厚7m，承台上设承台底座，底座厚4m。钻孔灌注桩。";
+			  info2="钢箱梁全宽49.7m，梁高4m，风嘴迎风角度45°，吊索锚固在风嘴上。";
+			  docs=[{"path":"js/bim/2/nizhou.svf","name":"Scene"}];
+			  t1="1.索塔";
+			  t2="2.箱梁";
+			  var image1="/images/大沙水道索塔.png";
+			  var image2="/images/泥洲水道桥箱梁.png";
+			  
+			  break;
+            case 2:
+              srcLink="http://182.92.131.28:8080/12426576-dashafbx/";
+			  info1="入射角为20.533度，主缆中心线水平角40度，空腹式锚体。";
+			  info2="钢箱梁全宽49.7m，梁高4m，风嘴迎风角度45°，吊索锚固在风嘴上。";
+			  docs=[{"path":"js/bim/1/dasha.svf","name":"Scene"}];
+			  t1="1.锚碇与基础";
+			  t2="2.箱梁";
+			  var image1="/images/大沙水道桥锚碇与基础.jpg";
+			  var image2="/images/泥洲水道桥箱梁.png";
+			  
+			  break;
+			 
+			case 3:
+			  srcLink="http://182.92.131.28:8080/17674240-S2-liu%20dong%20zhu%20%20xian%20-rvt/";
+			  info1="东涌互通分为东涌主线和A，D，E，H匝道，本路段位于东涌庆盛一带。";
+			  info2="东涌主线采用连续箱梁，匝道采用连续(刚构)箱梁+连续刚构+连续(刚构)箱梁+预应力砼先简支后桥面连续小箱梁；连续箱梁等宽段采用预制节段拼装方案施工，变宽段采用支架现浇方案施工。";
+			  info3="预制梁段为单箱双室结构，顶宽20m，55m跨径梁高为3.3m，其他跨径梁高为2.7m，相应的梁底宽10.64m，11.12m；部分采用小箱梁。下部结构大多采用双柱墩，板式墩；桩基均为钻孔灌注桩基础；\
+						连续箱梁的支座采用GPZ（2009）减震型盆式橡胶支座。";
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	
+			  break;  
+			  
+			case 4:
+			  srcLink="http://182.92.131.28:8080/17674240-S2-liu%20dong%20zhu%20%20xian%20-rvt/";
+			  info1="本路段位于东涌沙公堡一带，里程桩号K1+563.618~K2+555.618。";
+			  info2="桥跨布置为(4x39m+4x47m+4x47m+4x45m+4x45m)，按预制节段拼装方案施工。";
+			  info3="预制梁段为单箱双室结构，梁高2.7m，底宽11.12m，节段长度为2-3.7m，总共40跨，总预制节段数量为538块，最大节段重量173.9t。\
+			  		支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160型；桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  docs=[{"path":"1/nizhou.svf","name":"Scene"}];
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	
+			  break;
+			case 5:
+			  srcLink="http://182.92.131.28:8080/17698816-S2----WEST%20%20%20%20bridgervt/";
+			  info1="本路段位于东涌沙公堡一带，里程桩号K2+555.618~K3+305.618。";
+			  info2="桥跨布置为(5x55m+7x62.5m)，按预制节段拼装方案施工。";
+			  info3="预制梁段为单箱双室结构，62.5m跨径梁高3.6m，55m跨径梁高3.3m，顶宽20m，相应的底宽分别为10.4m和10.64m，节段长度约为2-3.7m，总共24跨，总预制节段数量为520块。\
+			  			支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160型；桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	
+			  
+			  break;
+			case 6:
+			  srcLink="http://182.92.131.28:9999/29593600-S3MiddleBridgervt/";
+			  info1="本路段位于石楼镇沙南村、江鸥村一带，里程桩号K4+505.618~K5+318.118。";
+			  info2="桥跨布置为(4x62.5m+4x62.5m+5x62.5m)，连续箱梁等宽段采用预制节段拼装方案施工，变宽段采用支架现浇方案施工。";
+			  info3="预制梁段为单箱双室结构，梁高3.6m，底宽10.4m，节段长度为2-3.7m，总共26跨，总预制节段数量为566块，最大节段重量173.9t。\
+					支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160、D240、D320型，桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	
+			  
+			  break;
+			case 7:
+			  srcLink="http://182.92.131.28:8080/21266432-S4-EASTbridgervt/";
+			  info1="本路段位于东莞沙田福禄沙村及民田村一带，里程桩号K9+740.618~K11+426.618.";
+			  info2="桥跨布置为左幅：5x55m+4x55m+4x55m+4x55m+4x55m+(2x45+39+42)m+4x55m+4x55m；\
+					右幅：5x55m+4x55m+4x55m+4x55m+4x55m+(45+39+42+45)m+4x55m+4x55m;连续箱梁等宽段采用预制节段拼装方案施工，变宽段采用支架现浇方案施工。";
+			  info3="预制梁段为单箱双室结构，顶宽20m，55m跨径梁高为3.3m，其他跨径梁高为2.7m，相应的梁底宽10.64m，11.12m。左右幅各33跨，总预制节段数量1062块。\
+						支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160、D240、D320型，桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	  
+			  break;
+			case 8:
+			  srcLink="http://182.92.131.28:8080/21266432-S4-EASTbridgervt/";
+			  info1="本路段位于石楼镇沙南村、江鸥村一带，里程桩号K5+318.118~K7+504.618.";
+			  info2="桥跨布置为左幅：5x44m+5x45m+5x44m+4x44m+5x55m+5x55m+3x55m;\
+						右幅：5x44m+4x45m+4x45m+4x44m+4x44m+5x55m+4x55m+3x55m连续箱梁等宽段采用预制节段拼装方案施工，变宽段采用支架现浇方案施工。";
+			  info3="预制梁段为单箱双室结构，顶宽20m，55m跨径梁高为3.3m，其他跨径梁高为2.7m，相应的梁底宽10.64m，11.12m。左幅共32跨，节段数量482,；右幅总共33跨，总预制节段数量为491个。\
+					支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160、D240、D320型，桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	  
+			  break; 
+			  
+			case 9:
+			  srcLink="http://182.92.131.28:8080/17674240-S2-liu%20dong%20zhu%20%20xian%20-rvt/";
+			  info1="本路段位于东莞沙田福禄沙村及民田村一带，里程桩号K11+426.168~K12+941.168。";
+			  info2="桥跨布置为：左幅：（4x30m+29）+5x29m+（2x29m+30m+31m）+4x31m+（33m+56m+36m）+3x29m+（25+30+31）m+4x29m+2x5x29m+（2x29+3x30）+（30+60+33）m；\
+					右幅：（4x30m+29）+5x29m+（29m+2x30m+30m）+（29+3x31m）+（33m+56m+36m）+（3x29m+30+31）m+（25+4x29）m+2x5x29m+（2x29+3x30）+（30+60+33）m\
+					连续箱梁等宽段采用预制节段拼装方案施工，变宽段采用支架现浇和挂篮悬浇方案施工。";
+			  info3="预制梁段为单箱双室结构，顶宽20m，55m跨径梁高为3.3m，其他跨径梁高为2.7m，相应的梁底宽10.64m，11.12m。左右幅各33跨，总预制节段数量1062块。\
+					支座采用PZ减震型盆式橡胶支座，伸缩缝采用D160、D240、D320型，桥墩采用板式墩和空心薄壁墩，桩基为钻孔灌注桩。";
+			  docs=[{"path":"js/bim/Resource/____/_3D_/_3D_.svf","name":"{3D}"}];
+			  t1="1.桥梁概况";
+			  t2="2.桥型布置方案";
+			  t3="3.结构形式";	
+			  break;
+			  
+			
+			}
+			
+			$(".bimNav ul li[class='active']").removeAttr("class");
+			$(".bimNav ul li")[id-1].setAttribute("class","active");
+			//$("IFRAME").attr("src",srcLink);
+			
+			var firline="<h3>项目简介</h3>";
+			if(id==1){
+				var secline="<h5 class='i-title'>1.索塔<br></h5><div><div class='info'>" + info1 + "</div><div class='img'><img src=" + image1 + " wdith=100% /></div></div><br>";
+				var thdline="<h5 class='i-title'>2.箱梁<br></h5><div><div class='info'>" + info2 + "</div><div class='img'><img src=" + image2 + " wdith=100% /></div></div><br>";
+			}
+			else{
+				if(info1) 
+					if(image1){
+						secline="<h5 class='i-title'>" + t1 + "<br></h5><div><div class='info'>" + info1 + "</div>";
+						secline += "<div class='img'><img src=" + image1 + " wdith=100% /></div></div><br>";
+					}
+					else{ 
+						secline="<h5 class='i-title' >" + t1 + "<br></h5><div><div class='info' style='width:90%; overflow:hidden;'>" + info1 + "</div></div><br>";	
+					}
+					
+				if(info2) 
+					if(image2){
+						thdline="<h5 class='i-title'>" + t2 + "<br></h5><div><div class='info'>" + info2 + "</div>";
+						thdline += "<div class='img'><img src=" + image2 + " wdith=100% /></div></div><br>";
+					}
+					else{ 
+						thdline="<h5 class='i-title'>" + t2 + "<br></h5><div><div class='info' style='width:90%; overflow:hidden;' >" + info2 + "</div></div><br>";	
+					}
+					
+				if(info3) 
+					if(image3){
+						forline="<h5 class='i-title'>" + t3 + "<br></h5><div><div class='info'>" + info3 + "</div>";
+						forline += "<div class='img'><img src=" + image3 + " wdith=100% /></div></div><br>";
+					}
+					else{ 
+						forline="<h5 class='i-title'>" + t3 + "<br></h5><div><div class='info' style='width:90%;overflow:hidden;'>" + info3 + "</div></div><br>";	
+					}
+			}
+			
+			var htmlStr = firline + secline + thdline + forline;
+			
+			$(".contentContain_info").html(htmlStr);
+			$(".img").click(function(){
+        		var html = $(this).html();
+        		$("#imageShow .modal-content").html(html);
+        		$('#imageShow .modal-content').css("width",800);
+        		$('#imageShow .modal-content').css("height",450);
+        		$('#imageShow .modal-content').css("margin-top","20%");
+        		$("#imageShow .modal-content").css("text-align","center");
+        		$('#imageShow').modal('show');
+        	});
+        	
+        	//add for statistic
+        	if($(".contentContain_data").css("display")=="inline"){
+	        	staticRefresh(activeFlag);
+	        }
+        	
+			//add for WebGL
+			$(".adsk-viewing-viewer").remove();
+			
+	        var oViewer =null ;
+            //var options ={ 'document': '', 'env': 'AutodeskProduction' } ;
+            var options ={ 'docid': docs [0].path, env: '' } ;
+
+            //oViewer =new Autodesk.Viewing.Viewer3D ($("#viewer") [0], {}) ; // No toolbar
+            oViewer =new Autodesk.Viewing.Private.GuiViewer3D ($(".frameDiv")[0], {}) ; // With toolbar
+            function loadExtensions(viewer) {
+                viewer.loadExtension('Viewing.Extension.Workshop');
+            }
+            
+            Autodesk.Viewing.Initializer (options, function () {
+				oViewer.initialize () ;
+				
+                oViewer.addEventListener(
+                        Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
+                        function(event) {
+                            loadExtensions(oViewer);
+                        });
+                
+				oViewer.load (options.docid) ;
+				console.log("3");
+				for ( var i =0 ; i < docs.length ; i++ ) {
+					var r =$('<div><button id="view_' + i + '">' + docs [i].name + '</button></div>') ;
+					$('#list').append (r) ;
+					$('#view_' + i).click (function (e) {
+						e.stopPropagation () ;
+						var i =parseInt (e.target.id.substring (5)) ;
+						oViewer.load (docs [i].path) ;
+					}) ;
+				}
+			}) ;
+			
+			$(".adsk-viewing-viewer").css("width",fulWid-450);
+			$(".adsk-viewing-viewer").css("height",window.screen.availHeight-137);
+			
+			//$(".contentContain_data").html();
+        }
+        
+        function loadInfo(id){
+        	if(id==1){
+        		$(".contentContain_data").css("display","none");
+        		$(".contentContain_info").css("display","inline");
+        	}
+        	else{
+        		$(".contentContain_data").css("visibility","visible");
+        		$(".contentContain_info").css("display","none");
+        		$(".contentContain_data").css("display","inline");
+
+        		//add for statistic
+	        	staticRefresh(activeFlag);
+        		
+        		
+        	}
+        }
+        
+        function staticRefresh(id){
+        	$.ajax({
+				  type:"post",
+				  url:"query_TaskInfo/",
+				  cache:false,
+				  dataType:"json",
+				  data:{"id": id},
+				  success: function(data){
+				  	if(data.status=="Succeed"){
+				  		//refresh table
+				  		objTD = $(".table tr").children("td");
+				  		objTD[2].innerHTML = data.total;
+				  		objTD[6].innerHTML = data.yuzhi;
+				  		objTD[10].innerHTML = data.anzhuang;
+				  		objTD[14].innerHTML = data.cunliangqu;
+				  		
+		  				// Morris Donut Chart
+		  				$("#hero-donut-total").html("");
+					   if(data.total !=0){
+					        var rate_yuzhi = (parseFloat( data.yuzhi / data.total ).toFixed(4)) ;
+					        var rate_weiyuzhi = (parseFloat(1 - rate_yuzhi).toFixed(4) ) ;
+					    }
+					    else{
+					    	var rate_weiyuzhi = 1.0;
+					    	var rate_yuzhi = 0.0;
+					    }
+					    
+						rate_weiyuzhi = (rate_weiyuzhi*100).toFixed(2);
+						rate_yuzhi = (rate_yuzhi*100).toFixed(2);
+					    
+						Morris.Donut({
+				            element: 'hero-donut-total',
+				            data: [
+				            	{label: '已预制完成比例', value: rate_yuzhi },
+				                {label: '未预制完成比例', value: rate_weiyuzhi },	                
+				            ],
+				            colors: ["#008000","#9D6C7D"],
+				            formatter: function (y) { return y + "%" }
+				        });
+							
+							
+				        // Morris Donut Chart
+				        $("#hero-donut-pass").html("");
+				        if(data.total !=0){
+					        var rate_anzhuang = parseFloat( data.anzhuang / ( data.total ) ).toFixed(4);
+					        var rate_weizhuang = parseFloat(1 - rate_anzhuang).toFixed(4);
+					    }
+					    else{
+					    	var rate_anzhuang = 0.0;
+					    	var rate_weizhuang = 1.0;
+					    }
+					    
+					    rate_weizhuang = (rate_weizhuang*100).toFixed(2);
+					    rate_anzhuang = (rate_anzhuang*100).toFixed(2);
+					    
+				        Morris.Donut({
+				            element: 'hero-donut-pass',
+				            data: [
+				                {label: '已安装完成比例', value: rate_anzhuang},
+				                {label: '未安装完成比例', value: rate_weizhuang},
+				            ],
+				            colors: ["#89C589","#D9534F"],
+				            formatter: function (y) { return y + "%" }
+				        });
+				  	}
+				  },
+				  error:function(data){
+				  	alert("服务器错误");
+			      	return false;
+			      },
+			      complete:function(data){
+				  }
+				});
+        
+        }
+        
+        function popModal(){
+        	$("#fullScreenModal .modal-content").html($(".bimFrame").html());
+        	$('#fullScreenModal .modal-content').css("width",window.screen.width*0.7);
+        	$('#fullScreenModal .modal-content').css("height",window.screen.height*0.8);
+        	$('#fullScreenModal').modal('show');
+        }
+        
+        
+        var fulWid=document.body.scrollWidth;
+        
+        $(window).ready(function(){
+        	loadBimContent(1);
+        	
+        	if(window.screen.availHeight>930){
+        		$(".bimNav").css("height",window.screen.availHeight-132);
+        		$(".bimContent").css("height",window.screen.availHeight-132);
+        		$(".frameDiv").css("height",window.screen.availHeight-137);
+        		$(".frameDiv").css("width",fulWid-451);
+        	}
+        	
+        	//$.get('http://182.92.131.28:8080/8343552-hthrvt/', function(res){
+				//alert(res.responseText);
+				//$('.frameDiv').html(res.responseText);
+			//});
+			
+			
+        });
+        
+</script>
+<script src="/js/bim/Viewing.Extension.Workshop.js"></script>
+
+<div style="height:100%;width:100%;margin-left:-15%;text-align:left; overflow-x:hidden;overflow-y:hidden;" class="modal fade" id="fullScreenModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+    <div class="modal-content">
+       	
+    </div>
+	</div>
+</div>
+
+<div align="center" valign="middle" style="height:100%;width:100%;overflow-x:hidden;overflow-y:hidden;" class="modal fade" id="imageShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+    <div class="modal-content">
+       	
+    </div>
+	</div>
+</div>
+
+{% endblock %}

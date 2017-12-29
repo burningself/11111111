@@ -1,0 +1,73 @@
+{% extends "base_v2.html" %}
+{% include "baseuser.html" %}
+{% block content %}
+<div class="header-v2">
+	<div class="header-bg-v2"><span class="title-v2">人员详情</span></div>
+</div>
+<div class="content-v2">
+		<div align="left">
+            <ul class="breadcrumb">
+				<label>人员姓名：</label><span id="name" ></span>&nbsp;&nbsp;&nbsp;&nbsp;
+				<label>工种名称：</label><span id="type"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+				<label>公司名称：</label><span id="company"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<label>联系方式：</label><span id="contract"></span>
+		 	</ul>
+					
+		</div>
+              
+        <table class="table table-bordered table-striped" style="margin-top:20px;">
+			<thead>
+				<tr>
+					<td colspan="4" style="padding:0px"><h3>进入区域详情记录</h3></td>
+				</tr>
+				<tr>
+					<th>进入区域的时刻</th>
+					<th>区域编号</th>
+					<th>区域名称</th>
+					<th>区域状态</th>
+				</tr>
+			</thead>
+			<tbody id="data_detail">
+			</tbody>
+			<td colspan="4" align="center" id="nomore">
+				<h3>没有相关记录！</h3>
+			</td>
+		</table>
+	 
+     </div>
+<script type="text/javascript">
+	$(function(){
+		$("#goback").click(function(){
+			window.close();
+		})
+		$("#data_detail").html("");
+		$("#id").text(sessionStorage.getItem('id'));
+	    $("#name").text(sessionStorage.getItem('name'));
+		$("#contract").text(sessionStorage.getItem('contract'));
+		$("#type").text(sessionStorage.getItem('type'));
+		$("#company").text(sessionStorage.getItem('company'));
+	
+	
+		console.log(sessionStorage.getItem('list'));
+		var list =sessionStorage.getItem('list');
+		var data_detail = JSON.parse(list);
+		console.log(data_detail);
+		var html = ""
+		for(var i =0;i<data_detail.length;i++){
+			html+= '<tr>'+
+					'<td id="time_second">'+data_detail[i].time+'</td>'+
+					'<td id="type_second">'+data_detail[i].zone.id+'</td>'+
+					'<td id="id_second">'+data_detail[i].zone.name+'</td>'+
+					'<td id="name_second">'+data_detail[i].type+'</td>'+
+		
+				'</tr>'
+				$("#data_detail").html(html);
+				$("#nomore").css("display","none");
+		
+		}
+	
+	
+		
+	})
+</script>
+{% endblock %}

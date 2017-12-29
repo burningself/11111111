@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      	智慧建造平台
+  </title>
+  <!--<meta http-equiv="Page-Enter" content="revealTrans(Duration=1.0,Transition=2)">
+	<meta http-equiv="Page-Exit" content="revealTrans(Duration=1.0,Transition=2)">-->
+      <link rel="stylesheet" href="/js/weui-master/style/weui.css"/>
+  <link rel="stylesheet" href="/js/weui-master/style/weui2.css"/>
+  <link href="/css/bootstrap/bootstrap.css" media="all" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link href="/css/project/base_mobile.css?version=2.0(2017-06-17)" media="all" rel="stylesheet" type="text/css" />
+	<link href="/css/jquery/jquery.ferro.ferroMenu.css" rel="stylesheet" />
+	<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+	<script defer src="/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>	
+	<script src="/js/jquery/jquery.transit.min.js" type="text/javascript"></script>
+	<script defer src="/js/common/base_mobile.js?version=2.0(2017-06-19)" type="text/javascript"></script>	
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+
+  
+        <style>
+      	.weui-menu-inner ul{
+      		top: 0,
+        	opacity: 0,;
+        	display: none;
+      	}
+      	.weui-menu-inner ul em {
+      			border-top-color: #337AB7;
+      		}
+      </style>
+	{% block ownerhead %} {% endblock %}
+  </head>
+  <body class="page-header-fixed bg-1">
+    <div class="modal-shiftfix">
+      <!-- Navigation -->
+      
+      <!--<div class="navbar" style="background-color: white;margin-bottom: 0px;">
+				 	<img src="/images/title_mobile.png" style="width: 340px;height: 43px;"/>
+				 	<div class="proName" style="text-align: center;color:#337AB7 ;font-size: 1em; white-space: nowrap;">欢迎你,<span id="username" class="{{user.name}}">{{user.truename}}</span><span id="proName"></span></span></div>
+	    </div>-->
+	    
+	   <div class="weui-header bg-blue"> 
+	  	<div class="weui-header-left"> <a class="icon icon-109 f-white" id="goback">返回</a>  </div>
+	   		<h2 class="weui-header-title" id='proName'></h2>
+	    <div class="weui-header-right"><a  href="/index/" class="f-white">首页</a></div> 
+    </div>
+
+
+      <!-- End Navigation -->
+	  	<div class="container-fluid main-content">
+	  	{% block content %} 
+
+			{% endblock %}
+   		</div>
+    	
+    	
+    	<footer style="white-space: nowrap;">
+    		    <section class="weui-menu" id="menu_base">
+        <!--<div class="weui-menu-inner">
+            <em></em>
+            <span>项目管理</span>
+            <ul>
+                <em></em>
+               <li><a  href="/task/projecttask/list/">施工进度</a></li>
+               <li><a  href="/task/anquan/hazard/list/">重大危险源</a></li>
+               <li><a  href="/task/jishu/fangan/">施组方案</a></li>
+               <li><a  href="/task/progress/problem/">整改单处理</a></li>
+               <li><a  href="/index/">项目概览</a></li>
+            </ul>
+        </div>
+        <div class="weui-menu-inner">
+            <span onclick="window.location.href='/task/projectevent/create/'">发起整改单</span>
+        </div>
+        <div class="weui-menu-inner">
+            <span onclick="window.location.href='/task/goujian/update/'">扫码验收</span>
+        </div>
+        
+          <div class="weui-menu-inner">
+            <em></em>
+            <span>个人中心</span>
+            <ul>
+                <em></em>
+                <li><a  href="/logout/">退出系统</a></li>
+               <li><a  href="/welcome/" >项目中心</a></li>
+               <li><a  href="#">消息中心</a></li>
+               <li><a  href="/progress/goujian/">验收查看</a></li>
+               <li><a  href="/task/goujian/">扫码追踪</a></li>
+            </ul>
+        </div>-->
+    </section>
+			 
+			</footer>
+    	
+	    <ul id="fixNav">
+				<li><a href="/task/projectevent/create/"><i class="fa fa-edit"></i></a></li>
+				<li><a href="/task/progress/problem/">问</a></li>
+				<li><a href="/task/message/list/"><img src="/images/base/icon_2.png"  href="" title="消息"/></a>	</li>
+				<li><a href="/progress/goujian/">构</a></li>
+				<li><a href="/task/goujian/update/"><i class="fa fa-upload"></i></a></li>
+			</ul>
+  	</div>
+
+  	
+  	 <script type="text/javascript">
+		    $(function(){
+		    	$("#goback").click(function(){
+		    		window.history.go(-1);
+		    	});
+		    	
+		    		$.ajax({
+							type: "get",
+							url: "/xadmin/prjconfig/baseinfo/",
+							async: true,
+							//cache:false,
+							success: function(data) {
+								document.title=data.project_title;
+							},
+							error: function(data) {
+								console.log("错误");
+							}
+				});
+		    });
+
+		    
+		    $.ajax({
+					type: "get",
+					url: "/xadmin/navigat/prjmenujson_mobile/",
+					async: true,
+					//cache:false,
+					success: function(data) {
+						for (var i in data.menulist) {
+							var tmp = '<div class="weui-menu-inner">'
+							if(data.menulist[i].submenu.length >0){
+								tmp +='<em></em>'
+								tmp += '<span>'+data.menulist[i].name+'</span>'
+								tmp +='<ul>'
+								tmp +='<em></em>'
+							}else{
+								tmp += '<span onclick="window.location.href=\''+data.menulist[i].url+'\'">'+data.menulist[i].name+'</span>'
+							}
+							
+								for (var j in data.menulist[i].submenu) {
+
+									if(typeof data.menulist[i].submenu[j].url=="undefined"){
+										continue;
+									}
+									tmp += '<li><a  href="'+data.menulist[i].submenu[j].url+'">'+data.menulist[i].submenu[j].name+'</a></li>'
+								}
+							
+							if(data.menulist[i].submenu.length >0){
+								tmp +='</ul>'
+							}
+							
+							tmp += '</div>'
+							$("#menu_base").append(tmp);
+						}
+						
+						
+						   $('.weui-menu-inner').click(function () {
+					    var $menu = $(this).find('ul'),
+					        height = $menu.find('li').length * 40 + 15 + 'px',
+					        opacity = $menu.css('opacity');
+					
+					    if(opacity == 0) {
+					        $menu.css({
+					            'top': '-' + height,
+					            'opacity': 1
+					        });
+					         $menu.css("display","block");
+					    }else {
+					        $menu.css({
+					            'top': 0,
+					            'opacity': 0
+					        });
+					        $menu.css("display","none");
+					    }
+					});
+					},
+					error: function(data) {
+						console.log("错误");
+					}
+				});
+    	
+
+    </script>
+  </body>
+</html>

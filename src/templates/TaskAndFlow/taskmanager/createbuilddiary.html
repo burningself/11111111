@@ -1,0 +1,185 @@
+{% extends "base_v2.html" %} {% block ownerhead %}
+
+<link href="/css/project/biaodan.css" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.config.biaodan.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.all.min.js"> </script>
+
+	<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+<!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/biaodanedit.js" type="text/javascript" charset="utf-8"></script>
+
+{% endblock %} {% block content %}
+<style type="text/css">
+
+</style>
+<div class="row">
+	<div class="header-row">
+	 	<i class="fa fa-book"></i>施工日记编辑
+	</div>  
+	<div class="content-row" >
+		<div class="col-lg-12 task-from form-inline" style="text-align: center;color:black;">
+			<div class="form-group"  >
+				<label class="control-label"  for="timerange">日记名称：</label>
+				<input type="text" style="min-width: 260px;"   id="builddiary_name" class="form-control" placeholder="输入日记名称" />
+			</div>
+		   <div class="form-group" style="margin-left: 20px;">
+				<label class="control-label"  for="timerange">日记日期：</label>
+				<input type="text" style="min-width: 260px;"   id="builddiary_date" class="form-control" placeholder="选择日记日期"  readonly="true"/>
+			</div>
+			
+			<button class="btn btn-primary" style="margin-left: 20px;" onclick="saveBuildDiary()">保存施工日记</button>
+		</div>
+
+
+	    	<script id="editor" type="text/plain" style="width:1024px;height:500px;margin: auto;"></script>
+
+	</div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+	$('#builddiary_date').datetimepicker({
+		language: 'zh-CN',
+		format:'yyyy-mm-dd',
+		weekStart: 1,
+		todayBtn: 1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		endDate:new Date(),
+		forceParse: 0
+	});
+
+	$(function(){
+//		var para = window.location.search.substring(1).split("&")
+		mbId = GetQueryString('mbId');
+		bdId = GetQueryString('bdid');
+		diaryid = GetQueryString('diaryid');
+		
+		biaodantype = GetQueryString('biaodantype');
+		initUE();
+//		inittree();
+		setTimeout( function(){
+			if(mbId){
+				ShowTableById(mbId,"/assist/biaodanmuban/");
+				id = mbId;
+			}
+		    else if(bdId){
+		    	ShowTableById(bdId,"/assist/biaodan/");
+		    	id = bdId;
+		    }
+		}, 200 );
+	});
+	
+	function ShowTableById(id,ur){
+
+		var dat = {
+			"id":id,
+			'from':'createissue'
+		}
+		$.ajax({
+		  url:ur,
+		  data: dat,
+		  async: false,
+		  success: function(data){
+		  	var jdata = JSON.parse(data);
+			setContent(jdata.content);
+			
+			if(bdId)
+			{
+				$("#builddiary_name").val(jdata.name);
+ 				$("#builddiary_date").val(jdata.createdate);
+				$("#builddiary_name").attr("disabled","disabled");
+				$("#builddiary_date").attr("disabled","disabled");
+			}
+			
+	 	 }
+		});
+	}
+	
+function editBuildDiary()
+{
+ 	
+ 	$.ajax({
+ 	  type:"post",
+ 	  url:"/assist/projecttask/editbuilddiary/",
+// 	  cache:false,
+ 	  async: false,
+ 	  dataType:"json",
+ 	  data:{
+ 	  	"diaryid":diaryid,
+		"content":getContent()
+ 	  },
+ 	  success: function(data){
+ 	  	if (data.issuc=="true") {
+ 	  		alert("保存成功");
+ 	  		window.opener.location.reload();
+			window.close();
+ 	  	}
+ 	  	else{
+ 	  		alert(data.error);
+ 	  	}
+
+ 	  }
+ 	  
+ 	  
+ 	});
+};	
+	
+function saveBuildDiary()
+{
+	if(bdId)
+	{
+		editBuildDiary();
+		return;
+	}
+ 	
+ 	var builddiary_name = $("#builddiary_name").val();
+ 	var builddiary_date = $("#builddiary_date").val();
+ 	
+ 	if (!builddiary_name || !builddiary_date) {
+ 		alert("名称和日期都要填写！");
+ 		return;
+ 	}
+
+ 	$.ajax({
+ 	  type:"post",
+ 	  url:"/assist/projecttask/savebuilddiary/",
+// 	  cache:false,
+ 	  async: false,
+ 	  dataType:"json",
+ 	  data:{
+ 	  	"mbId":mbId,
+ 	  	"builddiary_name":builddiary_name,
+		"builddiary_date":builddiary_date,
+		"content":getContent()
+ 	  },
+ 	  success: function(data){
+ 	  	if (data.issuc=="true") {
+ 	  		alert("保存成功");
+ 	  		window.opener.location.reload();
+			window.close();
+ 	  	}
+ 	  	else{
+ 	  		alert(data.error);
+ 	  	}
+
+ 	  }
+ 	  
+ 	  
+ 	});
+};
+	
+</script>
+
+{% endblock %}

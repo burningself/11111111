@@ -1,0 +1,12 @@
+th,td{ text-align:center; }
+
+
+.row{width:99.8%; margin:2px 0.1% 0 0.1%; padding: 0 5px 0 5px; border-radius:5px;  background: white; color: #007aff;min-height:calc(100vh - 95px);}
+
+.header-row{width:100%; margin:5px 0 5px 5px; padding: 0;text-align:left;font-size: 18px;font-weight:bold;color: #2e6da4;}
+.header-row h3{font-weight:bold; margin-bottom:10px; text-align:left; width:100%; }
+.content-row, .content-row > div{ text-align:left;}
+.content-row > div{overflow:auto;}
+
+
+.row table {margin-top:10px; font-size:1.2em;}

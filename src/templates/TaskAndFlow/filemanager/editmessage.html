@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>修改文件</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+	<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+	<link href="/css/bootstrap/bootstrap.min.css" media="all" rel="stylesheet" type="text/css">
+	<script src="/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+	<script src="/js/common/guanlianyuansufile.js" type="text/javascript" charset="utf-8"></script>
+	<link href="/css/project/uploadview.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/css/project/guanlianyuansu.css" media="all" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+	<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+	<style>
+		a:hover{
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+	<div id='edit_body'>
+		<div class="panel panel-default">
+			    <div class="panel-heading">已选关联元素<i class="glyphicon glyphicon-edit" style="float: right;color: #5BC0DE;" onclick="FunGuanLianYuanSu()"></i></div>
+			    <div class="panel-body" style="min-height: 226px;color:#001F3F;">
+			    	<p id="edit_original"></p>
+			    	<div id="selectText" ></div>
+			    </div>
+			</div>
+			<textarea name="" id="remarkFile" rows="3" style="border: 1px solid #ccc;border-radius: 3px;font-size: 14px;color: #001F3F;width: 100%;" placeholder=" 添加备注"></textarea>
+	</div>
+	<div class="btn btn-info" id="edit_complete" style="float: right;margin: 20px 0px;">保存</div>
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择关联元素</h4>
+			</div>
+			<div class="modal-body" style="padding: 2px;">
+				<select class="pull-right" name="guanlianyuansumajor" id="guanlianyuansumajor">
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				</select>
+				<ul class="nav nav-tabs" >
+					<li class="active">
+						<a href="#goujian" data-toggle="tab">构件</a>
+					</li>
+					<li >
+						<a href="#kongjianjiegou" data-toggle="tab">空间</a>
+					</li>
+
+					<li>
+						<a href="#fenleixinxi" data-toggle="tab">分类信息</a>
+					</li>
+					
+					<li >
+						<a href="#renwu" data-toggle="tab">任务</a>
+					</li>
+
+				</ul>
+				<div class="tab-content">
+					
+					<div class="tab-pane fade in active guanlianyuansuTab" id="goujian">
+						<div class="left_panel">
+							<div class="toptree" id="jstree_goujian">
+							</div>
+							<select class="goujianselect bottomlist" multiple name="left" id="left" size="7" style="" ondblclick="moveright('gj')">
+								</select>
+						</div>
+						<div class="middle_panel">
+							<a href="#" onclick="moveleft('gj')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('gj')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="right_panel">
+							<select class="choosegoujian"  multiple name="right" id="right" size="20" ondblclick="moveleft('gj')">
+								</select>
+						</div>
+					</div>
+					
+					<div class="tab-pane fade guanlianyuansuTab" id="renwu">
+						<div class="left_panel">
+							<div class="toptree" id="jstree_renwu">
+							</div>
+							<select class="renwuselect bottomlist"  multiple name="left" id="left" size="7" ondblclick="moveright('rw')">
+							</select>
+						</div>
+						<div class="middle_panel">
+							<a href="#" onclick="moveleft('rw')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('rw')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="right_panel">
+							<select class="chooserenwu"  multiple name="right" id="right" size="20" ondblclick="moveleft('rw')">
+								</select>
+						</div>
+
+					</div>
+					
+					<div class="tab-pane fade  guanlianyuansuTab" id="kongjianjiegou">
+						<div class="left_panel" >
+							<div id="jstree_kongjian" class="onlytree"></div>
+						</div>
+						<div class="middle_panel">
+						</div>
+						<div class="right_panel">
+							<select class="choosekongjian"  multiple name="right" id="right" size="20">
+
+							</select>
+						</div>
+					</div>
+					
+					<div class="tab-pane fade  guanlianyuansuTab" id="fenleixinxi">
+						<div class="left_panel">
+							<div id="jstree_fenleixinxi" class="onlytree">
+							</div>
+						</div>
+						<div class="middle_panel">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+								<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div class="right_panel">
+							<select id="fenleixinxi_right"    multiple name="right" size="20">
+								</select>
+						</div>
+
+					</div>
+					
+					
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script>
+		var deletedGJs = [];var fileId = '';var remark= "";
+		var removed_message = function( data ){
+			$(data).parent().hide();
+			var delcon = {};
+			var typetable ='';var relatedid ='';
+			var content = $(data).parent().attr("value").split(",");
+			delcon.relatedid = content[0];
+			delcon.typetable = content[1];
+			deletedGJs.push( delcon );
+		}
+		$(function(){
+			init_tree();
+			function GetQueryString(name){
+			     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+			     var r = window.location.search.substr(1).match(reg);
+			     if(r!=null)return  unescape(r[2]); return null;
+			}
+			fileId = GetQueryString('fileId');
+			$.ajax({
+                    url:"/task/ziliao/fileproperty/",
+                    dataType : "json",
+                    type:'get',
+                    data:{fileId:fileId},
+                    success:function(datas){
+                       var temp_edit = '';
+                       if (datas.issuc == 'true'){
+                       			remark = datas.docinfo.remark;
+                       			if( remark == null || remark == undefined){ remark = ''}
+                       			$("#remarkFile").val( remark );
+                       		if( datas.relateList.length == 0){	
+                       		}else{
+                       			for(var i = 0;i < datas.relateList.length;i++){
+                       				var relateid1 = datas.relateList[i].relateid;
+	                           		var relatetype1 =  datas.relateList[i].relatetype;
+	                           		var relateinfo1 =  datas.relateList[i].relateinfo;
+	                           		temp_edit += '<a style="border-bottom:1px solid #ccc;padding-bottom: 10px;display:block;color:#333;margin-top:10px;" value="'+relateid1+','+relatetype1+'">'+ relateinfo1 +'<i class="glyphicon glyphicon-remove" style="font-size: 14px;float: right;color:red" onclick="removed_message( this )"></i></a>';
+                       			}
+                       			$("#edit_original").html( temp_edit );
+                       		}
+                       		
+                       }
+                    },
+                    error:function(){
+                        console.log('读取失败');
+                    }
+                });
+			
+			$("#edit_complete").click(function(){
+					var addedGJs = JSON.stringify(selectedGJs);
+					remark = $("#remarkFile").val();
+					$.ajax({
+						url:'/task/ziliao/fileproperty/',
+						dataType:'json',
+						type:'post',
+						data:{remark:remark,fileId:fileId,addedGJs:addedGJs,deletedGJs:JSON.stringify(deletedGJs)},
+						success:function( datas){
+							 if (datas.issuc == 'true'){
+							 	console.log('ok');
+							 	window.parent.location.reload();
+							 }
+						},error:function(){
+							console.log("保存失败！");
+						}
+					});
+			});
+		})
+	</script>
+</body>
+</html>

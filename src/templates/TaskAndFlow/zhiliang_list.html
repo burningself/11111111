@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.resize.js"></script>
+
+<script src="/js/common/jishu.js" type="text/javascript"></script>
+<link href="/css/project/jishu.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+
+{% endblock %}
+
+{% block content %} 
+
+	 <div class="row search-row">
+		
+		<div class="widget-container fluid-height clearfix">
+		 	<h3><i class="fa fa-camera-retro"></i>&nbsp;质量管理</h3>
+			<div class="widget-content padded">
+				<form class="serarch-tab" action="" method="get"> {% csrf_token %}
+				  <div class="form-group draw-group">
+				  	<div id="item-donut"> </div>
+				  </div>
+				  <div class="form-group search-group">
+					{{ form.name.errors }}
+					<div class="search-item">
+			            <label class="control-label col-md-1" align="right">当前阶段：</label>
+			            <div class="col-md-3">
+					  <input type="text" name="number"  class="form-control" list="pblist" value="{{pbnumber}}">
+									<datalist id="pblist">
+									   {% for item in zhilianglist.object_list %}
+										  <option value="{{item.number}}">
+									   {% endfor %}
+									</datalist>
+		            </div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">负责分包：</label>
+			            <div class="col-md-3">
+					  <input type="text" class="form-control" name="postion" list="poslist"value="{{pbpostion}}">
+									<datalist id="poslist">
+									   {% for item in PredestalChoices %}
+										  <option value="{{item.name}}">
+									   {% endfor %}
+									</datalist>
+		            </div>
+					</div>
+					<div class="search-itemsingle">
+						  <label class="control-label col-md-2" align="right" for="timerange">发起时间段：</label>
+						  <div class="col-md-4">
+								 <div class="input-group">
+									 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+									 <input type="text" name="timerange"  value="{{timerange}}" id="timerange" class="form-control" />
+								 </div>
+						  </div>
+					</div>
+		          </div>
+				  <div class="form-group btn-group">
+				  	<div class="col-md-3" >
+						<a href="#" onclick="FunFaqiwentiDlg()" class="btn btn-success" ><i class="fa fa-plus"></i> 发起新问题 </a>
+		            </div>
+					<div class="col-md-3" >
+						<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+		            </div>
+		          </div>
+				</form>
+			</div>                    
+		</div>  
+	</div>   
+	
+	<div class="row content-row" align="center">
+		<div class="widget-container fluid-height clearfix">
+		    <table class="table table-striped" >
+		      <thead>
+		       <tr>
+				  <th>名称</th>
+				  <th>发起人</th>
+				  <th>发起时间</th>
+				  <th>当前阶段</th>
+				  <th>当前负责人</th>
+				  <th>附件</th>
+				  <th>关联元素</th>
+				  <th>操作</th>
+			</tr>
+		      </thead>
+		      <tbody>
+			  {% ifequal listcount 0 %}
+			  <tr>
+		          <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+			   </tr>
+			  {% endifequal %}
+			  {% for item in zhilianglist %}
+		        <tr>
+		          <td>{{item.name}}</td>
+				  <td>{{item.faqiren}}</td>
+				  <td>{{item.faqishijian|date:"Y-m-d H:i:s"}}</td>
+				  <td>{{item.dangqianjieduan}}</td>
+				  <td>{{item.dangqianfuzeren}}</td>
+				  <td>{{item.fujian}}</td>
+				  <td>{{item.guanlianyuansu}}</td>
+		          <td>
+		          	<a href="/task/precastbeam/edit/{{item.id}}?obj_url={{cur_url}}" title="编辑梁段信息" style="cursor: pointer;">[处理]</a>
+					<a href="/task/precastbeam/edit/{{item.id}}?obj_url={{cur_url}}" title="编辑梁段信息" style="cursor: pointer;">[查看]</a>
+		          </td>
+		        </tr>
+			   {% endfor %}
+		      </tbody>
+		    </table>
+		</div>
+		
+		<div class="widget-content padded text-center" >
+		    <ul class="pagination pagination-lg">
+		    	<li><a href="?page=1&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">首页</a></li>
+				{% if zhilianglist.has_previous %}	
+					<li><a href="?page={{ zhilianglist.previous_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">前一页</a></li>
+				{% endif %}
+		        <li><a>第 {{ zhilianglist.number }} 页，共 {{ zhilianglist.paginator.num_pages }}页</a></li>
+		        <li><a> 
+		        	<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;"/>
+		        	</a>
+		        	<a id="jumpBTN">
+		        	跳转
+		        	</a>
+		        </li>
+				{% if zhilianglist.has_next %}
+		         <li><a href="?page={{ zhilianglist.next_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">下一页</a></li>
+				{% endif %}
+				<li><a href="?page={{paginator.num_pages}}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">尾页</a></li>
+				
+		    </ul>
+		</div>
+	</div>
+
+ 	<div class="modal fade" id="faqiwentidlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4>发起质量问题</h4>
+            </div>
+            <div class="modal-body">
+	          <div class="widget-content padded">
+				<form action="#" class="form-horizontal">
+				<div class="form-group">
+					<label class="control-label col-md-3">问题编号</label>
+					<div class="col-md-7">
+						<input class="form-control" placeholder="输入问题编号"  name="qnumber" id="qnumber" type="text">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">问题描述</label>
+					<div class="col-md-7">
+					<textarea class="form-control"  name="qdescribe" id="qdescribe" rows="3"></textarea>
+				</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">关联元素</label>
+					<div class="col-md-7">
+					<label class="radio-inline"><input name="optionsRadios2" type="radio" value="option1"><span>构件</span></label><label class="radio-inline"><input checked="" name="optionsRadios2" type="radio" value="option2"><span>任务</span></label>
+					</div>
+				</div>
+				          <div class="form-group">
+            <label class="control-label col-md-3">Select2 Dropdown</label>
+            <div class="col-md-7">
+              <select class="select2able"><option value="Category 1">Option 1</option><option value="Category 2">Option 2</option><option value="Category 3">Option 3</option><option value="Category 4">Option 4</option></select>
+            </div>
+          </div>
+				<div class="form-group">
+					<label class="control-label col-md-2">Checkbox</label>
+					<div class="col-md-7">
+					<label class="checkbox"><input type="checkbox"><span>Checkbox 1</span></label><label class="checkbox"><input type="checkbox"><span>Checkbox 2</span></label><label class="checkbox"><input type="checkbox"><span>Checkbox 3</span></label><label class="checkbox"><input type="checkbox"><span>Checkbox 4</span></label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">Checkbox</label>
+					<div class="col-md-7">
+					<label class="checkbox-inline"><input type="checkbox"><span>Checkbox 1</span></label><label class="checkbox-inline"><input type="checkbox"><span>Checkbox 2</span></label><label class="checkbox-inline"><input type="checkbox"><span>Checkbox 3</span></label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">Form Actions</label>
+					<div class="col-md-7">
+					<button class="btn btn-primary" type="submit">Submit</button><button class="btn btn-default-outline">Cancel            </button>
+					</div>
+				</div>
+				</form>
+			  </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnAddTemplateStepCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnAddTemplateStep" data-dismiss="modal" aria-hidden="true">新建</button>
+            </div>
+    </div>
+    </div>
+    </div>
+ 
+<script type="text/javascript">
+
+          $(document).ready(function () {
+		  
+		  $('#timerange').daterangepicker({
+		     ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    '最近7天': [moment().subtract('days', 6), moment()],
+                    '最近30天': [moment().subtract('days', 29), moment()],
+                    '本月': [moment().startOf('month'), moment().endOf('month')],
+                    '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                },
+	        locale : {
+                       applyLabel : '确定',
+                       cancelLabel : '取消',
+                       fromLabel : '起始时间',
+                       toLabel : '结束时间',
+                       customRangeLabel : '自定义',
+                       daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                       monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',
+                           '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                       firstDay : 1
+                   },
+				});
+		  
+			  $('#dataTables-example').dataTable({
+            "sPaginationType" : "full_numbers",
+			"bPaginate": false, //翻页功能  
+			"bInfo": false,//页脚信息 
+			"bLengthChange": false, //改变每页显示数据数
+            "oLanguage" : {
+                "sLengthMenu": "每页显示 _MENU_ 条记录",
+                "sZeroRecords": "抱歉， 没有找到",
+                "sInfo": "从 _START_ 到 _END_ /共 _TOTAL_ 条数据",
+                "sInfoEmpty": "没有数据",
+                "sInfoFiltered": "(从 _MAX_ 条数据中检索)",
+                "sZeroRecords": "没有检索到数据",
+                 "sSearch": "筛选：",
+                "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "前一页",
+                "sNext": "后一页",
+                "sLast": "尾页"
+                }
+                     
+            }
+        }
+        );
+         });
+
+		$('#pageJump').bind('input propertychange', function() { 
+			var tgtPage = $('#pageJump').val();
+			if(tgtPage){
+				$("#jumpBTN").attr("href","?page=" + tgtPage + "&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}");
+			}
+		});
+		
+	  function FunFaqiwentiDlg()
+	  {
+		$('#faqiwentidlg').modal('show');
+	  }
+	  
+	  
+</script>
+
+
+
+{% endblock %}
+

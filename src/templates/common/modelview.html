@@ -1,0 +1,196 @@
+{% extends "base_v2.html" %} {% block ownerhead %}
+
+<script src="js/web3d/scripts/libs/jscolor/jscolor.js"></script>
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<!-- prism syntax higlighting library -->
+<link href="js/web3d/scripts/libs/prism/prism.css" rel="stylesheet" />
+<script src="js/web3d/scripts/libs/prism/prism.min.js"></script>
+<link href="/js/web3d/style.min.css" rel="stylesheet" />
+<script src="/js/web3d/three.min.js"></script>
+<script src="/js/web3d/viewer3D.min.js"></script>
+<script src="js/datastruct.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskStatus/Autodesk.ADN.Viewing.Extension.SampleTaskStatus.js"></script>
+<script src="js/web3d/scripts/LoadModelTaskStatus.js?ver=1116"></script>
+<script src="js/web3d/scripts/modelcommon.js?ver=1115"></script>
+<script src="js/web3d/scripts/getObjectTreeTaskStatus.js"></script>
+<!-- This apps includes -->
+<link href="js/web3d/stylesheets/theme.css" rel="stylesheet">
+<script src="js/web3d/scripts/MyAuthToken.js"></script>
+<script src="js/web3d/scripts/DebugUtils.js"></script>
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+<script src="/js/common/resizebar.js"></script>
+
+<link rel="stylesheet" href="dist_vue/css/modelview.css">
+<script src="dist_vue/js/modelview.js"></script>
+
+
+{% endblock %}
+ {% block content %}
+	<div>
+		<div class="pro-title">
+			<span id="labelCountType"></span>
+		</div>
+		<div id="left" class="pull-left">
+			<div class="panel-group" id="accordion">
+				<div class="panel">
+					<div class="panel-heading">
+						<div class="panel-title">
+							<a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">空间结构<i class="profont pro-font-xiangyou" style="float: right"></i></a>
+						</div>
+					</div>
+					<div class="panel-collapse collapse" id="collapseOne">
+						<div class="panel-body"  style="height:35vh; overflow:auto;" id="div_jstree">
+							<div id="jstree_div"> </div>
+							<div class="ResizeBottombar" id="Bottombar1" ></div>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="panel-heading">
+						<div class="panel-title">
+							<a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">构件分类<i class="profont pro-font-xiangyou" style="float: right"></i></a>
+						</div>
+					</div>
+					<div class="panel-collapse collapse" id="collapseTwo">
+						<div class="panel-body" style="height:35vh; overflow:auto;" id="div_pb_type">
+							<div id="jstree_div_pbtype" > </div>
+							<div class="ResizeBottombar" id="Bottombar2" ></div>
+						</div>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="panel-heading">
+						<div class="panel-title">
+							<a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseThree">状态查看<i class="profont pro-font-xiangyou" style="float: right"></i></a>
+						</div>
+					</div>
+					<div class="panel-collapse collapse" id="collapseThree">
+						<div class="panel-body">
+							<div style="height:35vh; overflow:auto;" id="div_status_filter">
+								<label class="control-label" align="right"></label>
+								<div>
+									<select name="pbstatussel" id="pbstatussel" class="form-control">
+										<option value="">全部</option>
+										{% for status in PBStatusChoices %} 
+										
+										<option value="{{status.id}}">{{status.pbtype}}_{{status.statusname}}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div >
+									<label class="control-label" for="timerange"></label>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+										<input type="text" name="timerange" value="{{timerange}}" id="timerange" class="form-control" onMouseOver="this.title=this.value" />
+									</div>
+									<p class="prompt" style="margin:0;"></p>
+									<div class="pbwell-operator">
+									<button id="btnPbsearch" name="btnPbsearch" class="btn btn-danger model-from"><i class="fa fa-search"></i> 查看 </button>
+									<button id="btnRestore" name="btnRestore" class="btn btn-default model-from"><i class="fa fa-refresh"></i> 恢复</button>
+									</div>
+								</div>
+							</div>
+							<div class="ResizeBottombar" id="Bottombar3" ></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="right" class="pull-right">
+			<div class="panel-group" id="panel-group-property">
+				<div class="panel">
+					<div class="panel-heading">
+						<div class="panel-title">
+							<a class="panel-group-property-toggle" data-parent="#panel-group-property" data-toggle="collapse" href="#property-collapseOne">构件属性</a>
+						</div>
+					</div>
+					<div class="panel-collapse collapse in" id="property-collapseOne">
+						<div  class="panel-body">
+							<div style="height:20vh; overflow:auto;" id="div_pbpro">
+								
+							<div class="panel panel-default">
+							    
+							    <table class="table">
+							        <tr><td class="tdproprtytitle">编号</td><td><span id="pbnumber"></span ></td></tr>
+							        <tr><td class="tdproprtytitle">状态</td><td><span id="pbstatus" ></span ></td></tr>
+							        <tr><td class="tdproprtytitle" colspan="2">累计完成百分比&nbsp;&nbsp;<span id="statuspercent" ></span ></td></tr>
+							        <tr><td class="tdproprtytitle">类型</td><td><span id="pbtype" ></span ></td></tr>
+							        <tr><td class="tdproprtytitle">空间</td><td><span id="pbelevation" ></span ></td></tr>
+							        <tr><td class="tdproprtytitle">备注</td><td><span id="statusdesc" ></span ></td></tr>
+							    </table>
+							    <div class="pbwell-operator">
+							    	<a href="javascript:PrintPbQrcode()" id="pbqrcode" class="btn-sm btn-danger model-from">打印身份牌</a>
+									<a href="javascript:TracePbStatus()" id="pbtrace"  class="btn-sm btn-danger model-from">过程追踪</a>
+							    </div>
+							</div>
+							
+							</div>
+							<div class="ResizeBottombar" id="Bottombar4" ></div>
+                      </div>
+                    </div>
+                  </div>
+				<div class="panel">
+                    <div class="panel-heading">
+                      <div class="panel-title">
+                        <a class="panel-group-property-toggle" data-parent="#panel-group-property2" data-toggle="collapse" href="#property-collapseTwo">关联文件</a>
+                      </div>
+                    </div>
+                    <div class="panel-collapse collapse in" id="property-collapseTwo">
+                      <div class="panel-body">
+                      	<div style="height:21vh; overflow:auto;" id="div_pbrelatefile">
+						 		<table class="table table-striped" id="file_relate_table">
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+						<div class="ResizeBottombar" id="Bottombar5" ></div>
+                      </div>
+                    </div>
+                  </div>
+				  
+				<div class="panel">
+					<div class="panel-heading">
+					  <div class="panel-title">
+						<a class="panel-group-property-toggle" data-parent="#panel-group-property3" data-toggle="collapse" href="#property-collapseThree">构件列表</a>
+					 	<a href="/task/goujian/" id="pbmanage"  class="pull-right" target="_blank" title="构件管理"><i class="profont pro-font-moxing"></i></a>
+					  </div>
+
+					</div>
+					<div class="panel-collapse collapse in" id="property-collapseThree">
+					  <div class="panel-body">
+						  <div style="height:calc(59vh - 299px); overflow:auto;" id="div_pblist">
+							<table class="table table-striped" id = "pbtable" style="margin: 0px;">
+							  <thead>
+							  </thead>
+							  <tbody>
+
+							  </tbody>
+							</table>
+								<ul class="pagination pagination-sm" id="pagebar" style="margin: 0px;">
+
+								</ul>
+
+								<div class="pbwell-operator">
+									<!--<a href="javascript:PrintPbQrcode2();" id="pbqrcode2" class="btn btn-danger model-from">打印身份牌</a>-->
+									
+								</div>
+							</div>
+							<div class="ResizeBottombar" id="Bottombar6" ></div>
+					  </div>
+					</div>
+				</div>
+              </div>
+              </div>
+		<div id="viewerContent">
+			<div class="col-md-12" style="width:100%;padding: 0px;margin: 0px;" id="viewer"></div>
+		</div>
+		<div>
+			<textarea class="form-control"  name="sqllist" id="sqllist" rows="100" style="display:none"></textarea>
+		</div>
+  </div>
+{% endblock %}

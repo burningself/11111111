@@ -1,0 +1,11 @@
+
+.main-content{
+	    margin:0 3px;
+	   min-height:calc(100vh - 50px);
+    background-color: white;
+}
+
+
+body{
+		background-image:url('/images/bgs/11.jpg') !important;
+}

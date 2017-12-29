@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %} 
+	
+<div class="row">
+ <div class="col-lg-12">
+ <div class="widget-container fluid-height clearfix">
+	 <div class="widget-content padded">
+	<form id="tab" action="" method="GET"> {% csrf_token %}
+		  <div class="form-group">
+			{{ form.submittimeend.errors }}
+            <label class="control-label col-md-2" align="right">盘点日期：</label>
+            <div class="col-sm-2">
+							<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+								<input type="text" class="form-control" value="{{submittimebegin|date:"Y-m-d"}}" name="submittimebegin">
+								<span class="add-on"><i class="icon-remove"></i></span>
+								<span class="add-on"><i class="icon-th"></i></span>
+							</a>  	
+            </div>
+            <div class="col-sm-2">
+							<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+							<input  type="text" class="form-control" value="{{submittimeend|date:"Y-m-d"}}" name="submittimeend">
+							<span class="add-on"><i class="icon-remove"></i></span>
+							<span class="add-on"><i class="icon-th"></i></span>
+							</a>
+            </div>
+			<div class="col-md-3" >
+				<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+            </div>
+			<div class="col-md-3" >
+				<a href="/task/specialmaterial/edit"  class="btn btn-success btn" ><i class="fa fa-edit"></i>专用材料周存量盘点</a>
+            </div>
+		 </div>
+	</form>
+</div> 
+</div> 
+</div> 
+</div>               
+
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+		  <th>盘点时间</th>
+		  <th>盘点人</th>
+		  <th>操作</th>
+          <th style="width: 26px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+	  <tr>
+          <td colspan="4" align="center"><h3>没有相关记录！</h3></td>
+	   </tr>
+	  {% endifequal %}
+	  {% for item in list_items %}
+        <tr>
+		  <td>{{item.date | date:"Y-m-d" }}</td>
+		  <td>{{item.record.actor}}</td>
+          <td>
+			  <a href="/task/specialmaterial/view?recordid={{ item.record.id}}" >[查看盘点]</a>
+          </td>
+		  <td></td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+	 <ul class="pagination pagination-lg">
+		<li><a href="?page=1&submittimebegin={{submittimebegin|date:'Y-m-d'}}&submittimeend={{submittimeend|date:'Y-m-d'}}">首页</a></li>
+		{% if list_items.has_previous %}
+		<li><a href="?page={{ list_items.previous_page_number }}&submittimebegin={{submittimebegin|date:'Y-m-d'}}&submittimeend={{submittimeend|date:'Y-m-d'}}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+		{% if list_items.has_next %}
+         <li><a href="?page={{ list_items.next_page_number }}&submittimebegin={{submittimebegin|date:'Y-m-d'}}&submittimeend={{submittimeend|date:'Y-m-d'}}">下一页</a></li>
+		{% endif %}
+		<li><a href="?page={{list_items.paginator.num_pages}}&submittimebegin={{submittimebegin|date:'Y-m-d'}}&submittimeend={{submittimeend|date:'Y-m-d'}}">尾页</a></li>
+    </ul>
+</div>
+
+            </div>
+</div>
+
+
+{% endblock %}

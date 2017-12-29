@@ -1,0 +1,294 @@
+{% extends "base_mobile.html" %} {% include "baseuser.html" %} {% block content %}
+<!-- Weather -->
+<link type="text/css" href="/css/project/general_mobile.css?ver=1112" media="all" rel="stylesheet" />
+<link type="text/css" href="/css/project/morris.css" media="all" rel="stylesheet" />
+<!--<script src="/js/morris.js-0.5.1/raphael-min.js"></script>-->
+<!--<script src="/js/morris.js-0.5.1/morris.min.js" type="text/javascript"></script>-->
+<link href="/css/swipercss/swiper.min.css" media="all" rel="stylesheet" type="text/css" />
+	
+	<link href='/js/fullcalendar/fullcalendar.min.css' rel='stylesheet' />
+	<link href='/js/fullcalendar/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+	<script src="/js/fullcalendar/moment.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/fullcalendar/fullcalendar.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/fullcalendar/locale-all.js" type="text/javascript" charset="utf-8"></script>
+
+<!--<script src="/js/swiperjs/swiper.min.js" type="text/javascript"></script>-->
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="all">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="/js/common/general_mobile.js?ver=(20171104)" type="text/javascript"></script>
+<script data-main="/js/common/requireMainMobile2" src="/js/common/require.js"></script>
+<!--	<div class="swiper-container-produce">-->
+<style>
+	.fc-icon, body .fc {
+    font-size: 0.8em;
+}
+
+.fc-list-table td{
+	padding: 3px 1px;
+	word-break: break-all;
+}
+
+.fc-header-toolbar{
+	display: none;
+}
+
+.fc-list-heading{
+    height: 20px;
+}
+
+.table>thead>tr>th {  
+    width:33vw;
+    text-align: center;  
+}
+.table>thead{
+	display:block;
+}
+.table>tbody{
+	display:block;
+	height: 130px;
+	overflow-y: auto;
+}
+.table>tfoot{
+	display:block;
+}
+.table>tfoot>tr>td {
+	text-align: center;  
+    width:33vw; 
+    font-weight: bold;
+}  
+.table>tbody>tr>td {  
+    width:33vw; 
+    text-align: center; 
+} 
+
+		.weui_panel_hd{
+			 font-size: 1.2em;
+		    color: #1382AB;
+		    font-weight: bold;
+		}
+		.weui_media_desc_custom{
+			color: #999;
+		    font-size: 13px;
+		    line-height: 1.2;
+		}
+
+
+</style>	
+		<div class="row-fluid" id="div-todolist">
+			<div class="title_row">
+				<h3><i class="fa fa-th-list">&nbsp</i>工作列表</h3>
+			</div>
+
+			<div id='calendar'></div>
+
+		</div>
+	
+
+
+<div class="swiper-container swiper-container-problem">
+	<div class="swiper-wrapper">
+		<div class="swiper-slide tab-pane fade in active">
+			<div class="row-fluid">
+				<div class="title_row">
+					<h3><i class="fa fa-th">&nbsp</i> 质量问题进展</h3>
+					<div class="pull-right" style="display:inline-block; margin-top:-30px; margin-right:10px; text-decoration:underline;">
+						<a href="/task/progress/problem/"> 获取详细 </a>
+					</div>
+				</div>
+				<div class="list_row">
+					<div class="data_draw" id="zhiliang-bar">
+						<table class="table zhiliangTable table-filters">
+				            <thead><tr></tr></thead>
+			                <tbody>
+	
+			                </tbody>
+			                <tfoot>
+			                	
+			                </tfoot>
+			            </table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="swiper-slide tab-pane fade in">
+			<div class="row-fluid">
+				<div class="title_row">
+					<h3><i class="fa fa-th">&nbsp</i> 安全问题进展</h3>
+					<div class="pull-right" style="display:inline-block; margin-top:-30px; margin-right:10px; text-decoration:underline;">
+						<a href="/task/progress/problem/"> 获取详细 </a>
+					</div>
+				</div>
+				<div class="list_row">
+					<div class="data_draw" id="anquan-bar">
+						<table class="table anquanTable table-filters">
+			            	<thead><tr></tr></thead>
+			                <tbody>
+
+			                </tbody>
+			                <tfoot>
+		                	
+		                	</tfoot>
+			            </table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="swiper-container swiper-container-produce">
+	<div class="swiper-wrapper">
+		<div class="swiper-slide">
+			<div class="row-fluid" id="week-draw">
+				<div class="title_row">
+					<h3><i class="fa fa-tasks">&nbsp</i>周生产进度<span id="weeklydate"></span></h3>
+				</div>
+
+				<div class="draw_row" style="overflow-y: auto;">
+	
+					<div class="weui_panel_bd" id="pbweekly">
+	
+					</div>
+					    
+				</div>
+			</div>
+		</div>
+		<div class="swiper-slide">
+			<div class="row-fluid" id="month-draw">
+				<div class="title_row">
+					<h3><i class="fa fa-tasks">&nbsp</i>月生产进度<span id="monthlydate"></span> </h3>
+				</div>
+
+				<div class="draw_row" style="overflow-y: auto;">
+						<div class="weui_panel_bd" id="pbmonthly">
+										
+			            </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if PersonInfo %}
+	<div class="row-fluid" >
+	<div class="title_row">
+		<h3><i class="fa fa-users">&nbsp</i>现场人员信息</h3>
+	</div>
+
+	<div id='personcount'>
+		<div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                    	现场总人数
+            </div>
+            <div class="weui_cell_ft weui-badge">80人</div>
+         </div>
+         <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                   	欢迎区人数
+            </div>
+            <div class="weui_cell_ft">50人</div>
+         </div>
+          <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                    BIM区人数
+            </div>
+            <div class="weui_cell_ft">10人</div>
+         </div>
+          <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                    VR区人数
+            </div>
+            <div class="weui_cell_ft">10人</div>
+         </div>
+          <div class="weui_cell">
+            <div class="weui_cell_bd weui_cell_primary">
+                    	平台区人数
+            </div>
+            <div class="weui_cell_ft">10人</div>
+         </div>
+
+	</div>
+
+</div>			
+{% endif %}
+
+
+<div class="custom_row_data" style="display: none;">
+	<div id="pad-wrapper">
+		<div class="row-fluid" id="pbSect">
+			<div class="title_row">
+				<h3><i class="fa fa-th-list">&nbsp</i>构件总览
+	                	</h3>
+				<div class="pull-right" style="display:inline-block; margin-top:-30px; margin-right:10px; text-decoration:underline;">
+					<a href="/progress/goujian/"> 获取更多 </a>
+				</div>
+			</div>
+			<div class="donut-pb-row">
+				<div class="swiper-container swiper-container-pb">
+					<div class="swiper-wrapper swiper-wrapper-pb">
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row-fluid" id="duichang">
+			<div class="title_row">
+				<h3><i class="fa fa-th">&nbsp</i> 堆场总览</h3>
+				<div class="pull-right" style="display:inline-block; margin-top:-30px; margin-right:10px; text-decoration:underline;">
+					<a href="/task/factoryarea/list/"> 获取更多 </a>
+				</div>
+			</div>
+			<div class="donut-factory-row">
+				<div class="swiper-container swiper-container-factory">
+					<div class="swiper-wrapper swiper-wrapper-factory">
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+</div>
+<div class="modal fade" id="configPage" tabindex="-1" role="dialog" aria-labelledby="configPageLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                  &times;
+	            </button>
+				<h4 class="modal-title" id="configPageLabel" style="font-weight:bold;text-align:center;margin-left:5%;">
+	            	首页私人订制
+	            </h4>
+			</div>
+			<form action="" method="post">
+				{% csrf_token %} <br />选取需要隐藏的板块？<br /><br />
+				<label><input name="configBox" type="checkbox" value="month-draw" />月生产进度 </label>
+				<label><input name="configBox" type="checkbox" value="week-draw" />周生产进去</label>
+				<label><input name="configBox" type="checkbox" value="duichang" />堆场统计 </label>
+				<label><input name="configBox" type="checkbox" value="jishu" />技术统计 </label>
+				<label><input name="configBox" type="checkbox" value="zhiliang" />质量问题 </label>
+				<label><input name="configBox" type="checkbox" value="anquan" />安全问题 </label>
+				<label><input name="configBox" type="checkbox" value="pandianRow" />材料盘点 </label>
+				<br><br>
+				<input class="form-control" placeholder="定制名" type="text" id="saveName">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" onclick="chooseNone()">
+		            	全不选
+		            </button>
+					<button type="button" class="btn btn-default" onclick="chooseAll()">
+		            	全选
+		            </button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+		            	返回
+		            </button>
+					<button type="button" class="btn btn-primary" onclick="submitConfig()">保存</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+	{% endblock %}

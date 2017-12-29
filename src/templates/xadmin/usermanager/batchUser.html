@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        #batchUser{ padding: 10px;  }
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        .ivu-poptip-popper{  max-height: 400px;  overflow: auto;  }
+        .title{  display: inline-block;  line-height: 32px;  margin-bottom: 10px;  }
+        .title span{  float: left;  }
+        .title p{  border-left: 1px solid #495060;  width: 1px;  height: 32px;  float: left;  margin-left: 10px;  }
+        .back{  font-size: 14px;font-weight: normal;color: #bbbec4;margin-left: 10px;  }
+        .back:hover{  color: #2d8cf0;  }
+    </style>
+</head>
+<body>
+<div id="batchUser">
+    <h2 class="title"><span>添加现有用户</span><p></p><a class="back" type="info" href="javascript:history.go(-1);location.reload()">返回上一级</a></h2>
+    <i-input v-model="searchValue" placeholder="用户名查找" style="width: 300px;margin-bottom: 10px;float: right" @on-change="find" icon="ios-search"></i-input>
+    <i-table ref="selection" :columns="columnsUser" :data="dataTable"></i-table>
+    <page show-total :total="pages" :page-size="pageSize" @on-change="userTable" style="margin:20px auto;float:right;" show-elevator ref="page"></page>
+    <spin size="large" fix v-if="spinShow"></spin>
+    <modal v-model="handleShow" title="添加角色" ok-text="确定" cancel-text="取消" width="450" @on-ok="trueAdd" @on-cancel="cancel">
+        <transfer
+                :data="RoleNames"
+                :target-keys="targetKeys2"
+                filterable
+                :filter-method="filterMethod"
+                :list-style = "{height:'300px'}"
+                @on-change="handleChange2"></transfer>
+    </modal>
+</div>
+</body>
+<script>
+     new Vue({
+        el:'#batchUser',
+        data () {
+            return{
+                columnsUser: [
+                    {
+                        title: '用户名',
+                        key: 'name'
+                    },
+                    {
+                        title: '实际姓名',
+                        key: 'truename'
+                    },
+                    {
+                        title: '所属企业',
+                        key: 'companyname',
+                        filters: [],
+                        filterMultiple: false,
+                        filterRemote :( id )=> {
+                            [this.company] = id;
+                            this.userTable(1);
+                        }
+                    },
+                    {
+                        title: '专业',
+                        key: 'majorname',
+                        filters: [],
+                        filterMultiple: false,
+                        filterRemote :( id )=> {
+                            [this.major] = id;
+                            this.userTable(1);
+                        }
+                    },
+                    {
+                        title:'角色',
+                        render: (h, params) =>{
+                            let nodes = [];
+                            if(params.row.role.length > 0){
+                                for(let i = 0;i < params.row.role.length ;i++){
+                                    nodes.push( h('Tag',params.row.role[i]));
+                                }
+                            } else {
+                                nodes.push( h('Button',{
+                                    props:{
+                                        icon:'ios-plus-empty',
+                                        type:'dashed',
+                                        size:'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            //获取当前行用户
+                                            this.nowPeople = params;
+                                            this.handleShow = true;
+                                        }
+                                    }
+                                },'添加角色'))
+                            }
+
+                            return h('div', nodes );
+                        }
+                    }
+                ],
+                role:null,
+                nowPeople:null,
+                dataTable:[],
+                spinShow:false,
+                handleShow:false,
+                RoleNames:this.getMockData(),
+                targetKeys2:[],
+                pages:0,
+                pageSize:15,
+                searchValue: null,
+                major:null,
+                company:null,
+            }
+        },
+        methods:{
+            trueAdd () {
+                //添加用户
+                let that = this;
+                for(let i = 0; i < this.targetKeys2.length ; i++){
+                    for(let j = 0;j<this.role.length; j++){
+                        if(this.targetKeys2[i] == this.role[j].id){
+                            this.dataTable[this.nowPeople.index].role.push( this.role[j].name )
+                            break;
+                        }
+                    }
+                }
+                $.ajax({
+                    url:"/config/adduserroles/",
+                    dataType:"json",
+                    type:"post",
+                    data:{
+                        userid: this.nowPeople.row.id,
+                        roles:JSON.stringify(this.targetKeys2)
+                    },
+                    success:function( datas ){
+                        if(datas.issuc === true){
+                            that.$Message.success('添加用户成功');
+                        }else {
+                            that.$Message.error('添加失败:' + datas.error );
+                            console.log( datas );
+                        }
+                    },
+                    error:function () {
+                        that.addSucceed = false;
+                        console.log("加载失败");
+                    }
+                });
+                this.targetKeys2 = [];
+            },
+            cancel () {
+                this.targetKeys2 = [];
+            },
+            getMockData () {
+                let that =this;
+                var mockData = [];
+                $.ajax({
+                    url:"/config/roles/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage: 999999 },
+                    success:function( datas ){
+                        that.role = datas.results;
+                        for (let i = 0; i < datas.results.length; i++) {
+                            mockData.push({
+                                key: datas.results[i].id,
+                                label: datas.results[i].name
+                            });
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                return mockData;
+            },
+            handleChange2 (newTargetKeys) {
+                console.log(newTargetKeys)
+                this.targetKeys2 = newTargetKeys;
+            },
+            filterMethod (data, query) {
+                return data.label.indexOf(query) > -1;
+            },
+            CompanyList () {
+                let that = this;
+                $.ajax({
+                    url:"/user/companys/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage: 999999 },
+                    success:function( datas ){
+                        for(let n = 0;n < datas.results.length;n++){
+                            that.columnsUser[2].filters.push({
+                                label: datas.results[n].name,
+                                value: datas.results[n].id
+                            })
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            MajorList () {
+                let that = this;
+                $.ajax({
+                    url:"/user/majors/",
+                    dataType:"json",
+                    type:"get",
+                    data:{isAll : "True"},
+                    success:function( datas ){
+                        for(let n = 0;n < datas.results.length;n++){
+                            that.columnsUser[3].filters.push({
+                                label: datas.results[n].name,
+                                value: datas.results[n].id
+                            })
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            userTable ( page ) {
+                let that = this;
+                $.ajax({
+                    url:"/user/users/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        isAll:'',
+                        company:that.company,
+                        major:that.major,
+                        search:that.searchValue,
+                        page:page,
+                        getOther:true
+                    },
+                    beforeSend:function(){
+                        that.spinShow = true;
+                    },
+                    success:function( datas ){
+                        that.spinShow = false;
+                        datas.results.forEach(t=>{
+                            t.role = [];
+                        });
+                        that.dataTable = datas.results;
+                        that.pages = datas.count;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            find ( event ) {
+                this.$refs.page.currentPage = 1;
+                this.searchValue = event.target.value;
+                this.userTable(1);
+            }
+        },
+        mounted:function () {
+            let that = this;
+            that.userTable(1);
+            that.CompanyList();
+            that.MajorList();
+        }
+    })
+</script>
+</html>

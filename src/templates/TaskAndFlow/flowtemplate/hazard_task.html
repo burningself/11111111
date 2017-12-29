@@ -1,0 +1,196 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="/js/common/weixianyuantask.js?555"></script>
+<link rel="stylesheet" type="text/css" href="/css/project/hazard.css"/>
+<link rel="stylesheet" href="/js/select2/select2.min.css" />
+<script src="/js/select2/select2.min.js"></script>
+
+<style>
+	.table td{
+		word-break: break-all;
+	}
+	
+    td>div{outline: none;}
+</style>
+
+{% endblock %} 
+
+{% block content %}
+
+
+<!--<div class="header-row">
+    <i class="fa fa-file-word-o"></i>危险源
+</div>-->
+<div class="container" style="background: white;width: 100%;    margin-top: 2px;">
+
+			<div class="col-md-2 column" id="jstree_div_hazard" style="text-align: left; overflow:auto;margin-top: 20px;max-height:calc(100vh - 125px);"> </div>
+			<div class="col-md-10 column" style="padding-top: 20px;border-left:1px solid #748eaa; min-height: 800px;">
+				<a href="/task/anquan/hazard/general/" class="btn btn-danger pull-right">返回</a>
+				<h3 style="margin-top:0px;">危险源策划</h3>
+				<table class="table" style="width:90%; margin:20px auto;table-layout:fixed;" id='task_hazard_table'>
+					<tr>
+                		<td style="width:100px;">等级</td>
+                		<td>危险源</td>
+                		<td>关联任务</td>
+                		<td style="width:200px;">空间</td>
+                		<td style="width:200px;">关联方案</td>
+                		<td style="width:100px;">操作</td>
+                	</tr>
+                	{% for each in hazard_task %}
+                	<tr class='{{each.weixianku}}'>
+                		<td>{{each.ji}}</td>
+                		<td>{{each.wxy}}</td>
+                        <td><a href='#' onclick='ChooseTask(this)' val='renwu_{{each.projecttask.id}}'>{{each.projecttask.name}}</a></a></td>
+                		<td><a href='#' val='{{each.kjval}}' onclick='ChooseKJ(this)'>{{each.kjys}}</a></td>
+						<td><a href='#' val='{{each.technical.id}}' onclick='ChooseFangan(this)'>{{each.technical.name}}</a></td>
+                		<td><a href="#" onclick="delerow(this)" title="" style="cursor: pointer;">[删除]</a></td>
+                	</tr>
+                	</tr>
+                	{% endfor %}
+                </table>
+                <div style="text-align: center;">
+                	<button class="btn btn-primary" onclick="deleall()">保存修改</button>
+                	<!--<button class="btn btn-danger" onclick="qingkong()">清空</button>-->
+                </div>
+            	<br>
+			</div>
+</div>
+
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: 600px;min-width: 600px;">
+			<div class="modal-header" style="padding: 10px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择空间结构</h4>
+			</div>
+			<div style="padding: 10px">
+
+			</div>
+			<div style="margin-top: 15px;">
+
+					<div class="tab-pane" id="kongjianjiegou">
+						<div style="float:left;width: 45%;margin-left: 15px;">
+							<div id="jstree_kongjian" style="width: 100%;border: 1px solid darkgrey;overflow:auto;height: 422px;text-align: left;">
+
+							</div>
+							<!--<select class="kongjianselect" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" style="width: 100%;" ondblclick="moveright('kj')">
+
+							</select>-->
+						</div>
+						<div style="float:left;width: 5%;height: 422px;padding-top:175px;font-size: 25px;color: rgba(51,122,183,0.85);">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div style="float:left;width: 45%;">
+							<select class="choosekongjian" multiple name="right" id="right" size="20" style="width: 100%;height: 422px;">
+
+							</select>
+						</div>
+
+					</div>
+			</div>
+			<div style="float: left;margin-top: 10px; width: 100%;padding-left: 350px;">
+				<a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseKJfromTree()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="modal fade" id="guanlianrenwu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: 600px;min-width: 600px;">
+			<div class="modal-header" style="padding: 10px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择关联任务</h4>
+			</div>
+			<div style="padding: 10px">
+
+			</div>
+			<div style="margin-top: 15px;">
+
+					<div class="tab-pane" id="renwu">
+						<div style="float:left;width: 45%;margin-left: 15px;">
+							<div id="jstree_renwu" style="width: 100%;border: 1px solid darkgrey;overflow:auto;height: 422px;text-align: left;">
+
+							</div>
+							<!--<select class="kongjianselect" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" style="width: 100%;" ondblclick="moveright('kj')">
+
+							</select>-->
+						</div>
+						<div style="float:left;width: 5%;height: 422px;padding-top:175px;font-size: 25px;color: rgba(51,122,183,0.85);">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div style="float:left;width: 45%;">
+							<select class="chooserenwu" multiple name="right" id="right" size="20" style="width: 100%;height: 422px;">
+
+							</select>
+						</div>
+
+					</div>
+			</div>
+			<div style="float: left;margin-top: 10px; width: 100%;padding-left: 350px;">
+				<a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseTaskfromTree()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+   <div class="modal fade" id="fangandlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <a>选择技术方案</a>
+            </div>
+            <div class="modal-body" >
+				 <select class="form-control" id="fanganSel" style="min-width: 100px;">
+				 	{% for each in fangAnlist %}
+				 		<option value="{{each.id}}">{{each.name}}</option>
+				 	{% endfor %}
+				 </select>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnSelectFangAn" >确认选择</button>
+            </div>
+    </div>
+    </div>
+   </div>
+
+
+
+<script type="text/javascript">    
+	var flagLeft=true;
+	var flagRight=true;
+
+    $(document).ready(function() {
+		intweixianyuan();
+		init_tree({{curMajorId}});
+		$("#fanganSel").select2({
+			 placeholder:'请选择',
+ 			 allowClear:true,
+ 			 width: "100%", //设置下拉框的宽度
+ 			 language: "zh-CN", //设置 提示语言
+		});
+    });
+    
+    	$('#guanlianyuansumajor').change(function() {
+		var major = $("#guanlianyuansumajor").val();
+		if(major!='0'){
+			init_tree(major,'');
+		}
+
+	});
+
+</script>
+
+
+{% endblock %}

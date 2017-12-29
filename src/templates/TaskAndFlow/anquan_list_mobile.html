@@ -1,0 +1,70 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %} 
+<script src="/js/commonopr.js" type="text/javascript"></script>
+<script src="/js/common/jishu.js" type="text/javascript"></script>
+<script src="/js/touchswap/jquery.touchSwipe.min.js" type="text/javascript"></script>
+
+<link href="/css/project/jishu_mobile.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+	<div class="swiper-container swiper-container-problem">
+		<div class="swiper-wrapper">
+			<div class="swiper-slide tab-pane fade in active">
+				<div class="row-fluid">
+		        	<div class="title_row">
+		             	 <h3><i class="fa fa-th">&nbsp</i> 质量问题统计</h3>
+		            </div>
+		            <div class="list_row">
+			            <table class="table table-striped" >
+					      <thead>
+					        <tr>
+					          <th>名称</th>
+							  <th>状态</th>
+							  <th>进度</th>
+							  <th>信息</th>
+					        </tr>
+					      </thead>
+					      <tbody>
+							<tr>
+					          <th>装修地板</th>
+							  <th>完成</th>
+							  <th>100%</th>
+							  <th>虎门二桥项目</th>
+					        </tr>
+					        <tr>
+					          <th>装修地板</th>
+							  <th>完成</th>
+							  <th>100%</th>
+							  <th>虎门二桥项目</th>
+					        </tr>
+					        <tr>
+					          <th>装修地板</th>
+							  <th>完成</th>
+							  <th>100%</th>
+							  <th>虎门二桥项目</th>
+					        </tr>
+					      </tbody>
+					    </table>
+					</div>
+				</div> 
+		    <div class="swiper-slide tab-pane fade in">
+		        <div class="row-fluid">
+		        	<div class="title_row">
+		             	 <h3><i class="fa fa-th">&nbsp</i> 安全问题统计</h3>
+		             	 <div class="pull-right" style="display:inline-block; margin-top:-30px; margin-right:10px; text-decoration:underline;"> 
+		             	 	<a href="/task/anquan/">	获取详细 </a>
+		             	 </div>
+		            </div>
+		            <div class="list_row">
+			            <div class="data_draw" id="anquan-bar">
+			            </div>
+			        </div>
+		        </div> 
+	        </div> 
+	    </div> 			
+	</div> 
+
+{% endblock %}
+

@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.resize.js"></script>
+
+<script src="/js/commonopr.js" type="text/javascript"></script>
+<script src="/js/common/jishu.js" type="text/javascript"></script>
+<link href="/css/project/jishu.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+
+	 <div class="row search-row">
+		
+		<div class="widget-container fluid-height clearfix">
+		 	<h3><i class="fa fa-arrows"></i>&nbsp;安全方案管理</h3>
+			<div class="widget-content padded">
+				<form class="serarch-tab" action="" method="get"> {% csrf_token %}
+				  <div class="form-group draw-group">
+				  	<div id="item-donut"> </div>
+				  </div>
+				  <div class="form-group search-group">
+					{{ form.name.errors }}
+					<div class="search-item">
+			            <label class="control-label col-md-1" align="right">工程名称：</label>
+			            <div class="col-md-3">
+					  <input type="text" name="number"  class="form-control" list="pblist" value="{{pbnumber}}">
+									<datalist id="pblist">
+									   {% for item in list_items.object_list %}
+										  <option value="{{item.number}}">
+									   {% endfor %}
+									</datalist>
+		            </div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">方案名称：</label>
+			            <div class="col-md-3">
+					  <input type="text" class="form-control" name="postion" list="poslist"value="{{pbpostion}}">
+									<datalist id="poslist">
+									   {% for item in PredestalChoices %}
+										  <option value="{{item.name}}">
+									   {% endfor %}
+									</datalist>
+		            </div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">重大危险源：</label>
+			            <div class="col-md-3">
+						  <select name="taskid" class="form-control">
+								<option value="全部" selected>全部</option>
+								{% for task in TaskChoices %}
+									{% ifequal task.description pbtaskdes %}
+										<option value="{{task.description}}" selected>{{task.description}}</option>
+									{% else %}
+										<option value="{{task.description}}">{{task.description}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+			            </div>
+					</div>
+			        <div class="search-item">
+						<label class="control-label col-md-1" align="right">流程状态：</label>
+			            <div class="col-md-3">
+						  <select name="taskid" class="form-control">
+								<option value="全部" selected>全部</option>
+								{% for task in TaskChoices %}
+									{% ifequal task.description pbtaskdes %}
+										<option value="{{task.description}}" selected>{{task.description}}</option>
+									{% else %}
+										<option value="{{task.description}}">{{task.description}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+			            </div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">开始时间：</label>
+			            <div class="col-md-3">
+						  <select name="taskid" class="form-control">
+								<option value="全部" selected>全部</option>
+								{% for task in TaskChoices %}
+									{% ifequal task.description pbtaskdes %}
+										<option value="{{task.description}}" selected>{{task.description}}</option>
+									{% else %}
+										<option value="{{task.description}}">{{task.description}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+			            </div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">结束时间：</label>
+			            <div class="col-md-3">
+						  <select name="taskid" class="form-control">
+								<option value="全部" selected>全部</option>
+								{% for task in TaskChoices %}
+									{% ifequal task.description pbtaskdes %}
+										<option value="{{task.description}}" selected>{{task.description}}</option>
+									{% else %}
+										<option value="{{task.description}}">{{task.description}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+			            </div>
+					</div>
+		          </div>
+				  <div class="form-group btn-group">
+				  	<div class="col-md-3" >
+						<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 新建 </button>
+		            </div>
+					<div class="col-md-3" >
+						<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+		            </div>
+		            <div class="col-md-3" >
+						<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 清空 </button>
+		            </div>
+		          </div>
+		          <div class="form-group export-btn-group">
+					<div class="col-md-3" >
+						<a href="javascript:ExportReport();" class="btn btn-success btn" ><i class="fa fa-download"></i>导出梁段生产报告</a>
+		            </div>
+		            <div class="col-md-3" >
+						<a href="javascript:ExportReport();" class="btn btn-success btn" ><i class="fa fa-download"></i>导出梁段生产报告</a>
+		            </div>
+		          </div>
+				</form>
+			</div>                    
+		</div>  
+	</div>   
+	
+	<div class="row content-row" align="center">
+		<div class="widget-container fluid-height clearfix">
+		    <table class="table table-striped" >
+		      <thead>
+		        <tr>
+		        </tr>
+		      </thead>
+		      <tbody>
+			  {% ifequal listcount 0 %}
+			  <tr>
+		          <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+			   </tr>
+			  {% endifequal %}
+			  {% for item in list_items.object_list %}
+		        <tr>
+		          <td>{{item.number}}</td>
+				  <td>{{item.postion}}</td>
+				  <td>{{item.task.description}}</td>
+				  <td>
+				  {% ifequal item.status None %}
+		          	没有记录
+		          {% else %}
+		          	<a>{{item.status}}</a>
+		          {% endifequal %}
+		          </td>
+		          <td>
+		          	<a href="/task/precastbeam/edit/{{item.id}}?obj_url={{cur_url}}" title="编辑梁段信息" style="cursor: pointer;">[编辑状态<i class="fa fa-pencil"></i>]</a>
+		          	{% ifnotequal item.status None %}
+					  <a href="/task/precastbeam/trace/{{item.id}}" title="追踪梁段状态" style="cursor: pointer;">[追踪<i class="fa fa-search-plus" ></i>]</a>
+					  <a href="/task/precastbeam/tracematerial/{{item.id}}" title="查看梁段材料" style="cursor: pointer;">[材料<i class="fa fa-search-plus" ></i>]</a>
+					  <a href="/task/precastbeam/upload/{{item.id}}" title="添加梁段附件" style="cursor: pointer;">[添加<i class="fa fa-paperclip" ></i>]</a>
+					  <a href="/task/precastbeam/attach/{{item.id}}" title="查看梁段附件" style="cursor: pointer;">[查看<i class="fa fa-paperclip" ></i>]</a>          	
+		          	{% endifnotequal %}
+		          </td>
+		        </tr>
+			   {% endfor %}
+		      </tbody>
+		    </table>
+		</div>
+		
+		<div class="widget-content padded text-center" >
+		    <ul class="pagination pagination-lg">
+		    	<li><a href="?page=1&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">首页</a></li>
+				{% if list_items.has_previous %}	
+					<li><a href="?page={{ list_items.previous_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">前一页</a></li>
+				{% endif %}
+		        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+		        <li><a> 
+		        	<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;"/>
+		        	</a>
+		        	<a id="jumpBTN">
+		        	跳转
+		        	</a>
+		        </li>
+				{% if list_items.has_next %}
+		         <li><a href="?page={{ list_items.next_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">下一页</a></li>
+				{% endif %}
+				<li><a href="?page={{paginator.num_pages}}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">尾页</a></li>
+				
+		    </ul>
+		</div>
+	</div>
+
+<div class="modal fade" id="exportdlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <a>导出报表对话框</a>
+            </div>
+            <div class="modal-body">
+				 <div class="progress">
+                      <div class="progress-bar" id="exportpgbar" style="width: 0%"> <span></span></div>
+                  </div>
+				<a href=''  id='reporturl'></a>
+            </div>
+            <div class="modal-footer">
+				<button class="btn btn-danger" data-dismiss="modal" >取消</button>
+				<button class="btn btn-success" data-dismiss="modal" id="btnDownload" onclick="downloadreport()" aria-hidden="true" disabled="disabled">下载报表</button>
+            </div>
+    </div>
+    </div>
+</div>
+ 
+<script type="text/javascript">
+		$('#pageJump').bind('input propertychange', function() { 
+			var tgtPage = $('#pageJump').val();
+			if(tgtPage){
+				$("#jumpBTN").attr("href","?page=" + tgtPage + "&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}");
+			}
+		});
+</script>
+
+
+
+{% endblock %}
+

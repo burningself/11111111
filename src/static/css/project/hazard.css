@@ -1,0 +1,35 @@
+body{overflow-x:hidden;}
+td{text-align:center;}
+
+td input{
+border:none;
+width:100%;
+}
+
+.table tr{border:none;}
+.table td{border:solid 1px #ddd; vertical-align:middle!important;}
+.table td input {height:18px; vertical-align:bottom;}
+.header-row {
+	    padding-left: 5px;
+	    text-align: left;
+	    font-size: 18px;
+	    font-weight: bold;
+	    color: #2e6da4;
+	    background: white;
+	    margin-top: -17px;
+	}
+.nav_tool{display: none;}
+.issk {
+    /*width: 4em;*/
+    padding: 0.2em 0.4em 0.2em 0.4em;
+    border: 1px solid #94c1e7;
+    border-radius: 0.2em;
+    -webkit-appearance: none;
+    background: #ffffff;
+}
+
+.myleft{
+    text-align: left;
+}
+/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+select::-ms-expand { display: none; }

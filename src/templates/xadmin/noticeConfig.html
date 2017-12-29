@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link href="https://cdn.bootcss.com/iview/2.7.4/styles/iview.css" rel="stylesheet">
+	<style>
+		.cards {
+			display: flex;
+			flex-direction:column;
+			justify-content:space-between;
+		}
+		textarea{
+			resize: none;
+		}
+		#content{
+			width: 75%;
+			display: inline-block;
+			height: calc(100vh - 100px);
+			font-size: 18px;
+		}
+		.ivu-form-item{
+			margin-bottom:12px;
+		}
+		.cards .ivu-card-body{
+			height: calc(100% - 42px);
+			overflow: auto;
+		}
+		.ivu-col-span-6 {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		#extend{
+			overflow: auto;
+			height: calc(100% - 38px);
+		}
+	</style>
+</head>
+<body>
+<div id="app" style="padding: 8px;height: 100vh">
+	<template>
+		{% verbatim %}
+		<row :gutter="16" style="height: 100%">
+			<i-col :span="18" style="height: 100%">
+				<card style="height: 100%" ref="card">
+					<i-form :label-width="80">
+						<form-item label="标题">
+							<i-input v-model="form.title"></i-input>
+						</form-item>
+						<form-item label="正文" style="margin-bottom: 0;">
+							<!--<i-input v-model="form.content" type="textarea" :rows="rows" style="width: 75%"></i-input>-->
+							<div id="content" contenteditable="true" class="ivu-input" spellcheck="false" @keyup.backspace="check">
+								<p><br contenteditable="false"/></p>
+							</div>
+							<div style="width: 25%;float: right">
+								<card>
+									<span slot="title">词槽</span>
+
+									<i-Button type="ghost" size="small" @click="add">事件人员</i-Button>
+									<i-Button type="ghost" size="small" @click="add">人员参建方</i-Button>
+									<i-Button type="ghost" size="small" @click="add">人员公司</i-Button>
+									<i-Button type="ghost" size="small" @click="add">人员专业</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件标题</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件编号</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件描述</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件反馈</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件操作</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件截止时间</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件优先级</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件创建人</i-Button>
+									<i-Button type="ghost" size="small" @click="add">事件当前阶段</i-Button>
+								</card>
+							</div>
+						</form-item>
+					</i-form>
+				</card>
+			</i-col>
+			<i-col :span="6" style="height: 100%" class-name="cards">
+				<card style="height: 49%">
+					<template slot="title">
+						<Icon type="settings"></Icon>基础设置
+					</template>
+					<i-form :label-width="80">
+						<form-item label="通知类型">{{type}}</form-item>
+						<form-item label="发送通知">
+							<i-switch v-model="send"></i-switch>
+						</form-item>
+						<form-item label="使用模板">
+							<i-button type="warning" size="small">确认</i-button>
+							<div class="ivu-form-item-error-tip">使用模板将替换掉现有数据</div>
+						</form-item>
+					</i-form>
+				</card>
+				<card style="height: 49%">
+					<template slot="title">
+						<Icon type="ios-cloud-upload-outline"></Icon>高级设置
+					</template>
+					<div id="extend" ref="extend"></div>
+					<hr style="position: absolute;bottom: 52px;left: 16px;right: 16px;"/>
+					<i-button type="success" style="position: absolute;bottom: 12px;right: 12px;">保存</i-button>
+				</card>
+			</i-col>
+		</row>
+		<Modal
+		title="选择通知类型"
+		v-model="modelValue"
+		:closable="false"
+		:mask-closable="false"
+		>
+			<ul class="category" v-for="value,key of category ">
+				<li>
+					{{key}}
+					<ul>
+						<Radio-Group v-model="subType">
+							<li v-for="i in value"><Radio :label="[i.id,i.text]">{{i.text}}</Radio></li>
+						</Radio-Group>
+					</ul>
+				</li>
+			</ul>
+			<div slot="footer">
+				<i-button type="primary" :loading="loading" @click="getEvent">确认</i-button>
+			</div>
+		</Modal>
+	</template>
+</div>
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/iview/2.7.4/iview.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.17.1/axios.min.js"></script>
+<script>
+    Vue.config.devtools = true;
+    !function () {
+        this.vnode = new Vue({
+            el: '#app',
+            data () {
+                return {
+                    form: {
+                        title: '',
+                        content: ''
+                    },
+//                    rows: 0,
+                    type: '',
+                    send: true,
+                    /**
+                     * 模态框部分
+                     */
+                    category : {},
+                    subType:'',
+                    modelValue: true,
+                    loading: false,
+                    /**
+                     * 组件部分
+                     */
+                    open: false,
+                    value: '',
+
+                }
+            },
+            methods: {
+                add(e){
+                    const text = e.currentTarget.innerText;
+                    let node = document.createElement('div');
+                    node.classList = 'ivu-tag ivu-tag-blue ivu-tag-border ivu-tag-checked';
+                    node.setAttribute('contenteditable','false');
+                    node.setAttribute('vertical-align', 'bottom');
+                    let children = document.createElement('span');
+                    children.innerText = '<' + text + '>';
+                    children.classList = 'ivu-tag-text';
+                    node.appendChild(children);
+                    const locator = window.getSelection();//.getRangeAt(0);
+                    if(locator.focusNode.tagName === 'P'){
+                        locator.getRangeAt(0).insertNode(node);
+                    } else {
+                        const before =  document.getElementById('content').getElementsByTagName('br')[0];
+                        document.getElementById('content').lastChild.insertBefore(node,before);
+                    }
+                },
+                check(e){
+                    !e.currentTarget.children[0] && (e.currentTarget.innerHTML = '<p><br contenteditable="false"/></p>');
+                },
+                async getEvent(){
+                    this.loading = true;
+                    if(this.subType[1].indexOf('事件')>-1){
+                        await axios.get('/task/flowtypes/').then(t=>{
+                            const data = t.data.results;
+//                            events(data);
+//                            notice()
+                            meeting()
+						});
+						this.loading = false;
+						this.modelValue = false
+					}
+					await (this.loading = false,this.loading = false)
+				}
+            },
+            mounted(){
+            },
+            created(){
+                this.$Spin.show();
+                axios.get('/config/noticecategorys/').then(t=>{
+                    const data =  t.data.results;
+                    data.forEach(d=>{
+                        if(this.category[d.typetag]){
+                            this.category[d.typetag].push({id: d.id, text: d.subtypetag})
+                        } else {
+                            Vue.set(this.category, d.typetag, [{id: d.id, text: d.subtypetag}]);
+                        }
+                    });
+                    this.$Spin.hide();
+                    this.modelValue = true;
+                })
+            }
+        })
+    }();
+	function events(events) {
+        const Profile = Vue.extend({
+			template:`
+			<div id="extend">
+				事件类型
+				<hr/>
+				<RadioGroup v-model="group">
+					<row>
+						<i-col :span="6" v-for="i in events"><Radio :label="i.id.toString()">{{i.name}}</Radio></i-col>
+					</row>
+				</RadioGroup>
+			</div>
+			`,
+			data () {
+			    return {
+                    events,
+                    group:''
+				}
+			}
+		});
+        new Profile().$mount('#extend')
+	}
+	function notice () {
+		const Profile = Vue.extend({
+			template:`
+				<div id="extend">
+					二次通知时间
+					<hr/>
+					<TimePicker
+					:open="open"
+					:value="value"
+					format="HH:mm"
+					confirm
+					@on-change="handleChange"
+					@on-clear="handleClear"
+					@on-ok="handleOk">
+						提前
+						<a href="javascript:void(0)" @click="handleClick">
+							<Icon type="ios-clock-outline"></Icon>
+							<template v-if="value === ''">选择时间</template>
+							<template v-else>{{ value }}</template>
+						</a>
+						二次通知
+					</TimePicker>
+				</div>
+			`,
+			data () {
+			    return {
+                    open: false,
+                    value: ''
+				}
+			},
+            methods: {
+                handleClick () {
+                    this.open = !this.open;
+                },
+                handleChange (time) {
+                    this.value = time;
+                },
+                handleClear () {
+                    this.open = false;
+                },
+                handleOk () {
+                    this.open = false;
+                }
+            }
+		});
+        new Profile().$mount('#extend')
+    }
+    function meeting() {
+		const Profile = Vue.extend({
+            template:`
+				<div id="extend">
+					二次通知时间
+					<hr/>
+					<TimePicker
+					:open="open"
+					:value="value"
+					format="HH:mm"
+					confirm
+					@on-change="handleChange"
+					@on-clear="handleClear"
+					@on-ok="handleOk">
+						提前
+						<a href="javascript:void(0)" @click="handleClick">
+							<Icon type="ios-clock-outline"></Icon>
+							<template v-if="value === ''">选择时间</template>
+							<template v-else>{{ value }}</template>
+						</a>
+						二次通知
+					</TimePicker>
+					<br/>
+					<p style="margin-top: 1rem;">详细设置</p>
+					<hr/>
+					<Form>
+						<FormItem label="修改主题">
+							<RadioGroup v-model="one">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改描述">
+							<RadioGroup v-model="two">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改状态">
+							<RadioGroup v-model="three">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改指派">
+							<RadioGroup v-model="four">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改优先级">
+							<RadioGroup v-model="five">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改备注">
+							<RadioGroup v-model="six">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="结束时间">
+							<RadioGroup v-model="seven">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="修改关注">
+							<RadioGroup v-model="eight">
+								<Radio :label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio :label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+						<FormItem label="删除问题">
+							<RadioGroup v-model="nine">
+								<Radio label="true">
+									<span>通知</span>
+								</Radio>
+								<Radio label="false">
+									<span>不通知</span>
+								</Radio>
+							</RadioGroup>
+						</FormItem>
+					</Form>
+				</div>
+			`,
+            data () {
+                return {
+                    open: false,
+                    value: '',
+					one:true,
+					two:true,
+					three:true,
+					four:true,
+					five:true,
+					six:true,
+					seven:true,
+					eight:true,
+					nine:true
+                }
+            },
+            methods: {
+                handleClick () {
+                    this.open = !this.open;
+                },
+                handleChange (time) {
+                    this.value = time;
+                },
+                handleClear () {
+                    this.open = false;
+                },
+                handleOk () {
+                    this.open = false;
+                }
+            }
+		});
+        new Profile().$mount('#extend')
+    }
+</script>
+</body>
+</html>
+{% endverbatim %}

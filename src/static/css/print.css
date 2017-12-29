@@ -1,0 +1,57 @@
+
+
+/* 样式将只应用于打印 */
+
+@media print {
+	.labelInner{
+        display: table-row;
+    }
+
+    .labelPage{
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+	 html {
+
+        height: 100%;
+    }
+
+    body {
+
+        height: 100%;
+    }
+
+	/*白纸黑字*/
+	body, article {
+		color: #000;
+		background: #fff;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+	}
+	
+	/*为了使打印机更具效率,应只显示主体内容,去除页眉页脚导航栏*/
+	h1 {
+		color: #000;
+		background: none;
+		}
+
+	nav, aside {
+		display: none;
+	}
+	
+
+	@page {
+		size: 10cm 6cm ;
+		margin: 0.13cm;
+	}
+	
+	/*portrait： 纵向打印地, landscape: 横向*/
+	/*@page {
+		size: A4 landscape;
+		margin: 2cm;
+	}*/
+	
+	
+}

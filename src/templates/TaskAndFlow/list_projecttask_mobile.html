@@ -1,0 +1,124 @@
+{% extends "base_mobile.html" %}
+
+
+{% block content %} 
+		<link href="/css/swipercss/swiper.min.css" media="all" rel="stylesheet" type="text/css" />
+		<script src="/js/swiperjs/swiper.min.js" type="text/javascript"></script>
+		
+	<!--<div class="btn-group topBtn" style="width: 100%;">
+	  <button type="button" class="btn btn-primary active" style="width: 50%;"  onclick="loadTab(this,0)">周施工进度</button>
+	  <button type="button" class="btn btn-primary" style="width: 50%;"  onclick="loadTab(this,1)">月施工进度</button>
+	</div>-->
+	<style>
+		.weui_panel_hd{
+			 font-size: 1.2em;
+		    color: #1382AB;
+		    font-weight: bold;
+		}
+		.weui_media_desc_custom{
+			color: #999;
+		    font-size: 13px;
+		    line-height: 1.2;
+		}
+	</style>
+
+		<div class="swiper-container swiper-container-project" style="min-height: calc(100vh - 180px);">
+			<div class="swiper-wrapper">
+		    <div class="swiper-slide tab-pane fade in active">
+		    		<div style="background:white;">
+				         <div class="weui_panel weui_panel_access">
+					            <div class="weui_panel_hd">周施工进度({{weekstartdate|date:"Y/m/d"}}-{{weekstartend|date:"Y/m/d"}})</div>
+					            <div class="weui_panel_bd">
+					             {% for key,value in list_obj_weekly.items %}    
+									    <div class="weui_media_box weui_media_text">
+						                    <h4 class="weui_media_title">{{ key }}</h4>
+						                    <p class="weui_media_desc_custom">
+						                    	{% for key2,value2 in value.items %}
+						                    		{% for pb in value2 %}
+														{% if forloop.last %}
+															{{pb}}
+														{% else %}
+															{{pb}}、
+														{% endif %}
+														{% ifequal forloop.counter 5 %}
+															等5个
+														{% endifequal %}
+														{% if forloop.last %}
+															{{key2}}</p><p class="weui_media_desc_custom">
+														{% endif %}
+													{% endfor %}
+						                    	{% endfor %}  
+						                    </p>
+						                </div>
+									{% endfor %}  
+					            </div>
+					            <a href="/progress/goujian/" class="weui_panel_ft">查看详情</a>
+					        </div>     
+						</div>
+				</div>
+			<div class="swiper-slide  tab-pane fade in" >
+				      <div class="weui_panel weui_panel_access">
+			            <div class="weui_panel_hd ">月施工进度({{monthstartdate|date:"Y/m/d"}}-{{monthstartenddate|date:"Y/m/d"}})</div>
+			            <div class="weui_panel_bd">
+							{% for key,value in list_obj_monthly.items %}    
+									    <div class="weui_media_box weui_media_text">
+						                    <h4 class="weui_media_title">{{ key }}</h4>
+						                    <p class="weui_media_desc_custom">
+						                    	{% for key2,value2 in value.items %}
+						                    		{% for pb in value2 %}
+														{% if forloop.last %}
+															{{pb}}
+														{% else %}
+															{{pb}}、
+														{% endif %}
+														{% ifequal forloop.counter 5 %}
+															等5个
+														{% endifequal %}
+														{% if forloop.last %}
+															{{key2}} </p><p class="weui_media_desc_custom">
+														{% endif %}
+													{% endfor %}
+						                    	{% endfor %}  
+						                    </p>
+						                </div>
+							{% endfor %}  
+			            </div>
+			            <a href="/progress/goujian/" class="weui_panel_ft">查看详情</a>
+			        </div>     
+		    </div>
+		</div>
+	</div>
+    <script type="text/javascript">
+
+		var mySwiper = new Swiper ('.swiper-container-project' , {
+		//  direction: 'vertical',
+		//  loop: true,
+		    initialSlide: 0,
+		    effect : 'flip',
+			flip: {
+		            slideShadows : true,
+		            limitRotation : true,
+		       },
+		//  // 如果需要分页器
+		//  pagination: '.swiper-pagination',
+		//  
+		//  // 如果需要前进后退按钮
+		//  nextButton: '.swiper-button-next',
+		//  prevButton: '.swiper-button-prev',
+		//  
+		//  // 如果需要滚动条
+		//  scrollbar: '.swiper-scrollbar',
+			onSlideChangeEnd: function(swiper){
+//								$(".topBtn .active").removeClass("active");
+//		        $($(".topBtn button")[swiper.activeIndex]).addClass("active");
+		   }
+	  	}); 
+	  	
+//	  		function loadTab(obj,id){
+//				$(".topBtn .active").removeClass("active");
+//				$(obj).addClass("active");
+//				mySwiper.slideTo(id, 1000, false);
+//	}
+
+ 	</script>
+{% endblock %}

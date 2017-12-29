@@ -1,0 +1,26 @@
+.row{width:99.8%; margin:2px 0.1% 0 0.1%; padding: 0 5px 0 5px;  display:inline-block; background: white; color: #007aff;min-height:600px;}
+.header-row{width:100%; margin:5px 0 5px 5px; padding: 0;text-align:left;font-size: 18px;font-weight:bold;color: #2e6da4;}
+.nav_tool{
+    display: none;
+}
+th,td{ text-align:center; }
+.search-row {height:200px; text-align:center; background: #FDFDFD; vertical-align:middle; }
+.search-row .widget-container{width:95%; display:inline-block;}
+.search-row h3{width:20%; display: inline-block; font-weight:bold; max-height:100%; color:#007aff;}
+.serarch-tab .form-group {display:inline-block; vertical-align:middle;}
+#item-donut{height:150px; margin-top:-50px; width:170px;}
+.serarch-tab .draw-group{width:10%; display:inline-block;}
+.serarch-tab .search-group {width: 100%; max-width:800px;}
+.serarch-tab .search-group .search-item {vertical-align: middle; height:40px; width:50%; max-width:350px; display:inline-block;}
+.serarch-tab .search-group .search-itemsingle{vertical-align: middle; height:17px; width:100%; max-width:700px; display:inline-block;}
+.serarch-tab .col-md-1 {width:40%; padding:0; line-height:40px;}
+.serarch-tab .col-md-3 { width: 60%; min-width:100px; max-width:300px;}
+.serarch-tab .col-md-2 {width:20%; padding:0; line-height:40px;}
+.serarch-tab .col-md-4 { width: 50%; min-width:100px; max-width:700px;}
+.serarch-tab .btn-group {width: 15%; max-width:150px; text-align:left;}
+.serarch-tab .btn-group .col-md-3{width: 100%; height:40px;}
+.serarch-tab .btn-group .col-md-3 button{width:100px;}
+
+.content-row{min-height:300px; background: #FDFDFD; padding-top:20px;}
+.content-row .widget-container { min-height:200px;}
+.content-row .widget-container table {font-size:1.2em;}

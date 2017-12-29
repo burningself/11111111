@@ -1,0 +1,302 @@
+	
+	.row-fluid{
+		background-color:white;
+		margin-top:2px;
+		display:inline-block; 
+		border: 5px solid white;
+		border-radius: 5px;
+		width:100%;
+		#min-height:250px;
+		#max-height:650px;
+		vertical-align: top; 
+		text-align:left;
+		/*margin-left:0.2%;*/
+		overflow:hidden;
+	}
+
+  .row-fluid1{
+    background-color:white;
+    margin-top:2px;
+    display:inline-block; 
+    border: 5px solid white;
+    border-radius: 5px;
+    width:100%;
+    height:716px;
+    vertical-align: top; 
+    text-align:left;
+    /*margin-left:0.2%;*/
+    overflow:hidden;
+  }
+	
+	.row-fluid .title_row {height:25px;}
+  	.row-fluid1 .title_row {height:35px;}
+	.row-fluid .title_row h3, .notice div h3 {
+			margin-top:5px; 
+			text-align:center; 
+			color: dodgerblue;
+			font-weight:bold;
+			font-size: 16px;}
+  .row-fluid1 .title_row h3, .notice div h3 {
+      margin-top:5px; 
+      margin-left:10%; 
+      text-align:center; 
+      color: dodgerblue;
+      font-weight:bold;
+      font-size: 16px;}
+	.row-fluid table {width:95%;}
+	.row-fluid .label_row {height:25px;}
+	.row-fluid .draw_row {padding-left:2%; min-height:180px; ; max-height:280px; }
+				.draw_row #month-line,#week-line {height:100%; width:100%; }
+	
+	.row-fluid .list_row {min-height:200px; ; max-height:300px;}
+				.list_row .data_draw{ margin-left:2%; margin-top:-30px; max-height:110%; text-align:center; width:28%; display:inline-block;  }
+				
+	.row-fluid .list_row .data_list{ width:70%; display:inline-block;}
+	.row-fluid .list_row .data_list table{ width:95%; height:90%; }
+	#exportReport {position: relative; top:0px; right:20px;}
+	
+	.more{position: relative; display:inline-block; top:0px; right:5%; margin-top:-25px;}
+/*----------------------------------------------------------------------------------- */
+/*  Notice */
+/*----------------------------------------------------------------------------------- */
+	.custom_row_basic {margin-left:0.2%; padding-top:5px; heigth:100%;}
+	.custom_row_basic .notice{
+		width:49.5%;
+/*		display:inline-block;*/
+/*		height:110px;*/
+		border-radius: 5px;
+		background-color:white;
+    float: left;
+    margin-right: 5px;
+    padding-bottom: 5px;
+	}
+	
+	#carousel-example-generic{
+		height:110px;
+		width:100%;
+		margin:0;
+	}
+	
+	.carousel-inner{
+		height:68px;
+		width:100%;
+	}
+	
+	.carousel-indicators{
+		bottom:0px;
+	}	
+	
+	.carousel-indicators li{
+		background-color:white;
+		border: #5BC0DE solid 1px;
+	}
+	
+	.carousel-indicators .active{
+		background-color: #5BC0DE;
+	}
+	
+	.carousel-control{
+		height: 100%;
+		background-color:white !important;
+		border-radius: 20px;
+	}
+	
+	.carousel-control .glyphicon{
+		margin-left:-25%;
+		background-color:inherite;
+		color:#5BC0DE;
+		font-size:20px;
+	}
+
+
+/*----------------------------------------------------------------------------------- */
+/*  Weather Widget */
+/*----------------------------------------------------------------------------------- */
+.col-md-8{
+		display: inline-block;
+		height:112px;
+		padding:0;
+		width:100%;
+	}
+.dh{margin-top: 5px;text-align:left;padding-left: 10px}
+.btn-success{width: 100px;}
+.weather {
+/*  border: 5px solid #5BC0DE;*/
+  border-radius: 5px;
+  padding:0;
+  background: #F7F7F7;
+  color: #337AB7;
+  min-height: 100px;
+  height: 112px; 
+  overflow:hidden;}
+  .weather .heading {
+    background: transparent;
+    font-weight: 300;
+    color: #337AB7; }
+  .weather .padded {
+    padding: 0 10px 0 0; }
+    .weather .padded .row > div {
+      text-align:center;
+      padding-top:14px;
+      border-right: 1px solid #337AB7;
+      height: 100%;
+      margin-bottom: 0; }
+      .weather .padded .row > div:last-child {
+        border: 0; }
+      .weather .padded .row > div canvas {
+        display: block;
+        height:30px;
+	  }
+	  .weather .padded .row > div p.location { display:inline-block;font-size:1.5em; margin: 18px 0 0 0; font-weight:bold; 
+	  							height:100px; width:100px; background:rgb(27, 125, 192) ;border-radius:100px; padding-top:33px;}
+	  .locat .pro{font-size:1em; font-weight:bold;}
+      .weather .padded .row > div .number {
+        font-size: 1.5em;
+        color: #337AB7;
+        font-weight: 300;
+        letter-spacing: -0.05em;
+        display: inline-block;
+        vertical-align: middle;
+            padding-top: 5px; }
+        .weather .padded .row > div .number small {
+          font-size: 1em;
+          margin: 2px 0 0 4px;
+          display: inline-block; }
+        .weather .padded .row > div.today .pull-right{width:50%}
+        .weather .padded .row > div.today .pull-left{width:50%; padding-left:5%; margin-top:3px; height:103px; border-radius:50px;}
+        .weather .padded .row > div.today .number small {
+          margin: 0 0 0 -5%; font-size:1em;}
+      .weather-info p { display:inline-block; margin: 0; font-size:1.0em; margin-bottom:5px; white-space:nowrap;}
+
+/*----------------------------------------------------------------------------------- */
+/*  Modal_Container */
+/*----------------------------------------------------------------------------------- */
+.modal_container {
+	#max-height:549px;
+  #min-height:549px;
+	/*max-height:720px;*/
+	width:100%;
+/*	margin-right:0.35%;*/
+	background: white;
+	
+}
+.modal_container .modal_draw_body{height:680px; width:96%;}
+
+/*----------------------------------------------------------------------------------- */
+/*  Table duichang */
+/*----------------------------------------------------------------------------------- */
+.table-filters {
+  margin-bottom: 20px; }
+  .table-filters tbody tr td.filter-category {
+    text-align: center;
+    color: white;
+    border-bottom: 1px solid white; }
+/*  .table-filters tbody tr td {padding:0px;} */ 
+  .table-filters tbody tr td.filter-category [class^="fa"], .table-filters tbody tr td.filter-category [class*="fa"] {
+      font-size: 1.2em; }
+  .table-filters tbody tr td.blue {
+    background: #5bc0de; }
+  .table-filters tbody tr td.green {
+    background: #60c560; }
+  .table-filters tbody tr td.orange {
+    background: #f59b3b; }
+  .table-filters tbody tr td.red {
+    background: #d9534f; }
+  .table-filters tbody tr td.magenta {
+    background: #d94084; }
+  .table-filters tbody tr td.inactive {
+    background: #8e8e93; }
+  .table-filters tbody tr td h3 {
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 1em;
+    font-weight: 300 !important; }
+  .table-filters tbody tr td .success {
+    color: #60c560; }
+  .table-filters tbody tr td .danger {
+    color: #d9534f; }
+  .table-filters tbody:last-child td.filter-category {
+    border-bottom: 0; }
+
+.filter-categories .btn-group {
+  margin: 0;
+  display: block; }
+  .filter-categories .btn-group .btn {
+    font-size: 14px;
+    font-weight: 300 !important;
+    text-align: left;
+    border-radius: 4px !important;
+    margin: 0 0 10px; }
+    .filter-categories .btn-group .btn [class^="fa"], .filter-categories .btn-group .btn [class*="fa"] {
+      margin: 0 5px 0 0;
+      width: 45px;
+      font-size: 20px;
+      vertical-align: middle;
+      text-align: center; }
+
+/*----------------------------------------------------------------------------------- */
+/*  configPageModal */
+/*----------------------------------------------------------------------------------- */
+#configPage {padding-top:10%; border:none!important;}
+#configPage .modal-dialog {width:60%; font-size:18px; font-weight:bold;}
+#configPage .modal-dialog .modal-content form {padding-left:5%;}
+#configPage .modal-dialog .modal-content form label {width:30%;}
+#configPage .modal-dialog .modal-content form input {width:30%; font-size:18px}
+#configPage .modal-dialog .modal-content form label input{width:30px; height:16px;}
+
+
+
+	.shortcuts {
+    	text-align: center;
+	}
+
+	.shortcuts .shortcut {
+	    width: 9.50%;
+	    display: inline-block;
+	    padding: 12px 0;
+	    margin: 0 .25% 0.2em;
+	    vertical-align: top;
+	    text-decoration: none;
+	    border-radius: 5px;
+	    height: 78px;
+	}
+	
+	.shortcuts .shortcut .shortcut-icon {
+	    font-size: 32px;
+	}
+	
+
+	.shortcuts .shortcut-label {
+	    display: block;
+	    font-weight: 400;
+	   
+	}
+	
+	.shortcuts a
+	{ 
+		 color: white;
+	}
+	
+	.shortcuts a:hover
+	{ 
+		background-color:#C3BC69;
+		color: black;
+	}
+
+	.custom_b1{background-color: #2E82B3;}
+	.custom_b2{background-color: #7760a5;}
+	.custom_b3{background-color: #58905e;}
+	.custom_b4{background-color: #2E82B3;}
+
+
+.fenge{
+padding:16px 0px 0px 6px;
+margin-left: 6px;
+border-left: 1px solid gray;
+font-size: 0;
+}
+
+div.bootstrap-panel {
+	min-height: 0px;
+}

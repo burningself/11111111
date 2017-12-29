@@ -1,0 +1,151 @@
+{% extends "base_v2.html" %}
+{% block content %}
+<link href="/css/project/feedback.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/src/static/js/jquery/jquery-2.2.3.min.js"></script>
+<script>
+	var t1 = false;
+	var t2 = false;
+	var t3 = false;
+	var t4 = false;
+
+    String.prototype.Trim = function() {
+        var m = this.match(/^\s*(\S+(\s+\S+)*)\s*$/);
+        return (m == null) ? "" : m[1];
+    }
+
+    String.prototype.isMobile = function() {
+//        return (/^(?:13\d|15[89])-?\d{5}(\d{3}|\*{3})$/.test(this.Trim()));
+        return (/^1[34578]\d{9}$/.test(this.Trim()));
+    }
+
+    String.prototype.isTel = function()
+    {
+        //"兼容格式: 国家代码(2到3位)-区号(2到3位)-电话号码(7到8位)-分机号(3位)"
+        //return (/^(([0\+]\d{2,3}-)?(0\d{2,3})-)?(\d{7,8})(-(\d{3,}))?$/.test(this.Trim()));
+        return (/^(([0\+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/.test(this.Trim()));
+    }
+
+    $(function() {
+		$("#name").focus(function() {
+			$(".name").text("");
+		}).blur(function() {
+			if ($("#name").val() != "" && $("#name").val().length <= 4) {
+				$(".name").css("color", "green").text("");
+				t1 = true;
+			} else {
+				$(".name").css("color", "red").text("*输入错误");
+			}
+		});
+
+		$("#email").focus(function() {
+			$(".email").css("color", "red").text("请输入正确邮箱格式");
+		}).blur(function() {
+			var email = $("#email").val();
+			if (!email.match(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/)) {
+				$(".email").css("color", "red").text("*输入错误");
+			} else {
+				$(".email").css("color", "green").text("");
+				t2 = true;
+			}
+		});
+
+		$("#phone").focus(function() {
+			$(".phone").css("color", "red").text("请输入正确格式!");
+		}).blur(function() {
+            with(document.form1){
+                if (tel.value.isMobile()||tel.value.isTel())  {
+                    tel.value = tel.value.Trim();
+                    t3 = true;
+                    $(".phone").text("");
+                    console.log("您的电话/手机号码是:" + tel.value);
+                    return true;
+                }
+                else {
+                    $(".phone").css("color", "red").text("请输入正确格式!");
+                    return false;
+                }
+            }
+		});
+
+		$("#text").focus(function() {
+			$(".text").css("color", "red").text("请输入5~30个字符");
+		}).blur(function() {
+			if ($("#text").val() != "" && $("#text").val().length >= 5 && $("#text").val().length <= 30) {
+				$(".text").css("color", "green").text("");
+				t4 = true;
+			} else {
+				$(".text").css("color", "red").text("*输入错误");
+			}
+		});
+		$("#send").click(function () {
+			if( check() == true){
+                var name = $("#name").val();
+                var email = $("#email").val();
+                var phone = $("#phone").val();
+                var text = $("#text").val();
+                $.ajax({
+                    type:"get",
+                    url:"/feedbacks/",
+                    dataType:"json",
+                    data:{
+                        "name":name,
+                        "email":email,
+                        "phone":phone,
+                        "text":text,
+                    },
+                    success:function(data){
+                        if(data.issuc=="true"){
+                            zeroModal.success('感谢您的反馈!');
+                        }else{
+                            console.log("错误");
+                        }
+                    },
+                    error:function(){
+                        console.log("错误");
+                    }
+                });
+            }
+        });
+	});
+    function check() {
+		if (t1&&t2&&t3&&t4 == true) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+</script>
+<div class="main">
+	<div class="header-v2">
+		<div class="header-bg-v2">
+			<span class="title-v2 line_height32">使用反馈</span>
+			<span  id="send"  class="c-btn c-btn-red pull-right">提交反馈</span>
+		</div>
+	</div>
+	<div class="top">
+		<div class="top_left">
+			<iframe src="/assist/baidumap/" scrolling="no" frameborder="0"></iframe>
+		</div>
+		<div class="top_right">
+			<div class="tr_text">
+				<p>*有任何的反馈和建议都可以在这里发布，我们会及时处理</p>
+				<form name="form1" method="post" onsubmit="return check()">
+					<input type="text" id="name" placeholder="姓名：" />
+					<span class="name"></span>
+					<input type="text" id="email" placeholder="邮箱：" />
+					<span class="email"></span>
+					<input type="text" name="tel" id="phone" placeholder="联系电话：" />
+					<span class="phone"></span>
+					<textarea placeholder="请输入您的问题：" id="text"></textarea>
+					<span class="text"></span>
+				</form>
+				<ul class="bottom">
+					<li><i class="glyphicon glyphicon-map-marker" aria-hidden="true"></i>上海浦东金台路金台大厦1601</li>
+					<li><i class=" glyphicon glyphicon-earphone "></i>+021 61522470 </li>
+					<li><i class="glyphicon glyphicon-envelope" aria-hidden="true"></i><a href="mailto:zzkj@bimsheng.com">zzkj@bimsheng.com</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

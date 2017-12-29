@@ -1,0 +1,171 @@
+footer {
+	/*height: 71px;*/
+	position: fixed;
+	z-index: 999;
+	bottom: 0;
+	background: aliceblue;
+	width: 100%;
+	font-color: blue;
+	font-weight: bold;
+	border-top: darkgrey solid 1px;
+}
+
+footer > ul {
+	width: 100%;
+	font-size: 1em;
+	/*height: 70px;*/
+}
+
+footer > ul > li {
+	width: 25%;
+	font-size: 1em;
+	border-left: silver solid 1px;
+	cursor: pointer;
+	/*height: 70px;*/
+	margin: 0!important;
+}
+
+footer > ul > li > a {
+	text-align: center;
+	font-size: 1em;
+	padding: 10px 0px !important;
+	/*height: 70px;*/
+}
+
+footer > ul > li > a >p{
+	font-family: "微软雅黑";
+	font-size: 1.16em;
+	margin: 5px  0;
+}
+
+footer > ul > li > a > img {
+	width: 30px;
+	height: 30px;
+}
+
+footer > ul > li .dropdown-menu {
+	min-width: 0;
+	width: 100%;
+	background-color: #EEEEEE;
+	font-weight: bold;
+	border-radius: 2px!important;
+	margin-bottom: 2px!important;
+	z-index: 999；
+}
+
+footer > ul > li .dropdown-menu > li {
+	padding-top: 2.5px;
+}
+
+footer > ul > li .dropdown-menu .divider {
+	background-color: lightgrey;
+	padding-top: 0px;
+}
+
+footer > ul > li .dropdown-menu >li >a {
+	color: dodgerblue;
+	font-weight: bold;
+	text-align: center;
+	padding: 3px 0;
+}
+
+.main-content {
+	padding: 0;
+	margin-bottom: 85px;
+}
+
+
+
+
+.nav_tool {
+	position: fixed;
+	bottom: 90px;
+	right: 2%;
+	background: #3499EB;
+	width: 40px;
+	z-index: 998;
+	border-radius: 5px;
+	opacity: 0.2;
+}
+
+.nav_tool .tool-col {
+	height: 35px;
+	border-bottom: solid 1px white;
+	padding-top: 2px;
+}
+
+.nav_tool .message {
+	border-bottom: none
+}
+
+.nav_tool div img {
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+}
+
+.ferromenu-controller,
+#fixNav li a {
+	-webkit-transition: color 0.6s;
+	-moz-transition: color 0.6s;
+	-ms-transition: color 0.6s;
+	-o-transition: color 0.6s;
+	transition: color 0.6s;
+}
+
+.ferromenu-controller .label {
+	display: inline-block;
+	font-size: 30px;
+	padding: 0;
+	height: 30px;
+	width: 30px;
+}
+
+#fixNav li {
+	width: 40px;
+	height: 40px;
+	font-size: 25px;
+	line-height: 40px;
+	border-radius: 20px;
+	background: lightskyblue;
+	text-align: center;
+}
+
+#fixNav li a {
+	color: white;
+	background: lightskyblue;
+}
+
+#fixNav li a:visited,
+#fixNav li a:active {
+	background: lightskyblue;
+}
+
+#fixNav li img {
+	width: 25px;
+	height: 25px;
+	margin-top: -6px;
+	margin-right: 2px;
+}
+
+#ferromenu-controller.desktop:hover,
+#ferromenu-controller.mobile:active,
+#fixNav li a:hover,
+#fixNav li a:active {
+	background: lightskyblue;
+	color: gainsboro;
+	opacity: 0.8;
+}
+
+#ferromenu-controller.desktop.fixNav:hover,
+#ferromenu-controller.mobile.fixNav:active,
+#fixNav li:hover,
+#fixNav li:active {
+	background: lightskyblue;
+	color: gainsboro;
+	opacity: 0.8;
+}
+
+#switchProject a {
+	display: block;
+}

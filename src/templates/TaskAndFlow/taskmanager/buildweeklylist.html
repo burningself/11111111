@@ -1,0 +1,192 @@
+{% extends "base_v2.html" %}
+
+{% block ownerhead %} 
+		<link href="/css/project/taskmanager.css" media="all" rel="stylesheet" type="text/css" />
+	
+	
+		<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+	<script src="/js/daterangepicker/daterangepicker.js"></script>
+	<script src="/js/daterangepicker/moment.min.js"></script>
+	
+	<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<!-- SmartMenus jQuery plugin -->
+<script src="/js/jquery-smartMenu/js/jquery-smartMenu.js" type="text/javascript"></script>
+<!-- SmartMenus core CSS (required) -->
+<link href='/js/jquery-smartMenu/css/smartMenu.css' rel='stylesheet' type='text/css' />
+
+<link href='/js/shCircleLoader/css/jquery.shCircleLoader.css' rel='stylesheet' type='text/css' />
+<script src="/js/shCircleLoader/jquery.shCircleLoader.js" type="text/javascript"></script>
+
+<link href="/js/jQuery.filer-1.3.0/css/jquery.filer.css" rel="stylesheet">
+<script src="/js/jQuery.filer-1.3.0/js/jquery.filer.min.js" type="text/javascript"></script>
+
+{% endblock %}
+
+{% block content %} 
+
+<div class="row">
+	<div class="header-v2">
+	 	<div class="header-bg-v2">
+			<span class="title-v2 line_height32">工程周报管理</span>
+		</div>
+	</div>
+	<div class="content-row" >
+		<div class="col-lg-12 task-from form-inline" style="padding-left: 0px;padding-right: 0px;">
+			<form action=""  method="get" class="form-group" style="margin-right: 30px;" onsubmit="return check();">
+				<label class="control-label"  for="timerange">时间段：</label>
+				<input type="text" style="min-width: 260px;margin-right: 20px;"  value="{{timerange}}" id="timerange" name="timerange" class="form-control" placeholder="选择时间段"  onMouseOver="this.title=this.value"/>
+				<button type="submit" class="btn-sm btn-info"><i class="fa fa-filter">筛选</i> </button>
+				
+			</form>
+<!--			<button class="btn-sm btn-info pull-right" onclick="window.history.go(-1);">  返回    </button>-->
+		</div>
+		<p class="prompt" style="margin-left: 70px"></p>
+			<table class="table table-bordered table-striped " id="monthplan_table">
+			      <thead >
+			        <tr>
+			          <th>日期</th>
+					  <th>名称</th>
+					  <th>添加时间</th>
+					  <th>添加人</th>
+					  <th>归档文件</th>
+					  <th>操作</th>
+			        </tr>
+			      </thead>
+			      <tbody style="text-align: left;">
+					{% ifequal listcount 0 %}
+					<tr>
+						<td colspan="6" align="center">
+							<h3>没有相关记录！</h3></td>
+					</tr>
+					{% endifequal %}
+					 {% for item in list_items %}
+					<tr>
+						<td>{{item.weekly_date|date:"Y-m-d"}}</td>
+						<td>{{item.name}}</td>
+						<td>{{item.update_time|date:"Y-m-d H:i"}}</td>
+						<td>{{item.user.truename}}</td>
+						<td><a href="/task/projecttask/buildweekly2_read/?weeklyid={{item.id}}">{{item.file.shortname}}</a></td>
+						<td>
+							<a href="/task/projecttask/buildweekly2/?weeklyid={{item.id}}">查看</a>
+						</td>
+					</tr>
+					{% endfor %}
+			      </tbody>
+			    </table>
+			    
+			    {% ifnotequal list_items.paginator.num_pages 1%}
+				<div class="widget-content padded text-center"  style="text-align: center;">
+					<ul class="pagination pagination-lg">
+						<li>
+							<a href="?page=1&timerange={{timerange}}">首页</a>
+						</li>
+						{% if list_items.has_previous %}
+						<li>
+							<a href="?page={{ list_items.previous_page_number }}&timerange={{timerange}}">前一页</a>
+						</li>
+						{% endif %}
+						<li>
+							<a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a>
+						</li>
+						<li>
+							<a>
+								<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+							</a>
+							<a id="jumpBTN">
+								跳转
+							</a>
+						</li>
+						{% if list_items.has_next %}
+						<li>
+							<a href="?page={{ list_items.next_page_number }}&timerange={{timerange}}">下一页</a>
+						</li>
+						{% endif %}
+						<li>
+							<a href="?page={{paginator.num_pages}}&timerange={{timerange}}">尾页</a>
+						</li>
+			
+					</ul>
+				</div>
+			{% endifnotequal %}
+			    
+  </div>
+  </div>   	
+ 
+
+  <script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+
+  <script type="text/javascript">
+ 		 $('#timerange').daterangepicker({
+		     ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    '最近7天': [moment().subtract('days', 6), moment()],
+                    '最近30天': [moment().subtract('days', 29), moment()],
+                    '本月': [moment().startOf('month'), moment().endOf('month')],
+                    '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                },
+	        locale : {
+                       applyLabel : '确定',
+                       cancelLabel : '取消',
+                       fromLabel : '起始时间',
+                       toLabel : '结束时间',
+                       customRangeLabel : '自定义',
+                       daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                       monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',
+                           '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                       firstDay : 1
+                   },
+				});
+	
+	
+	$("#btnAddshigongriji").on('click',function()
+	{
+		window.open("/assist/projecttask/builddiarycreate/");
+	});
+	
+	$("#btnPrintShigongriji").on('click',function()
+	{
+		var timerange = $('#timerange').val();
+			$.ajax({
+			type: "get",
+			url: "/assist/projecttask/builddiaryprint/",
+			cache: false,
+			dataType: "json",
+			data:{"timerange":timerange},
+			success: function(data) {
+				if(data.issuc == "true") {
+					window.open(data.mergefile);
+				} else {
+					var r = alert(data.error);
+				}
+			}
+		});
+	});
+		
+	
+  </script>
+  <script>
+	function check() {
+		var flag = true;
+		var time = /^\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\s+-\s+\d{4}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+		var data = $("#timerange").val();
+		if (time.test(data)||data=="") {
+			flag = true;
+		} else {
+			$(".prompt").css("color", "red").text("请输入正确日期格式");
+			flag = false;
+		}
+		return flag;
+	};
+	$(function() {
+	$("#timerange").focus(function() {
+		$(".prompt").text("");
+	});
+});
+</script>
+  
+{% endblock %}
+

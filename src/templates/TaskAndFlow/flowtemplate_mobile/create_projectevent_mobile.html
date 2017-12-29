@@ -1,0 +1,495 @@
+{% extends "base_mobile.html" %}
+
+{% block content %} 
+<link href="/css/project/common_mobile.css?ver=1111" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/projectevent_create.css?version=1.1(2017-06-19)" media="all" rel="stylesheet" type="text/css" />
+
+<script src="/js/bootstrap/bootstrap-datetimepicker.js" type="text/javascript"></script>	
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<script src="js/jquery/jquery.form-3.51.0.js"></script>
+
+<script type="text/javascript" src="/js/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="/js/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+
+<script src="/js/common/guanlianyuansu_mobile.js" type="text/javascript" charset="utf-8"></script>
+
+<div id="recordBg" style="display:none; z-index:1001; background:RGBA(1,1,1,.778); position:absolute; width:100%; height:100%; text-align:center;">
+	<a class="btn btn-primary " id="stopRecord" style="border-radius: 15px; background: url(/images/bgs/voice.gif); background-size:contain; height:60px; padding:0; left:calc(50% - 120px); font-size: 40px; width:240px; line-height:60px; position:absolute; bottom:200px;"> 结束录音</a>
+</div>
+<div class="crEvent">
+	<label class="titleLabel"><i class="fa fa-cloud-upload" ></i> {{title}}  </label>
+	
+	<div class="row-fluid">
+		<form action="" method="POST" id="form_createevent" onsubmit="return FunFormValid()"> {% csrf_token %}  
+		    {% for field in form %}
+		     <div class="input-group" >
+		        <span class="input-group-addon">
+				 {{ field.label_tag }}
+				</span>
+		        {{ field }} 
+		        {{ field.errors }}
+		     </div>
+		    {% endfor %}
+			<script type="text/javascript">  	
+					$("#id_curflowstep").parent().css("display","none");
+					$("#id_priority").parent().css("display","none");
+					$("#id_issave").parent().css("display","none");
+					
+					$("#id_relateNum").after('<input id="relateYuanSu" name="relateYuanSu" type="text" class="form-control">');
+					$("#id_relateNum").css("display","none");
+					$("#relateYuanSu").after("<span class='input-group-addon' id='qrCode'>扫二维码</span>");
+					$("#id_relateNum").parent().after('<div class="input-group" style="margin-top:2px;"> \
+														 <button type="button" id="btnSelectYuanSu" style="background-color: #069CD8;border-color: #069CD8;width: 100%;" onclick="FunGuanLianYuanSu(\'id_relateNum\',\'relateYuanSu\');"><span class="input-group-addon">点击选择关联元素</span></button> \
+													</div>');
+			//		$("#id_photoUrl").after("<a id='chooseImage'><i class='fa fa-camera' ></i></a>");
+			//		$("#id_describe").after("<a id='startRecord' style='margin:-5px -26px auto;'><i class='fa fa-microphone' ></i></a>");
+					$("#id_photoUrl").after(" <a id='clearEventphoto' style='margin:-5px -26px auto; position:relative; z-index:2; right:30px; font-size:25px;'><i class='fa fa-close'></i></a> \
+												<span class='input-group-addon' id='chooseImage'><i class='fa fa-camera' ></i></span>");
+					$("#id_describe").after("<span class='input-group-addon' id='startRecord' style='margin:-5px -26px auto;'><i class='fa fa-microphone' ></i></span>");
+			
+					$("#form_createevent input").addClass("form-control");
+					$("#form_createevent select").addClass("form-control");
+					$("#form_createevent textarea").addClass("form-control");
+			</script>
+		  <input id="voiceid" name="voiceid"  type="hidden"/>
+		  <input id="createtype" name="createtype"  type="hidden"/>
+		  <p class="res res-{{status}}">{{msg}}</p>
+		  <div style="text-align: center;margin-top: 20px;">
+		  		<button class="btn weui_btn bg-blue weui_btn_inline" id="saveBtn"  type="button" onCliCk="funSaveIssue(this)"> 点击保存 </button>
+	      		<button class="btn weui_btn weui_btn_primary weui_btn_inline  " id="uploadBtn" type="button" onCliCk="funSubmitIssue(this)"> 点击发起 </button>
+		  </div>
+
+		</form>
+	</div>	
+</div>
+
+
+<style>
+
+
+.DivTrees
+{
+    float:left;
+    width: 48%;
+    margin-left: 1%;
+}
+
+#jstree_pbgrp,#jstree_anquanwenmingsheshi,#jstree_goujian,#jstree_renwu,#jstree_kongjian{
+	width: 100%;
+	border: 1px solid darkgrey;
+	overflow:auto;
+	height: 400px;
+	text-align: left;
+}
+
+	/*套在Select外层，用于隐藏Select框*/
+.DivSelect
+{
+    float:left;
+    width: 48%;
+    margin-left: 1%;
+    height: 400px;
+    border: 1px #A29D9D solid;
+    font-size: 1.3em;
+}
+
+/*设置Select样式*/
+.SelectList
+{
+    width: 100%;
+    margin-top: 2px;
+    border: none;
+}
+
+/*.SelectList option{
+	padding: 3px 3px;
+}*/
+
+</style>
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true" style="text-align: center;">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: calc(100vh - 180px);min-width: calc(100vw - 20px);font-size: 10px;">
+			<div class="modal-header" style="padding: 5px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<div style="text-align: left;font-size: 1.5em;padding: 5px;">
+				<span style="color:#337ab7;">选择关联元素</span>
+				<select id="guanlianyuansumajor" style="float: right;margin-right: 10px;" >
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				 </select>	
+				</div>
+
+			</div>
+			<div class="modal-body" style="padding: 0px;min-height: calc(100vh - 180px);margin-bottom: 2px;">
+			<div class="tabbable" id="tabs-615644" >
+				<ul class="nav nav-tabs chooseGLYS" style="margin-bottom: 2px;">
+						<li class="active">
+							 <a href="#goujianTab" data-toggle="tab">构件</a>
+						</li>
+						<li >
+							<a href="#kongjianjiegou" data-toggle="tab">空间结构</a>
+						</li>
+						{% if havesheshi %}
+						<li>
+							 <a href="#anquanwenmingsheshiTab" data-toggle="tab">安全设施</a>
+						</li>
+						{% endif%}
+						
+						{% if havejixie %}
+						<li >
+							 <a href="#shigongjixieTab" data-toggle="tab">施工机械</a>
+						</li>
+						{% endif%}
+						
+						{% if haverenwu %}
+						<li>
+							 <a href="#renwuTab" data-toggle="tab">任务</a>
+						</li>
+						{% endif%}
+				</ul>
+				<div class="tab-content" style="height:400px">
+						<div class="tab-pane active" id="goujianTab">
+								<div class="DivTrees" >
+								<div id="jstree_goujian" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect">
+									<select class="choosegoujian SelectList"  name="choosegoujian" id="choosegoujian"  multiple>
+									</select>
+								</div>
+	
+						</div>
+						
+						<div class="tab-pane " id="kongjianjiegou">
+						<div class="DivTrees">
+							<div id="jstree_kongjian" class="DivJsTree">
+
+							</div>
+
+						</div>
+						<div class="DivSelect">
+							<select class="choosekongjian SelectList"   name="choosekongjian" id="choosekongjian" multiple size="20">
+
+						  </select>
+						</div>
+
+					</div>
+					
+						{% if havesheshi %}	
+					<div class="tab-pane" id="anquanwenmingsheshiTab">
+							<div class="DivTrees">
+								<div id="jstree_anquanwenmingsheshi" class="DivJsTree">
+					
+								</div>
+							</div>
+							<div class="DivSelect">
+								<select class="choosesheshi SelectList" name="choosesheshi" id="choosesheshi" multiple >
+					
+								</select>
+							</div>
+						</div>
+							{% endif%}
+							
+						{% if havejixie %}
+						<div class="tab-pane" id="shigongjixieTab">
+								<div class="DivSelect" style="margin-left:1%;width: 98%;">
+									<select class="chooseshigongjixie SelectList"  name="chooseshigongjixie" id="chooseshigongjixie" multiple >
+									</select>
+								</div>
+						</div>
+							{% endif%}
+						
+						{% if haverenwu %}
+						<div class="tab-pane" id="renwuTab">
+							<div class="DivTrees">
+								<div id="jstree_renwu" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect">
+									<select class="chooserenwu SelectList"  name="chooserenwu" id="chooserenwu" multiple >
+									</select>
+								</div>
+						</div>
+					{% endif%}
+
+				</div>
+			</div>
+		</div>
+			<div class="modal-footer">
+				<a class="btn btn-default btn" role="button" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定选择</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">  	
+	$().ready(function(){
+
+		curDate = new Date(); 
+		var defaultDate = new Date(curDate.getTime() + 24*7*60*60*1000); 
+		$("#id_deadline").val(defaultDate.getFullYear()+"-"+(defaultDate.getMonth()+1) + "-"+ defaultDate.getDate());
+		
+		$('#id_deadline').datetimepicker({
+				format: 'yyyy-mm-dd',
+		      	language:'zh-CN',
+		      	todayBtn:  0,
+				autoclose: 1,
+				todayHighlight: 1,
+				startView: 2,
+				minView: 2,
+				forceParse:1,
+				initialDate:new Date(),
+//				endDate:new Date(),
+		  }).on("changeDate",function(dateStr){	
+		  	var ins = new Date();
+			var chooseMonth = dateStr.date.getMonth();
+			var chooseYear = dateStr.date.getFullYear();
+			var curMonth = ins.getMonth();
+			var curYear = ins.getFullYear();
+		  });
+		
+		$("#id_template").change(function(){
+			if($("#id_template").val()!=""){
+				tmpid=$("#id_template").val();
+				$.ajax({
+				  type:"get",
+				  url:"/task/issue/getissuenumber/",
+				  cache:false,
+				  dataType:"json",
+				  data:{"templateId":tmpid},
+				  success: function(data){
+				  	if(data.res=="sucess"){
+				  		$("#id_number").val(data.number);
+				  	}
+				  	else{
+				  		alert(data.error);
+				  	}
+				  },
+				  error:function(data){
+				  	alert("服务器错误");
+			      	return false;
+			      },
+				});	
+				
+				init_tree("",tmpid);
+			}
+			
+			
+		});
+		
+		$("#id_relatetype").change(function(){ 
+			$("#id_describe").val($("#id_relatetype").val() + "-");
+		});
+		
+		init_tree({{curMajorId}},"");
+	})
+	
+	wx.config({
+	    debug: false, 
+	    appId: '{{config.appid}}', 
+	    timestamp: {{config.timestamp}}, 
+	    nonceStr: '{{config.nonceStr}}', 
+	    signature: '{{config.signature}}',
+	    jsApiList: [
+	        'checkJsApi',
+	        'chooseImage',
+	        'previewImage',
+	        'uploadImage',
+	        'downloadImage',
+	        'openLocation',
+	        'getLocation',
+	        'scanQRCode',
+	        'translateVoice',
+	        'startRecord',
+	        'stopRecord',
+	        'onRecordEnd',
+	        'playVoice',
+	        'pauseVoice',
+	        'stopVoice',
+	        'uploadVoice',
+	        'downloadVoice',
+	      ]
+	});
+	
+	var images = {
+	    localId: [],
+	    serverId: []
+	  	};
+	
+	var voice = {
+	    localId: '',
+	    serverId: ''
+	};
+	
+	wx.ready(function(){		
+		document.querySelector('#startRecord').onclick = function () {
+		    wx.startRecord({
+		      success: function (res) {
+		      	$("#recordBg").css("display","block");
+		      },
+		      cancel: function () {
+		        alert('用户拒绝授权录音');
+		      }
+		    });
+		};
+		
+		document.querySelector('#stopRecord').onclick = function () {
+		    wx.stopRecord({
+		      success: function (res) {
+		        voice.localId = res.localId;
+		        
+		        wx.translateVoice({
+			      	localId: voice.localId,
+			      	complete: function (res) {
+			        	if (res.hasOwnProperty('translateResult')) {
+			          		$("#id_describe").val($("#id_describe").val()+res.translateResult);
+			        	}                                                                                                                                                                                                                                                                                                                                                                                                                                           
+			        	$("#recordBg").css("display","none");
+			      	}
+			    });
+			    
+			    		        
+		        wx.uploadVoice({
+			      localId: voice.localId,
+			      success: function (res) {
+			        voice.serverId = res.serverId;
+			        $("#voiceid").val(voice.serverId);
+			      }
+			    });
+			    
+		      },
+		      fail: function (res) {
+		        alert(JSON.stringify(res));
+		      }
+		    });
+		};
+
+		document.querySelector('#qrCode').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        var keyword=res["resultStr"];
+		        $.ajax({
+				  type:"get",
+				  url:"/task/getelebyqrcode/",
+				  cache:false,
+				  dataType:"json",
+				  data:{"qrcode": keyword},
+				  success: function(data){
+				  	if(data.issuc=="true"){
+				  		$("#relateYuanSu").val(data.elementinfo);
+						$("#id_relateNum").val(JSON.stringify(data.element));
+				  	}
+				  	else{
+				  		alert("无效的二维码！");
+				  	}
+				  },
+				  error:function(data){
+				  	alert("服务器错误");
+			      	return false;
+			      },
+				});
+		      }
+		    });
+		};
+		
+		document.querySelector('#chooseImage').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+		    wx.chooseImage({
+		      success: function (res) {
+		        images.localId = res.localIds;
+		        var length = images.localId.length;
+
+		        var i = 0, length = images.localId.length;
+		        function upload() {
+			      wx.uploadImage({
+			        localId: images.localId[i],
+			        isShowProgressTips: 1,
+			        success: function (res) {
+			          i++;
+			          images.serverId.push(res.serverId);
+			          if (i < length) {
+			            upload();
+			          }
+			          $("#id_photoUrl").val("已选取"+ length.toString() + "附件:" + images.serverId.join(";"));
+			        },
+			        fail: function (res) {
+			          alert(JSON.stringify(res));
+			        }
+			      });
+			    }
+			    upload();
+		        
+		      }
+	        });
+	  	};
+		
+		document.querySelector('#clearEventphoto').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+	  		$("#id_photoUrl").val("");
+	  	};
+		
+		
+	});	
+	
+	function funSaveIssue(obj)
+	{
+		$("#saveBtn").attr("disabled", true); 
+		$("#uploadBtn").attr("disabled", true); 
+		$("#createtype").val("save");
+		funSubmitIssue2Server();
+	}
+	
+	function funSubmitIssue(obj)
+	{
+		$("#uploadBtn").attr("disabled", true); 
+		$("#saveBtn").attr("disabled", true); 
+		$("#createtype").val("submit");
+		funSubmitIssue2Server();
+	}
+	
+	function funSubmitIssue2Server(){
+			var options ={   
+	        url:'',   
+	        type:'post',                    
+	        data:null,
+	        success:function(data){
+					alert(data.msg);
+					window.location.reload();
+	    		}
+	       
+	    	};
+	        
+	    	$("#form_createevent").ajaxSubmit(options); 
+	}
+
+	
+	function FunFormValid(obj){
+		if($("#id_template").val()==""){
+			return confirm("未选择流程，是否发起问题？");
+		}
+		return true;
+	}
+
+</script>	
+	
+{% endblock %}
+

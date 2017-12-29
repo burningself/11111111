@@ -1,0 +1,25 @@
+
+.titleLabel{width:100%; font-size:1.5em; margin-bottom:0px;color: white;
+		background-color: #007aff;text-align:center;}
+
+.row-fluid{
+	background-color:white;
+	margin-left:2%; 
+	margin-top:5%;
+	margin-bottom:5%;
+	display:inline-block; 
+	border: 5px solid white;
+	border-radius: 20px;
+	text-align:center;
+}
+
+.row-fluid .input-group{ 
+	width:96%;margin-left:2%; margin-top:7%;
+	}
+
+.row-fluid .input-group #chooseImage{background-color:#069CD8; border:0; color: white; font-weight:bold;}
+.row-fluid .input-group #chooseImage .fa {margin-right:5px;}
+.row-fluid .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.row-fluid .input-group .fa { margin-right:2px; }
+
+.uploadBtn {margin-bottom:7%; width:100%;font-size:1.5em;}

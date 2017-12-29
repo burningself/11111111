@@ -1,0 +1,298 @@
+{% extends "base.html" %} {% block ownerhead %}
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.resize.js"></script>
+
+<script src="/js/common/jishu.js" type="text/javascript"></script>
+<link href="/css/project/jishu.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+
+<link rel="stylesheet" href="/js/select2/select2.min.css">
+<script src="/js/select2/select2.min.js"></script>
+<script src="/js/select2/i18n/zh-CN.js"></script>
+
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<!-- 引用控制层插件样式 -->
+<link rel="stylesheet" href="/css/zyUpload.css" type="text/css">
+<!-- 引用核心层插件 -->
+<script type="text/javascript" src="/js/zyFile/js/zyFile.js"></script>
+<!-- 引用控制层插件 -->
+<script type="text/javascript" src="/js/zyFile/js/zyUploadCreateIssue.js"></script>
+
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<script src="/js/mdialog/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/mdialog/mdialog.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/css/mdialog/mdialog.css"> 
+{% endblock %}
+{% block content %}
+
+ <div class="row search-row" style="height: 160px;width: 100%;margin-top: 2px; border-radius: 0px; padding-top: 10px;">
+		
+		<div class="widget-container fluid-height clearfix">
+
+		<div class="widget-content padded">
+			<form class="serarch-tab" action="" method="get" style="margin-top: 10px;"> {% csrf_token %}
+
+				<div class="form-group search-group" style="float: left; margin-top: 15px;">
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">当前阶段：</label>
+						<div class="col-md-3">
+							<select name="curdealstep" class="form-control">
+								<option value="0" selected>全部</option>
+								{% ifequal curdealstep "未处理" %}
+								<option value="未处理" selected>未处理</option>
+								{% else %}
+								<option value="未处理">未处理</option>
+								{% endifequal %} {% ifequal curdealstep "正在处理" %}
+								<option value="正在处理" selected>正在处理</option>
+								{% else %}
+								<option value="正在处理">正在处理</option>
+								{% endifequal %} {% ifequal curdealstep "已结束" %}
+								<option value="已结束" selected>已结束</option>
+								{% else %}
+								<option value="已结束">已结束</option>
+								{% endifequal %}
+
+							</select>
+						</div>
+					</div>
+					<div class="search-item">
+						<label class="control-label col-md-1" align="right">关联元素：</label>
+						<div class="col-md-3">
+							<select name="fuzefenbao" class="form-control">
+								<option value="0" selected>全部</option>
+								<option value="1" >安全设施</option>
+								<option value="2">危险源</option>
+							</select>
+						</div>
+					</div>
+					<div class="search-itemsingle">
+						<label class="control-label col-md-2" align="right" for="timerange">发起时间段：</label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								<input type="text" name="createtTimerange" value="{{createtTimerange}}" id="createtTimerange" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group btn-group">
+					<div class="col-md-3" style="margin-top: 10px;">
+						<a href="#" onclick="FunFaqiwentiDlg()" class="btn btn-success"><i class="fa fa-plus"></i> 发起安全整改单 </a>
+					
+					</div>
+					<!--<div class="col-md-3">
+						<a href="issue/createstart#" class="btn btn-success"><i class="fa fa-plus"></i> new发起新问题 </a>
+					</div>-->
+					<div class="col-md-3">
+						<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 查询 </button>
+					</div>
+				</div>
+				<div class="form-group draw-group">
+					<div id="item-donut"> </div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="row content-row" align="center" style="width: 100%;margin-top: 2px;border-radius: 0px;min-height: 65vh;">
+	<div class="widget-container fluid-height clearfix">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>编号</th>
+					<th>名称</th>
+					<th>发起人</th>
+					<th>发起时间</th>
+					<th>当前阶段</th>
+					<th>当前负责人</th>
+					<th>关联元素</th>
+					<th>表单</th>
+					<th>操作</th>
+					
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>0231</td>
+					<td>桩基问题单</td>
+					<td>李四</td>
+					<td>2016-05-03</td>
+					<td>正在处理</td>
+					<td>张三</td>
+					<td>安全设施</td>
+					<td><a href="/task/issue/biaodan3" target="_blank"><i class="fa fa-book"></i></a></td>
+					<td>
+						<a href="#" title="删除安全单"  onclick="deleteRow(this)"> [删除] </a>
+						<a href="#" title="查看安全单" style="cursor: pointer;">[查看]</a>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>0231</td>
+					<td>塔吊</td>
+					<td>李四1</td>
+					<td>2016-05-04</td>
+					<td>未处理</td>
+					<td>张三</td>
+					<td>危险源</td>
+					<td><a href="/task/issue/biaodan3" target="_blank"><i class="fa fa-book"></i></a></td>
+					<td>
+						<a href="#" title="删除问题" onclick="deleteRow(this)"> [删除] </a>
+						<a href="#" title="查看问题信息" style="cursor: pointer;">[查看]</a>
+					</td>
+				</tr>
+				
+				
+				
+			</tbody>
+		</table>
+	</div>
+	<!--{% ifnotequal issuelist.paginator.num_pages 1%}
+		<div class="widget-content padded text-center" >
+			<ul class="pagination pagination-lg">
+				<li>
+					<a href="?page=1&curdealstep={{curdealstep}}&fuzefenbao={{fuzefenbao}}&createtTimerange={{createtTimerange}}">首页</a>
+				</li>
+				{% if issuelist.has_previous %}
+				<li>
+					<a href="?page={{ issuelist.previous_page_number }}&curdealstep={{curdealstep}}&fuzefenbao={{fuzefenbao}}&createtTimerange={{createtTimerange}}">前一页</a>
+				</li>
+				{% endif %}
+				<li>
+					<a>第 {{ issuelist.number }} 页，共 {{ issuelist.paginator.num_pages }}页</a>
+				</li>
+				<li>
+					<a>
+						<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+					</a>
+					<a id="jumpBTN">
+						跳转
+					</a>
+				</li>
+				{% if issuelist.has_next %}
+				<li>
+					<a href="?page={{ issuelist.next_page_number }}&curdealstep={{curdealstep}}&fuzefenbao={{fuzefenbao}}&createtTimerange={{createtTimerange}}">下一页</a>
+				</li>
+				{% endif %}
+				<li>
+					<a href="?page={{paginator.num_pages}}&curdealstep={{curdealstep}}&fuzefenbao={{fuzefenbao}}&createtTimerange={{createtTimerange}}">尾页</a>
+				</li>
+	
+			</ul>
+		</div>
+	{% endifnotequal %}-->
+</div>
+
+<div class="modal fade" id="faqiwentidlg" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">发起安全整改单</h4>
+			</div>
+			<div class="modal-body">
+				<div class="widget-content padded">
+					<form class="form-horizontal" id="faqiwentiForm" align="left">
+						<div class="form-group">
+							<label class="control-label col-md-3">整改单编号</label>
+							<div class="col-md-7">
+								<input class="form-control" placeholder="输入问题编号" name="qnumber" id="qnumber" type="text">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">整改单描述</label>
+							<div class="col-md-7">
+								<textarea class="form-control" placeholder="输入问题描述" name="qdescribe" id="qdescribe" rows="3"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">关联元素</label>
+							<div class="col-md-7">
+								<label class="radio-inline"><input onchange="RelateTypeChange()" name="optionsRadiosRelateType" type="radio" value="" checked><span>安全设施</span></label>
+								<label class="radio-inline"><input onchange="RelateTypeChange()" name="optionsRadiosRelateType" type="radio" value=""><span>危险源</span></label>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-md-3"></div>
+							<div class="col-md-7">
+								<select class="form-control select2able" style="width: 100%;" name="RelateElement" id="RelateElement">
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="IssueRelateFile" class="control-label col-md-3">添加附件</label>
+							<div class="col-md-7" id="faqi_uploadfile">
+
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label col-md-3">处理流程</label>
+							<div class="col-md-7">
+								<select class="form-control" name="dealTemplate" id="dealTemplate">
+									{% for temp in FlowTemplateList %}
+									<option value="{{temp.id}}">{{temp.name}}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">优先级</label>
+							<div class="col-md-7">
+								<select class="form-control" name="issuePriority" id="issuePriority">
+									<option value="1">普通</option>
+									<option value="5">重要问题</option>
+									<option value="10">重大问题</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">截至时间</label>
+							<div class="col-md-7">
+								<input class="form-control" type="text" value="{{deadline|date:" Y-m-d "}}" name="deadline" id="deadline" data-date-format="yyyy-mm-dd">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">添加表单</label>
+							<div class="col-md-7">
+								<a id="addbiaodan" href="javascript:biaodanDlg(this);" class="btn btn-default" ><i class="fa fa-plus"></i> 点击增加表单</a>
+							</div>
+						</div>
+						<input type="hidden" id="issuetype" name="issuetype" value="{{issuetype}}" />
+						<input type="hidden" id="RelateFileList" name="RelateFileList" value='' />
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-default btn" role="button" id="btnFaqiWenTiCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="FunfaqiwentiUploadFile()" id="btnFaqiWenTi">发起</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="biaodanback" style="width: 100%; height: 100%; display: none; background-color: rgba(111,111,111,0.8); position: fixed; top: 0;right: 0; z-index: 1500;">
+
+</div>
+
+
+
+<script type="text/javascript">
+	function deleteRow(obj){  
+	    var tr=obj.parentNode.parentNode;  
+	    var tb=tr.parentNode;  
+	    tb.removeChild(tr);
+	} 
+		
+</script>
+
+{% endblock %}

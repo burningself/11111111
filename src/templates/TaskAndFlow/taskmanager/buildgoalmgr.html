@@ -1,0 +1,335 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %} 
+<link href="/css/project/taskmanager.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script src="/js/loading/jq_mydialog.js"></script>
+<link href="/js/loading/my_dialog.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="js/common/buildgoal.js" ></script>
+{% endblock %}
+{% block content %}
+	<div class="header-v2">
+	 	<div class="header-bg-v2">
+			<span class="title-v2 line_height32">工作目标管理</span>
+			<button class="btn btn-danger pull-right" id="btnGoalDlg" style="margin-right: 20px;">添加工作目标</button>
+		</div>
+	</div>
+	<div class="content-row" >
+			<table class="table table-bordered table-striped " id="monthplan_table" style="min-width:1125px; ">
+			      <thead >
+			        <tr>
+					  <th width="110px">名称</th>
+					  <th width="120px">开始时间</th>
+					  <th width="120px">结束时间</th>
+					  <th width="80px">添加人</th>
+					  <th>描述</th>
+					  <th width="55px">操作</th>
+			        </tr>
+			      </thead>
+			      <tbody style="text-align: left;">
+					{% ifequal listcount 0 %}
+					<tr>
+						<td colspan="6" align="center">
+							<h3>没有相关记录！</h3></td>
+					</tr>
+					{% endifequal %}
+					 {% for item in list_items %}
+					<tr>
+						<td>{{item.label}}</td>
+						<td>{{item.begin_date|date:"Y-m-d"}}</td>
+						<td>{{item.end_date|date:"Y-m-d"}}</td>
+						<td>{{item.user.truename}}</td>
+						<td>{{item.description}}</td>
+						<td>
+							<a href="#" class="btn-xs btn-danger" onclick="deleteWorkGoal({{item.id}})" >删除</a>
+						</td>
+					</tr>
+					{% endfor %}
+			      </tbody>
+			    </table>
+    
+  </div>
+
+ 
+  	<div class="modal fade" id="newGoalDlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4 align="left">新建工作目标</h4>
+            </div>
+              <div class="modal-body">
+					<div class="widget-content padded">
+					<div class="form-horizontal" id="newWorkGoalForm" align="left">
+						<div class="form-group">
+							<label class="control-label col-md-3">工作目标</label>
+						 	<div class="col-md-7">
+								<input class="form-control" placeholder="工作目标" name="goalname" id="goalname" type="text">
+							</div>
+						 </div>
+						 <div class="form-group">
+							<label class="control-label col-md-3">时间段</label>
+						 	<div class="col-md-7">
+								<input   class="form-control" placeholder="选择时间段"  id="timerange" name="timerange" type="text" readonly="true">
+							</div>
+						 </div>
+						<div class="form-group">
+							<label class="control-label col-md-3">关联任务</label>
+							<div class="col-md-7">
+								<a id="addyuansu" onclick="FunGuanLianYuanSu()" class="btn btn-default" style="width: 100%;text-align: left;"><i class="fa fa-plus"></i>增加关联任务</a>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3">目标描述</label>
+							<div class="col-md-7">
+								<textarea class="form-control" placeholder="输入目标描述" name="goaldescribe" id="goaldescribe" rows="8" value=""></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-10" id="tishixinxi" style="color: blue;">
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			  </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="saveWorkGoal()" id="btnLoadHisVersion" >新建目标</button>
+            </div>
+    </div>
+    </div>
+    </div>
+    
+     	<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+			<div class="modal-header" style="padding: 5px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<div style="text-align: left;font-size: 1.3em;padding: 5px;">
+				<span style="color:#337ab7;">选择关联任务</span>
+				<select id="guanlianyuansumajor" style="float: right;margin-right: 10px;" >
+						{% for major in majorList %}
+							{% ifequal major.id curMajorIdUser %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				 </select>	
+				</div>
+
+			</div>
+              <div class="modal-body">
+					<div class="widget-content padded" style="text-align: left;">
+							<div id="jstree_renwu"></div>
+				</div>
+			  </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary"  id="btnSelectTask"  data-dismiss="modal" aria-hidden="true">确认选择</button>
+            </div>
+    </div>
+    </div>
+    </div>
+    
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<script type="text/javascript">
+ 
+     $('#timerange').daterangepicker({
+		     ranges: {
+                    '今年': [moment().startOf('year'), moment().endOf('year')],
+                    '明年': [moment().subtract('year', -1).startOf('year'), moment().subtract('year', -1).endOf('year')],
+                    '今年1季度': [moment().startOf('year'), moment().startOf('year').subtract('month', -2).endOf('month')],
+                    '今年2季度': [moment().startOf('year').subtract('month', -3).startOf('month'), moment().startOf('year').subtract('month', -5).endOf('month')],
+                    '今年3季度': [moment().startOf('year').subtract('month', -6).startOf('month'), moment().startOf('year').subtract('month', -8).endOf('month')],
+                    '今年4季度': [moment().startOf('year').subtract('month', -9).startOf('month'), moment().startOf('year').subtract('month', -11).endOf('month')]
+                },
+	        locale : {
+                       applyLabel : '确定',
+                       cancelLabel : '取消',
+                       fromLabel : '起始时间',
+                       toLabel : '结束时间',
+                       customRangeLabel : '自定义',
+                       daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                       monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',
+                           '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                       firstDay : 1
+                   }
+				},
+                   function(start, end, label) {
+		  				   $('#newWorkGoalForm').data('bootstrapValidator')
+						   .updateStatus('timerange', 'NOT_VALIDATED',null)
+						   .validateField('timerange');
+				});
+ 
+   $(document).ready(function(){
+	
+	formValidator();
+  	
+	init_tree();
+   window.onresize = function(){
+	   wrap.editWidth( $("#monthplan_table").width() + 40 );
+   }
+	wrap.editWidth( $("#monthplan_table").width() + 40 );
+
+});
+	
+ 
+$("#btnGoalDlg").click(function(){
+	$("#newGoalDlg").modal("show");
+});
+ 		
+ 
+ 		
+ function saveWorkGoal()
+{
+	//判断是否可以提交表单
+	$('#newWorkGoalForm').bootstrapValidator('validate');
+		if(!($('#newWorkGoalForm').data('bootstrapValidator').isValid())){
+		return ;
+	}
+ 	
+ 	if(selTasks.length==0){
+ 		alert("请选择目标关联任务！");
+ 		return ;
+ 	}
+ 	
+ 	$.myloading({
+		title: "目标保存中，请稍后……"
+	});
+	
+ 	var goalname = $("#goalname").val();
+ 	var timerange = $("#timerange").val();
+ 	var goaldescribe = $("#goaldescribe").val();
+
+   	$.ajax({
+   	  type:"post",
+   	  url:"/task/projecttask/savebuildgoal/",
+ 	  cache:false,
+   	  //async: false,
+   	  dataType:"json",
+   	  data:{
+   	  	"goalname":goalname,
+		"timerange":timerange,
+		"goaldescribe":goaldescribe,
+		"selTasks":JSON.stringify(selTasks)
+   	  },
+   	  success: function(data){
+   	  	$("#newGoalDlg").modal("hide");
+   	  	$.myloading("hide");
+   	  	if (data.issuc=="true") {
+   	  		
+   	  		alert("添加目标成功");
+   	  		window.location.reload();
+   	  	}
+   	  	else{
+   	  		alert(data.error);
+   	  	}
+
+   	  },
+	  error: function(e){
+	  	$("#newGoalDlg").modal("hide");
+			$.myloading("hide");
+			if(e.status==403){
+				alert("您没有权限编辑工作目标，请联系管理员！");
+			}
+		}
+   	  
+   	});
+   	
+   
+};
+
+ function deleteWorkGoal(objId)
+{
+
+   	if(!confirm("确认删除该目标？")){
+   	  	return;
+   	 }
+
+
+   	$.ajax({
+   	  type:"post",
+   	  url:"/task/projecttask/deletebuildgoal/",
+ 	  cache:false,
+   	  //async: false,
+   	  dataType:"json",
+   	  data:{
+   	  	"goalId":objId
+   	  },
+   	  success: function(data){
+   	  	if (data.issuc=="true") {
+   	  		window.location.reload();
+   	  	}
+   	  	else{
+   	  		alert(data.error);
+   	  	}
+
+   	  },
+		error: function(e){
+			if(e.status==403){
+				alert("您没有权限删除工作目标，请联系管理员！");
+			}
+		}
+   	  
+   	});
+   	
+};
+
+	function formValidator(){
+		$('#newWorkGoalForm').bootstrapValidator({
+			message: 'This value is not valid',
+			feedbackIcons: {
+				valid: 'glyphicon glyphicon-ok',
+				invalid: 'glyphicon glyphicon-remove',
+				validating: 'glyphicon glyphicon-refresh'
+			},
+			fields: {
+				goalname: {
+					validators: {
+						notEmpty: {
+							message: '目标名称不能为空'
+						},
+						stringLength: {
+							min: 5,
+							max: 64,
+							message: '名称5-64个字'
+						}
+					}
+				},
+				timerange: {
+					validators: {
+						notEmpty: {
+							message: '时间段不能为空'
+						}
+					}
+				},
+				goaldescribe: {
+					validators: {
+						notEmpty: {
+							message: '目标描述不能为空'
+						},
+						stringLength: {
+							min: 5,
+							max: 500,
+							message: '描述5-500个字'
+						}
+					}
+				}
+			}
+		});
+	}
+
+</script>
+  
+{% endblock %}
+

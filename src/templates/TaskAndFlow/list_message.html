@@ -1,0 +1,26 @@
+
+{% extends "base_mobile.html" %}
+
+{% block content %} 
+<link href="/css/project/message.css" media="all" rel="stylesheet" type="text/css" />
+
+<label class="titleLabel"><i class="fa fa-cloud-upload" ></i> 消息中心  </label>
+
+<table class="table msg_list">
+	<thead>
+		  <tr><th>消息记录</th><th>操作</th></tr>
+	</thead>
+	<tbody>
+		{% if list_items.object_list %}
+			{% for item in list_items.object_list %}
+			  <tr>
+			  	<td>  {{item}}</td> <td><a href="/">查看</a> </td> 
+			  <tr>
+			{% endfor %}
+		{% else %}
+		<tr><td rowspan="2" colspan="2">无消息</td></tr>
+		{% endif %}
+	</tbody>
+</table>
+
+{% endblock %}

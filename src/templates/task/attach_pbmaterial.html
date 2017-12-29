@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+       <div class="heading">
+        <i class="fa fa-paperclip"></i>梁段[{{pbinfo.number}}]关联材料
+      </div>
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+          <th>批次号</th>
+		  <th>材料类型</th>
+		  <th>预览下载</th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% for item in list_items.object_list %}
+        <tr>
+          <td>{{item.id}}</td>
+		  {% ifequal item.type '混凝土材料文档' %}
+				<td>混凝土材料</td>
+		 {% endifequal %}
+		  {% ifequal item.type '钢筋材料文档' %}
+				<td>钢筋材料</td>
+		 {% endifequal %}
+          <td>
+			{% if item.IsPic %}
+				 <img src="{{item.content}}" height="100" width="100"  />
+			{% else %}		
+				<img src='/images/notpic.jpg' height="100" width="100"  />			
+			{% endif %}
+			 <a href="{{item.content}}">{{item.name}}</a>
+          </td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+    <ul class="pagination pagination-lg">
+		{% if list_items.has_previous %}
+		<li><a href="?page={{ list_items.previous_page_number }}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+		{% if list_items.has_next %}
+         <li><a href="?page={{ list_items.next_page_number }}">下一页</a></li>
+		{% endif %}
+		<a class="btn btn-lg btn-primary" onclick="javascript:history.back(1)"> 返回</a>
+    </ul>
+	
+</div>
+
+</div>
+</div>
+
+{% endblock %}

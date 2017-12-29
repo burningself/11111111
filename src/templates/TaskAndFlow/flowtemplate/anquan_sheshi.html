@@ -1,0 +1,108 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<link href="/js/web3d/style.min.css" rel="stylesheet" />
+<script src="/js/web3d/three.min.js"></script>
+<script src="/js/web3d/viewer3D.min.js"></script>
+<link rel="stylesheet" href="dist_vue/css/modelview.css">
+<!--<link rel="stylesheet" type="text/css" href="/css/project/anquan.css"/>-->
+
+<style>
+
+</style>
+
+{% endblock %}
+{% block content %}
+<div id="left" class="pull-left" >
+        <div class="panel-group" id="accordion">
+         <div class="panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+                    空间结构<i class="profont pro-font-xiangyou" style="float: right"></i>
+                </a>
+              </div>
+            </div>
+            <div class="panel-collapse collapse" id="collapseOne">
+              <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_jstree">
+                 <div id="jstree_div" > </div>
+
+              </div>
+              <div class="ResizeBottombar" id="Bottombar1" ></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">
+                  <span>构件分类</span><i class="profont pro-font-xiangyou" style="float: right"></i></a>
+              </div>
+            </div>
+            <div class="panel-collapse collapse" id="collapseTwo">
+              <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_pb_type">
+                 <div id="jstree_div_pbtype" > </div>
+
+              </div>
+              <div class="ResizeBottombar" id="Bottombar2" ></div>
+            </div>
+          </div>
+
+        </div>
+</div>
+<div id="right" class="pull-right">
+    <div class="panel-group" id="itemSection">
+        <div class="panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <a class="itemSection-toggle" data-parent="#itemSection3" data-toggle="collapse" href="#machine_list">
+                    设施待检</a>
+              </div>
+            </div>
+            <div class="panel-collapse collapse  in" id="machine_list">
+              <div class="panel-body cebiangundong1" id="div_anquanjiancha" style="height: calc(100vh - 165px);">
+                 <table class="table">
+                    {% for eachItem in jianchalist %}
+                    <tr>
+                        <td style="width:70%;"><a href="/task/anquan/jianchadetail/?jianchaId={{eachItem.id}}" target="_blank" title="点击查看" >{{eachItem.pbtype}}：{{eachItem.name}}</a></td>
+                        {% if eachItem.isneedcheck %}
+                            <td style="background:orangered; color:ghostwhite; cursor:pointer; " title="点击检查">
+                              <a href="/task/anquan/jianchajiancha/?jianchaId={{eachItem.id}}" target="_blank" style="color:white;">待检</a>
+                              </td>
+                            {% else %}
+                             <td style="background:green; color:ghostwhite; cursor:pointer; " title="点击查看">
+                              <a  href="/task/anquan/jianchadetail/?jianchaId={{eachItem.id}}" target="_blank" style="color:white;">正常</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                 </table>
+              </div>
+               <div class="ResizeBottombar" id="Bottombar5" ></div>
+            </div>
+        </div>
+
+    </div>
+    <!--<button class="newIssue">发起<br>问题</button>-->
+</div>
+<div id="viewerContent" >
+    <div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+        <div id="viewer">
+        </div>
+    </div>
+</div>
+<div>
+	<textarea class="form-control"  name="sqllist" id="sqllist" rows="100" style="display:none"></textarea>
+</div>
+<script src="js/datastruct.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleSheShi/Autodesk.ADN.Viewing.Extension.SampleSheShi.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.Color/Autodesk.ADN.Viewing.Extension.Color.js"></script>
+<script src="js/web3d/scripts/LoadModelSheshi.js"></script>
+  <script src="js/web3d/scripts/modelcommon.js"></script>
+<script src="js/web3d/scripts/getObjectTree_sheshi.js"></script>
+<script type="text/javascript">    
+    $(document).ready(function() {
+		loadInitialModel();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<style type="text/css">
+	.btn-group{
+		width:100%; 
+		text-align:center; 
+		margin-top:-10px;
+	}
+	
+	#chooseBTN{
+		width:10%; 
+		font-size:1.5em;
+		margin-left:-1px; 
+		border-left:solid 1px;
+	}
+	
+	.btn-group > .dropdown-menu{
+		max-width:700px;
+		width:90%;
+		background-color:#39BBF8;
+	}
+	
+	.paintView_rumo{
+		background-color:#FCD209;
+		color:black
+	}	
+	.paintView_yanshouhege{
+			background-color:#39BBF8;
+			color:black
+		}	
+	.paintView_jiaozhuwancheng{
+			background-color:#6AEC87;
+			color:black
+		}
+	.paintView_yanghuzhong{
+			background-color:#FCD209;
+			color:black
+		}
+	
+	.paintView_weiqiyong{
+			background-color:#A2B5CD;
+			color:black
+		}	
+	.paintView_pipei{
+			background-color:#7F50A9;
+			color:black;
+		}	
+	
+	.listArea{
+		width:47.5%;
+		margin-left:1%;
+		height:180px;
+		display: inline-block;
+		border: double 4px;
+		vertical-align: middle;
+		text-align:center;
+		background-color:cadetblue;
+		background-color: white;
+		margin-top:8px;
+		border-radius:15px;
+	}
+	
+	.listArea > div {
+		height:30%; 
+		width:100%;  
+		text-align:center; 
+		margin-top:15px;
+	}
+	
+	.listArea > div > label{
+		margin-top:0;
+		width: 100%;
+		position: relative;
+		top:30%;
+		font-weight: bold;
+		text-align: center;
+		font-size:18px;
+		font-weight:bold;
+	}
+
+	.listArea > div > label > a{
+		color:black;
+	}
+	
+	.listArea > .pdID{
+		margin-top:0;
+		text-align:center;
+		border: none;
+		font-weight: bold;
+		font-size:20px;
+		color: black;
+		position: relative;
+		top:3%;
+	}
+	
+	.listView{
+		margin-top:-5px;
+		margin-bottom:30px;
+		
+	}
+	
+	.infoState{
+		text-align:center;
+		background-color:whitesmoke;
+	}
+	
+	.infoState thead tr th{
+		text-align:center;
+		font-size:1.5em;
+	}
+	
+	.infoState tbody tr td{
+		font-weight:bold;
+		font-size:1.2em;
+	}
+	
+	.navbar{
+		margin-bottom: 0px;
+	}
+	
+	</style>
+	
+</style>
+<label class="btn btn-primary" style="width:100%; font-size:1.5em; margin-bottom:0px;color: white;background-color: #007aff;"> 预制台座信息</label>
+<div style="width:100%;">
+   <table class="table table-striped infoState">
+	   <thead>
+	      <tr>
+	         <th>状态</th>
+	         <th>数量</th>
+	         <th>标示</th>
+	      </tr>
+	   </thead>
+	   <tbody>
+	      <tr>   
+	         <td>骨架入模</td>
+	         <td>{{totalState.rumo}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#FCD209;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>浇筑完成</td>
+	         <td>{{totalState.jiaozhuwancheng}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#6AEC87;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>浇筑验收</td>
+	         <td>{{totalState.yanshouhege}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#39BBF8;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>匹配修整</td>
+	         <td>{{totalState.pipei}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#7F50A9;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>未启用</td>
+	         <td>{{totalState.weiqiyong}}</td>
+	         <td><div style="width:100%; height:15px;background-color:#A2B5CD;"></div></td>
+	      </tr>
+	   </tbody>
+	</table>
+</div>
+<div class="listView">
+	{% for item in list_items.object_list %} 
+	<div class="listArea" align="center" >	
+		{% if item.count == 2 %}
+			{% for each in item.precastbeam %}
+				{% if each.status_id = 7 or each.status_id = 8 %}
+					<div class="paintView_pipei" >
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+				{% endif%}
+			{% endfor %}
+			{% for each in item.precastbeam %}
+				{% if each.status_id = 4  %}
+					<div class="paintView_rumo" >
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+				{% elif each.status_id = 5 %}
+					<div class="paintView_yanshouhege">
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>		
+				{% elif each.status_id = 6 %}
+					<div class="paintView_jiaozhuwancheng">
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>		
+				{% endif %}
+			{% endfor %}
+		{% elif item.count = 1 %}	
+			{% for each in item.precastbeam %}
+				{% if each.status_id = 7 or each.status_id = 8  %}
+					<div class="paintView_pipei" >
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+					<div class="paintView_weiqiyong">
+						<label>空闲</label>
+					</div>
+				{% elif each.status_id = 4 %}
+					<div class="paintView_weiqiyong" >
+						<label>空闲</label>
+					</div>
+					<div class="paintView_rumo">
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+				{% elif each.status_id = 5 %}
+					<div class="paintView_weiqiyong" >
+						<label>空闲</label>
+					</div>
+					<div class="paintView_yanshouhege">
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+				{% elif each.status_id = 6 %}
+					<div class="paintView_weiqiyong" >
+						<label>空闲</label>
+					</div>
+					<div class="paintView_jiaozhuwancheng">
+						<label><a color="black" href="/task/precastbeam/trace/{{each.id}}/">{{each.number}}</a></label>
+					</div>
+				{% else %}
+					<div class="paintView_weiqiyong">
+						<label>空闲</label>
+					</div>
+					<div class="paintView_weiqiyong">
+						<label>空闲</label>
+					</div>
+				{% endif %}				
+			{% endfor %}
+		{% else %}
+			{% if item.factoryarea_id = 4 %}
+				<div class="paintView_yanghuzhong">	
+					<label>养护</label>
+				</div>
+				<div class="paintView_yanghuzhong">
+					<label>养护</label>
+				</div>
+			{% else %}
+				<div class="paintView_weiqiyong">	
+					<label>空闲</label>
+				</div>
+				<div class="paintView_weiqiyong" >
+					<label>空闲</label>
+				</div>
+			{% endif %}
+		{% endif %}
+		<div class="pdID">{{item.name}}</div>						
+	</div>	
+	{%endfor%}
+</div>
+
+
+
+{% endblock %}

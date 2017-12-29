@@ -1,0 +1,250 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" type="text/css" href="/js/dataTables/media/css/jquery.dataTables.min.css"/>
+<script src="/js/dataTables/media/js/jquery.dataTables.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/js/dataTables/Buttons-1.2.4/css/buttons.dataTables.min.css"/>
+<script src="/js/dataTables/Buttons-1.2.4/js/dataTables.buttons.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/dataTables/Buttons-1.2.4/js/buttons.html5.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/dataTables/Buttons-1.2.4/js/buttons.print.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/dataTables/Plugins-master/pagination/input.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/css/jquery/jquery-labelauty.css">
+<script src="/js/jquery/jquery-labelauty.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/project/anquanjiancha.css" />
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+  <div class="header-bg-v2"><span class="title-v2">安全检查</span></div>
+</div>
+    <table class="table table-striped table-bordered table-hover datatable">
+        <thead>
+                <tr>
+                  <th style="text-align:center; color: white;background-color: #337ab7;">名称</th>
+                  <th style="text-align:center;color: white;background-color: #337ab7;">构件类型</th>
+                  <th style="text-align:center;color: white;background-color: #337ab7;">周期</th>
+                  <th style="text-align:center;color: white;background-color: #337ab7;">周期时间</th>
+                  <th style="text-align:center;color: white;background-color: #337ab7;">关联表单</th>
+                  <th style="text-align:center;color: white;background-color: #337ab7;">状态</th>
+                  <th style="text-align:center; color: white;background-color: #337ab7;width:150px">操作</th>
+                </tr>
+        </thead>
+              <tbody>
+                {% for item in check_list %}
+                <tr>
+                  <td>{{item.name}}</td>
+                  <td>{{item.pbtype}}</td>
+                  <td>{{item.task_cycle_type}}</td>
+                  <td>{{item.task_cycle}}</td>
+                  <td>{% ifequal item.relatedformtemplate None %} -- {% else %}{{item.relatedformtemplate}}{% endifequal %}</td>
+                
+                  	{% if item.isneedcheck %}
+                  	  <td style="background-color: orangered;color: white;">设施待检</td>
+                  	{% else %}
+                  	  <td style="background-color:green ;color: white;">设施正常</td>
+                  	{% endif %}
+                  <td>
+                  	{% if item.isneedcheck %}
+                    	<button type="button" class="btn btn-success btn-xs" onclick="anquanjianchaManager.batchJiancha({{item.id}})">批量检查</button>
+                    {% endif %}
+                    <button type="button" class="btn btn-default btn-xs" onclick="anquanjianchaManager.detailJiancha({{item.id}})">查看</button>
+                   <!-- <button type="button" class="btn btn-success btn-xs" onclick="anquanjianchaManager.editJiancha({{item.id}})">编辑</button>-->
+                    <button type="button" class="btn btn-danger btn-xs" onclick="anquanjianchaManager.delJiancha({{item.id}})">删除</button>
+                  </td>
+                </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+ 	<div class="modal fade" id="addjiancha" aria-hidden="true" style="text-align: left;">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            	<label id="dlgtitle">新增安全检查</label>
+            </div>
+            <div class="modal-body">
+            <form class="form-horizontal" id="addJianchaForm"  align="left">
+	          <div class="form-group">
+					<div class="input-group">
+			            <span class="input-group-addon">检查名称</span>
+			            <input id="new_name" name="new_name" type="text" class="form-control" placeholder="检查名称">
+			        </div>
+			  </div>
+			    <div class="form-group">
+			        <div class="input-group">
+			            <span class="input-group-addon">构件类型</span>
+			            <select class="form-control" id="new_pbtype" name="new_pbtype">
+			            	{% for each in pbtypeList %}
+			            		<option value={{each.id}}>{{each.name}}</option>
+			            	{% endfor %}
+			            </select>
+			        </div>
+			    </div>
+			    <div class="form-group">
+			        <div class="input-group">
+			            <span class="input-group-addon" >周期类型</span>
+			            <select class="form-control" id="zhouqitype" name="zhouqitype">
+			            	<option value="每天">每天</option>
+			            	<option value="每周">每周</option>
+			            	<option value="每月">每月</option>
+			            </select>
+			        </div>
+			</div>
+			    <div class="form-group createtimediv unactive" >
+			        <div class="input-group">
+			            <span class="input-group-addon">周期时间</span>
+			            <input  type="text"  class="form-control" id="createtime" name="createtime" readonly="true"  placeholder="请选择时间">
+			            	 <div class="zhoutimeselect unactive" >
+                                <ul class="time-week unactive">
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Monday" data="星期一" style="display: none;" data-labelauty="星期一">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Tuesday" data="星期二"  style="display: none;" data-labelauty="星期二">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Wednesday" data="星期三"  style="display: none;" data-labelauty="星期三">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Thursday" data="星期四"  style="display: none;" data-labelauty="星期四">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Friday" data="星期五"  style="display: none;" data-labelauty="星期五">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Saturday" data="星期六"  style="display: none;" data-labelauty="星期六">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Sunday" data="星期日"  style="display: none;" data-labelauty="星期日">
+                                    </li>
+                                    <li><a class="btn btn-default time-week-btn" role="button" style="padding: 2px;padding-left: 11px;padding-right: 11px;font-size: 11px; margin-bottom: 25px;margin-left: 110px;background-color: #3498db;color: white;">确定</a></li>
+                                </ul>
+                                <ul class="time-day unactive">
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d1" data="01"  style="display: none;" data-labelauty="01">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d2" data="02" style="display: none;" data-labelauty="02">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d3" data="03" style="display: none;" data-labelauty="03">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d4" data="04" style="display: none;" data-labelauty="04">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d5" data="05" style="display: none;" data-labelauty="05">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d6" data="06" style="display: none;" data-labelauty="06">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d7" data="07" style="display: none;" data-labelauty="07">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d8" data="08" style="display: none;" data-labelauty="08">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d9" data="09" style="display: none;" data-labelauty="09">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d10" data="10" style="display: none;" data-labelauty="10">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d11" data="11" style="display: none;" data-labelauty="11">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d12" data="12" style="display: none;" data-labelauty="12">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d13" data="13" style="display: none;" data-labelauty="13">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d14" data="14" style="display: none;" data-labelauty="14">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d15" data="15" style="display: none;" data-labelauty="15">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d16" data="16" style="display: none;" data-labelauty="16">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d17" data="17" style="display: none;" data-labelauty="17">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d18" data="18" style="display: none;" data-labelauty="18">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d19" data="19" style="display: none;" data-labelauty="19">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d20" data="20" style="display: none;" data-labelauty="20">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d21" data="21" style="display: none;" data-labelauty="21">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d22" data="22" style="display: none;" data-labelauty="22">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d23" data="23" style="display: none;" data-labelauty="23">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d24" data="24" style="display: none;" data-labelauty="24">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d25" data="25" style="display: none;" data-labelauty="25">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d26" data="26" style="display: none;" data-labelauty="26">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d27" data="27" style="display: none;" data-labelauty="27">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d28" data="28" style="display: none;" data-labelauty="28">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d29" data="29" style="display: none;" data-labelauty="29">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d30" data="30" style="display: none;" data-labelauty="30">
+                                    </li>
+                                    <li>
+                                        <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-3d31" data="31" data="01" style="display: none;" data-labelauty="31">
+                                    </li>
+                                    <li><a class="btn btn-default time-day-btn" href="#" role="button" style="padding: 2px;padding-left: 11px;padding-right: 11px;font-size: 11px; margin-bottom: 25px;margin-left: 108px;background-color: #3498db;color: white;">确定</a></li>
+                                </ul>
+
+                                <small id="createtime-small" class="help-block"  style="text-align: center;color: #a94442;display:none;">时间段不能为空</small>
+                            </div>
+			            </input>
+			        </div>
+
+			   </div>
+			    <div class="form-group">
+			        <div class="input-group">
+			            <span class="input-group-addon">关联表单</span>
+			            <select class="form-control" id="relateform" name="relateform">
+			            	<option value="0">------------------------</option>
+			            	{% for each in formlist %}
+			            		<option value={{each.id}}>{{each}}</option>
+			            	{% endfor %}
+			            </select>
+			        </div>
+			  </div>
+			  </form>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" type="button" id="btnAddJiancha"  >新增</button>
+            </div>
+    </div>
+    </div>
+    </div>
+
+<script src="/js/common/anquanjiancha.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+</script>
+{% endblock %}

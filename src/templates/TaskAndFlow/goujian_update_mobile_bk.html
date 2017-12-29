@@ -1,0 +1,240 @@
+{% extends "base_mobile.html" %}
+{% block content %}
+<style type="text/css">
+		.row-fluid{
+			background-color:white;
+			margin-left:2%; 
+			margin-top:1%;
+			margin-bottom:5%;
+			display:inline-block; 
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.row-fluid ul {
+			width:50%;
+			margin-left:25%;
+		}
+</style>
+
+<label class="btn btn-primary" style="width:100%; font-size:1.5em; margin-bottom:0px;color: white;background-color: #007aff; margin-top:-10px;"> 上传梁段最新状态</label>
+
+<form method="post" action="">
+	<div class="row-fluid" style="text-align:center; margin-top:5%;" >
+		<div class="input-group" style="width:96%;margin-left:2%; margin-top:7%;">
+		         <span class="input-group-addon" style="font-weight:bold;">
+		         <i class="fa fa-barcode" style="margin-right:2px;"></i>梁段编号：
+		         </span>
+		         <input type="text" class="form-control" id="liangduan" name="liangduan" value="{{form.cleaned_data.liangduan}}">
+		         <span class="input-group-addon" 
+		         	style="background-color:#069CD8; border:0; color: white; font-weight:bold;" id="saoma_liangduan">扫码二维码
+		         </span>
+		</div>
+		{{form.liangduan.errors}}
+		
+		<div class="input-group" style="width:96%;margin-left:2%; margin-top:7%;">
+	         <span class="input-group-addon" style="font-weight:bold;">
+	         <i class="fa fa-hdd-o" style="margin-right:2px;"></i>场地仓位：</span>
+	         <select name="changdi" id="changdi" style="height:2em; width:100%; padding-left:15px; border:groove 1px #888888; border-radius: 0;">
+	        	 <option value="" selected>请选择场地</option>
+	         </select>
+	         <span class="input-group-addon" 
+	         	style="background-color:#069CD8; border:0; color: white; font-weight:bold;" id="saoma_changdi">扫码二维码
+	         </span>
+		</div>
+		{{form.changdi.errors}}
+		
+		<div class="input-group" style="width:96%;margin-left:2%; margin-top:7%; font-size:1.1em;">
+			<label style="font-weight:bold;">
+				<i class="fa fa-edit" style="margin-right:2px;"></i>选择目标状态：
+			</label>
+	        <select name="status" id="status" style="width: 35%;">
+	        	 <option value=1 selected>请选择状态</option>
+		         
+	        </select>
+	    </div>
+	    {{form.status.errors}}
+		<div class="input-group" style="width:96%;margin-left:2%; margin-top:2%; margin-bottom:5%;">
+			<p style="color:{{color_code}}">{{result_string}}</p>
+			<input class="btn btn-primary" style="width:100%;font-size:1.5em;" type="submit" data-inline="true" value="提交">
+		</div>
+	</div>
+      
+</form>
+
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+	$("#changdi").bind("change", function() { 
+		$("#status").empty();
+		$("#status").append("<option value=1 selected>请选择状态</option>");
+		if( $("#changdi").val()[0] == "B" || $("#changdi").val()[0] == "b" ){ 
+			$("#status").append("<option value=2>钢筋绑扎中</option>");
+			$("#status").append("<option value=3>绑扎验收合格</option>");
+		}
+		if( $("#changdi").val()[0] == "Y" || $("#changdi").val()[0] == "y" ){  
+		    $("#status").append("<option value=4>骨架入模</option>");
+			$("#status").append("<option value=5>浇筑前验收合格</option>");
+			$("#status").append("<option value=6>浇筑完成</option>");
+			$("#status").append("<option value=7>匹配</option>");
+		}		
+		if( $("#changdi").val()[0] == "-"){ 
+			$("#status").append("<option value=8>修整养护</option>");
+			$("#status").append("<option value=9>成品检查合格</option>");
+		}	
+		if( $("#changdi").val()[0] == "C" || $("#changdi").val()[0] == "c" ){ 
+			$("#status").append("<option value=10>存放</option>");
+			$("#status").append("<option value=11>出厂检查合格</option>");
+		}
+	});
+
+	wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+      ]
+	});
+	
+	wx.ready(function(){
+		document.querySelector('#saoma_changdi').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        keyword=res["resultStr"];
+		        $("#changdi").val(keyword);
+		        
+		        $("#status").empty();
+				$("#status").append("<option value=1 selected>请选择状态</option>");
+				
+				if( keyword[0] == "Y" || keyword[0] == "y" ){  
+				    $("#status").append("<option value=4>骨架入模</option>");
+					$("#status").append("<option value=5>浇筑前验收合格</option>");
+					$("#status").append("<option value=6>浇筑完成</option>");
+					$("#status").append("<option value=7>匹配</option>");
+				}
+				if( keyword[0] == "B" || keyword[0] == "b" ){ 
+					$("#status").append("<option value=2>钢筋绑扎中</option>");
+					$("#status").append("<option value=3>绑扎验收合格</option>");
+				}
+				if( keyword[0] == "C" || keyword[0] == "c" ){ 
+					$("#status").append("<option value=10>存放</option>");
+					$("#status").append("<option value=11>出厂检查合格</option>");
+				}
+
+		      }
+		    });
+		};
+		
+		document.querySelector('#saoma_liangduan').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        keyword=res["resultStr"];
+		        $("#liangduan").val(keyword);
+		        
+		        $.ajax({
+				  type:"post",
+				  url:"weixin_query_Pb/",
+				  cache:false,
+				  dataType:"json",
+				  data:{"liangduan": keyword},
+				  success: function(data){
+				  	if(data.status=="Succeed"){
+				  		$("#changdi").val(data.init_predestal);
+						$("#changdi").change();
+						$("#status").val(data.init_status);
+				  	}
+				  	else{
+				  		alert("服务器错误，请重试！");
+				  	}
+				  },
+				  error:function(data){
+				  	alert("服务器错误");
+			      	return false;
+			      },
+				});
+		      }
+		    });
+		};
+		
+	    
+  	});
+	
+	wx.error(function(res){
+		alert("授权失败！");
+	});
+	
+	$().ready(function(){
+		{% if changdi %}
+			$("#changdi").val( '{{changdi}}' );
+			$("#changdi").change();
+			$("#status").val( {{status}} );
+		{% endif %}
+		
+		$("#liangduan").bind("change", function() { 
+				var keyword = $("#liangduan").val();
+				if (keyword){
+					$.ajax({
+					  type:"post",
+					  url:"weixin_query_Pb/",
+					  cache:false,
+					  dataType:"json",
+					  data:{"liangduan": keyword},
+					  success: function(data){
+					  	if(data.status=="Succeed"){
+					  		$("#changdi").val(data.init_predestal);
+							$("#changdi").change();
+							$("#status").val(data.init_status);
+					  	}
+					  },
+					  error:function(data){
+					  	alert("服务器错误");
+				      	return false;
+				      },
+					});
+				}
+		});               
+	});
+	
+</script>
+
+{% endblock %}

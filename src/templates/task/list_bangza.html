@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<div class="container-fluid" align="center">
+	<style>
+	.predestalView{
+		background-color:white;
+		height:520px;
+		width:90%;
+		margin-left:0px;
+		margin-top:-15px;
+		padding-top:5px;
+		padding-left:-1.5%;
+		border-bottom-right-radius: 20px;
+		border-bottom-left-radius: 20px;
+	}
+	
+	h5{
+		width:100%;
+		text-align:center;
+		font-size:18px;
+		padding-top:5%;
+		font-weight:bold;
+	}
+	
+	h3{
+		height:50px;
+		background-color:white;
+		margin-top:-5px;
+		padding-top:10px;
+		border-top-right-radius: 20px;
+		border-top-left-radius: 20px;
+		color: #007AFF;
+	}
+	
+	.span3{
+		width:20%;
+		display:inline-block;
+		height:50px;
+		vertical-align:middle;
+	}
+	
+	.col-sm-6{
+		width:100%;
+		vertical-align:middle;
+	}
+	
+	.col-sm-6 > label{
+		margin-top:3%; 
+		font-size:20px;
+		width:60%; 
+		height:30px;
+		color:black; 
+		text-align: center;
+	}
+	
+	.row-fluid{
+		width:99%;
+		height:30px;
+		margin-top:2%;
+		text-align:center
+	}
+	
+	.viewTai{
+		height:450px;
+		width:30%;
+		display:inline-block;
+		border: dashed 1px;
+		margin-left:2%;
+		vertical-align:top;
+	}
+	
+	h3 > a {
+		margin-right:5%;
+	}
+	
+	h4{	
+		margin-top:10%;
+		width:100%;
+		font-size:20px;
+		font-style: italic;
+		font-weight: bold;
+		text-align:center;
+		display:inline-block;
+	}
+	
+	.listFrame > a {
+		margin-top:4%;
+	}
+
+	.listFrame{
+		height:17%;
+		width:40%;
+		margin-top:3%;
+		display:inline-block;
+		margin-left:2%;
+		text-align:center;
+		vertical-align: middle;
+	}
+	
+	.listArea{
+		width:100%;
+		height:60%;
+		text-align:center;
+		vertical-align: middle;
+	}
+
+	.listArea > div {
+		height:100%; 
+		width:100%;  
+		text-align:center; 
+		margin:0px auto;
+	}
+
+	.listArea > div > label{
+		font-size:20px;
+		padding-top:5%;
+		font-weight: bold;
+		color:black;
+		text-align:center;
+	}
+	
+	h6{
+		font-weight: bold;
+		font-size:15px;
+		text-align:center;
+		width:100%;
+		height:40%;
+		text-align:center;
+		padding-top:5px;
+	}
+	
+	.paintView_bangza{
+			background-color:#FCD209;
+			color:black
+		}
+	.paintView_weiqiyong{
+			background-color:#A2B5CD;
+			color:black
+		}	
+		
+	.paintView_hege{
+			background-color:#6AEC87;
+			color:black
+		}	
+		
+	.paintView_yichang{
+			background-color:red;
+			color:black
+		}	
+	
+	</style>
+	<div>
+	<h3 align="center" style= "width: 90%;"><i class="glyphicon glyphicon-th"></i>钢筋绑扎区状态
+	</h3>
+	
+	<div class="predestalView" align="center">
+		{% for item in list_items.object_list %}
+			{% if forloop.counter = 1%}
+				<div class="viewTai" align="center" style="margin-left:0">  
+				<h5>B1区</h5> 
+			{% elif forloop.counter = 8%}
+				<div class="viewTai" align="center">  
+				<h5>B2区</h5>  
+			{% elif forloop.counter = 15%}
+				<div class="viewTai" align="center">   
+				<h5>B3区</h5> 		
+			{% endif %}
+					<div class="listFrame" align="center">
+				  		<div class="listArea" >		
+				  		{% if item.pb %}
+				  			{% ifequal item.pb "error" %}
+				  				<div class="paintView_yichang">	
+								<label>数据异常 </label>
+				  			{% else %}
+				  				{% if item.pb.status_id = 2 %}						
+									<div class="paintView_bangza">	
+										<label>{{item.pb.number}} </label>
+								{% elif item.pb.status_id = 3 %}		
+									<div class="paintView_hege" >	
+										<label>{{item.pb.number}} </label>
+								{% else %}
+									<div class="paintView_yichang">	
+									<label>{{item.pb.number}} </label>
+								{% endif %}	
+							{% endifequal %}
+							</div>
+						{% else %}
+							<div class="paintView_weiqiyong">	
+								<label >
+									空闲
+								</label>
+							</div>
+						{% endif %}				
+						</div>
+						<h6 style="font-size:20px;font-weight:bold; color:black">{{item.name}}</h6>	
+					</div>
+					{% ifequal forloop.counter 16%}
+						<div class="listFrame" align="center"></div>
+						<div class="listFrame" align="center"></div>
+					{% endifequal %}
+								
+			{% if forloop.counter in row_num_list%}	 
+				</div>
+			{% endif %}
+		 {% endfor %}
+	</div>
+	<div class="row-fluid" >
+	
+		<div class="span3">
+			<div class="col-sm-6">			
+					<label style="background-color:#6AEC87;" >绑扎验收合格</label>
+			</div>
+		</div>
+	
+		<div class="span3">
+   			<div class="col-sm-6">			
+					<label style="background-color:#FCD209;" >骨架绑扎中</label>
+			</div>
+		</div>     
+
+		<div class="span3">
+			<div class="col-sm-6">			
+					<label style="background-color:#A2B5CD;" >台座未启用</label>
+			</div>
+		</div>  
+		<div class="span3">
+			<div class="col-sm-6" valign="bottom">	
+				<a href="javascript:PrintPbAll()" class="btn btn-success btn "><i class="fa fa-qrcode"></i>打印绑扎区二维码 </a>
+			</div>
+		</div>  
+               
+	</div>
+	<div style="display:none;">
+		<a href="javascript:PrintPbAll()" class="btn btn-success btn"><i class="fa fa-qrcode"></i>&nbsp&nbsp打印绑扎区二维码&nbsp&nbsp </a>
+		<!-- 注释了，需要在打开。潘古兵 -->
+		<!-- <a href="javascript:gen_preqrcode()" class="btn" role="button"><i class="icon-print"></i>&nbsp&nbsp生成绑扎区二维码&nbsp&nbsp </a> -->
+	</div>
+
+</div>
+<script src="/js/yuzhitai.js" type="text/javascript"></script>
+<script type="text/javascript" language="javascript"> 
+	function PrintPbAll()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+        //var dlgResult = window.showModalDialog("/task/predestal/printpredestal/", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0");
+		if(window.ActiveXObject)
+		{ //IE  
+			 var dlgResult = window.showModalDialog("/task/bangzaqu/printbangzaqu/", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		}
+		else
+		{  //非IE  
+			window.open("/task/bangzaqu/printbangzaqu/", 'newwindow','height='+dheight+',width='+dwidth+',toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no');  
+		} 	
+	}
+	
+	function gen_preqrcode()
+	{
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+		  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+		  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		  {
+			var result=xmlhttp.responseText;
+			alert(result);
+		  }
+		}
+		xmlhttp.open("GET","/task/predestal/gen_preqrcode/",true);
+		xmlhttp.send();
+	}
+</script>
+{% endblock %}

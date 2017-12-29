@@ -1,0 +1,314 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/admin/css/admin-theme.css" rel="stylesheet">
+    <link href="/css/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/admin/css/xadmin-default.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link href="/admin/css/cropper.min.css" rel="stylesheet">
+    <link href="/admin/css/fileinput.min.css" rel="stylesheet">
+    <style>
+        @CHARSET "UTF-8";
+
+        .input-order{width:30px;}
+        .wrap {
+        padding: 20px 20px 70px;
+        }
+        .table td {font-size:12px;}
+
+        form .input-order {
+            margin-bottom: 0px;
+            padding: 3px;
+            width: 40px;
+        }
+
+        .table-actions {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding: 0px;
+        }
+
+        .table-list {
+            margin-bottom: 0px;
+        }
+        .file-footer-buttons{
+            display: none;
+        }
+        .form-control.file-caption.kv-fileinput-caption{
+           /*display: none;*/
+        }
+        .file-preview{
+            /*display: none;*/
+        }
+        .btn.btn-primary.btn-file{
+            float:left;
+        }
+        #caijian{
+            float:left;
+        }
+        .zuobiao{
+            float:left;
+        }
+        .zuobiao div{
+            float:left;
+        }
+        /*限制图像宽度以避免容器溢出*/
+         .img-active{
+            border: 5px solid red;
+         }
+         img {
+          max-width: 95%; /*这个规则是非常重要的，请不要忽视这个！*/
+         }
+         #image-list img{
+            margin-bottom: 5px;
+            #height: 150px;
+            width: 300px;
+         }
+
+         .img-cover{
+            opacity: 0.2;        /*控制覆盖物的透明度*/
+            z-index: 2;
+        }
+        .img-uncover{
+            opacity: 1;
+        }
+        .clcimg-div{
+            position: relative;
+
+        }
+        #image-div{
+            width: 79%;
+            float: left;
+            max-height: 600px;
+
+        }
+        .imgdela{
+            position: absolute;
+            color: #fb1100;
+        }
+    </style>
+    <script src="/js/jquery/jquery-2.2.3.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <script src="/admin/js/cropper.min.js"></script>
+    <script>
+    $(function() {
+        $("[data-toggle='tooltip']").tooltip();
+    });
+    </script>
+</head>
+
+<body >
+    <div class="wrap js-check-wrap">
+        <ul class="nav nav-tabs">
+            <li><a href="/xadmin/adminmanagerpicture/">轮播图</a></li>
+            <li><a href="/xadmin/adminmanagerbackpic/" >背景图</a></li>
+            <li class="active"><a href="/xadmin/adminmanagerlogopic/">logo</a></li>
+        </ul>
+        <form class="form-horizontal js-ajax-forms" action="/admin/setting/site_post.html" method="post">
+            <fieldset>
+                <div class="tabbable">
+                    <div class="tab-content" style="overflow-x: hidden;">
+                        <div class="tab-pane active" id="A">
+                            <fieldset>
+                                <div class="control-group" style="min-height: 680px;">
+                                    <!--用块元素（容器）-->
+                                    <div id="image-div" >
+                                        {% if imgdoc != '' %}
+                                            <img  id = "image"  src = "/{{imgdoc.filepath}}{{imgdoc.name}}" >
+                                        {% else %}
+                                            <img  id = "image"  src = "" >
+                                        {% endif %}
+                                      <br>
+                                      <input id="Filedata" name="Filedata" type="file" data-min-file-count="1"  multiple>
+                                      <button class="btn btn-success" type="button" id="caijian"  style="margin-left: 5px;">确认裁剪并保存</button>
+                                      
+                                      <label class="control-label" style="margin-left: 50px;float: left;">选择裁剪比例：</label>
+                                      <button class="btn btn-default" type="button" onclick="imgcropper.changecrop(16,9)" style="margin-left: 5px;">16/9</button>
+                                      <button class="btn btn-default" type="button" onclick="imgcropper.changecrop(4,3)"  >4/3</button>
+                                      <button class="btn btn-default" type="button" onclick="imgcropper.changecrop(1,1)"  >1/1</button>
+                                      <button class="btn btn-default" type="button" onclick="imgcropper.changecrop(2,3)"  >2/3</button>
+                                      <button class="btn btn-default" type="button" onclick="imgcropper.changecrop(0,0)"  >自由</button>
+                                    </div>
+                                    <div style="width:20%;float:right;overflow:hidden;">
+                                        <div id="image-list" style="overflow: auto;max-height: 700px;">
+                                            {% if imgdoc != '' %}
+                                            <div class="clcimg-div img-uncover" onclick="btfileinput.showimg(this);"><img class="clcimg" id = "{{imgdoc.id}}" src = "/{{imgdoc.filepath}}{{imgdoc.name}}"></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+       <script src="/admin/js/xadmin-common.js"></script>
+       <script src="/admin/js/fileinput.min.js?3323"></script>
+    <script>
+    var commondata = {
+        currimgid : '{{imgdoc.id}}',
+        caijian_x1 : 0,
+        caijian_y1 : 0,
+        caijian_x2 : 0,
+        caijian_y1 : 0,
+    }
+
+    $(function() {
+        $("#urlmode-select").change(function() {
+            if ($(this).val() == 1) {
+                alert("更改后，若发现前台链接不能正常访问，可能是您的服务器不支持PATHINFO，请先修改data/conf/config.php文件的URL_MODEL为0保证网站正常运行,在配置服务器PATHINFO功能后再更新为PATHINFO模式！");
+            }
+            if ($(this).val() == 2) {
+                alert("更改后，若发现前台链接不能正常访问，可能是您的服务器不支持REWRITE，请先修改data/conf/config.php文件的URL_MODEL为0保证网站正常运行，在开启服务器REWRITE功能后再更新为REWRITE模式！");
+            }
+        });
+        $("#js-site-admin-url-password").change(function() {
+            $(this).data("changed", true);
+        });
+
+        $(".clcimg-div11").on("click",".clcimg",function(){
+            console.log(this.src);
+            $(".img-uncover").addClass("img-cover").removeClass("img-uncover");
+            $(this).parent().attr("class","img-uncover");
+            commondata.currimgid = this.id;
+            var selectsrc = $("#"+this.id).attr("src");
+            $("#image").cropper('replace',selectsrc);
+        });
+
+        $('#image').cropper({
+          aspectRatio: 0,//自由比例裁剪
+          zoomable:false,//缩放设置
+          crop: function(e) {
+            commondata.caijian_x1 = e.x;
+            commondata.caijian_y1 = e.y;
+            commondata.caijian_x2 = e.x+e.width;
+            commondata.caijian_y2 = e.x+e.height;
+          },
+          built:function(){
+            console.log(111);
+          }
+        });
+        //imgcropper.changecrop(4,3);
+
+        $("#Filedata").fileinput({
+            maxFileCount:1,
+            browseLabel:"选择文件",
+            removeLabel:"裁剪",
+            uploadLabel:"删除",
+            msgUploadThreshold:"",
+            showPreview:false,
+            showUpload:false,
+            showRemove:false,
+            showCaption:false,
+            showCancel:false,
+            showUploadedThumbs:false,
+            allowedFileExtensions :['jpg','png','bmp','jpeg'],
+            msgInvalidFileType:"文件格式不正确",
+            msgInvalidFileExtension:"文件格式不正确",
+            msgFilesTooMany:"只允许上传一张",
+            dropZoneTitle:" ",
+            uploadAsync: false,
+            layoutTemplates:{progress:''},
+            uploadUrl: "/uploadfile_conc/", // your upload server url
+            uploadExtraData:{'doctype':'logo'},
+        }).on("filebatchselected", function(event, files,data) {
+            $(this).fileinput("upload");//调用上传方法
+        }).on('fileerror', function(event, data, msg) {
+            console.log("图片异步上传失败处理");
+        }).on('filebatchuploaderror', function(event, data, msg) {
+            console.log("图片同步上传失败处理");
+        }).on('filebatchuploadsuccess', function(event, data, previewId, index) {
+            console.log("图片同步上传成功处理");
+            console.log(data.response.docpath);
+            $("#image").cropper('replace',data.response.docpath);
+            $(".img-uncover").addClass("img-cover").removeClass("img-uncover")
+            $("#image-list").html('<div class="clcimg-div img-uncover" onclick="btfileinput.showimg(this)"><img class="clcimg" id = "'+data.response.docId+'"  src = "'+data.response.docpath+'"></div>');
+            btfileinput.delimg(commondata.currimgid);
+            commondata.currimgid = data.response.docid;
+        }).on("fileclear",function(event, data, msg){
+            console.log("图片remove处理");
+            console.log(data);
+            console.log(msg);
+        });
+
+        $("#caijian").bind("click",function(){
+            var cropbox = $("#image").cropper('getCropBoxData')
+            var height = document.getElementById('image-div').offsetHeight;
+            var IMAGE_X1 = parseInt(commondata.caijian_x1);
+            var IMAGE_Y1 = parseInt(commondata.caijian_y1);
+            var IMAGE_X2 = parseInt(commondata.caijian_x2);
+            var IMAGE_Y2 = parseInt(commondata.caijian_y2);
+            var imgpath = $("#image").attr("src");
+            console.log(IMAGE_X1);
+            console.log(IMAGE_X2);
+            console.log(cropbox.x);
+            console.log(cropbox.y);
+            console.log(cropbox.width);
+            console.log(cropbox.height);
+            imgpath = imgpath.substring(imgpath.lastIndexOf('/')+1);
+            $.ajax({
+              type: "get",
+              url: "/xadmin/cropimg/",
+              dataType: "json",
+              data: {IMAGE_X1:IMAGE_X1,IMAGE_Y1:IMAGE_Y1,IMAGE_X2:IMAGE_X2,IMAGE_Y2:IMAGE_Y2,IMAGE_PATH:imgpath,docid:commondata.currimgid,doctype:'logo'},
+              success: function(data) {
+                console.log(data);
+                $(".img-uncover").addClass("img-cover").removeClass("img-uncover");
+                $("#"+commondata.currimgid).parent().attr("class","img-uncover");
+                var selectsrc = data.docpath;
+                $("#image").cropper('replace',selectsrc);
+                $("#"+commondata.currimgid).attr("src",selectsrc);
+                $("#"+commondata.currimgid).attr("id",data.docid);
+                commondata.currimgid = data.docId;
+                alert("裁剪并保存成功！");
+              },
+              error: function(data) {
+              	alert("裁剪出错！");
+              }
+            });
+        });
+    });
+
+    var btfileinput = {
+        showimg:function(obj){
+            $(".img-uncover").addClass("img-cover").removeClass("img-uncover");
+            $(obj).addClass("img-uncover");
+            commondata.currimgid = $(obj).children("img").attr("id");
+            var selectsrc = $("#"+commondata.currimgid).attr("src");
+            console.log(selectsrc);
+            console.log(commondata.currimgid);
+            $("#image").cropper('replace',selectsrc);
+        },
+        delimg:function(id){
+            // console.log($(this).next());
+            $.ajax({
+              type: "get",
+              url: "/xadmin/delimg/",
+              dataType: "json",
+              data: {docid:id},
+              success: function(data) {
+                // document.frames("rightframe").location.reload(true);
+                // self.location.reload();
+              },
+              error: function(data) {}
+            });
+        }
+    }
+
+    var imgcropper = {
+        changecrop:function(a,b){
+            $("#image").cropper('setAspectRatio',a/b);
+        }
+    }
+    </script>
+</body>
+
+</html>

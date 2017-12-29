@@ -1,0 +1,125 @@
+{% extends "base_v2.html" %}
+{% include "baseuser.html" %}
+{% block content %}
+<!--<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />-->
+<link rel="stylesheet" type="text/css" href="/js/dataTables/media/css/jquery.dataTables.min.css"/>
+<script src="/js/dataTables/media/js/jquery.dataTables.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="../../static/js/area_person_imformation/area_personnel.js"></script>
+<!--人员跟踪页面-->
+<!--日历时间插件-->
+<link rel="stylesheet" href="../../../static/js/jquery/skin/jedate.css" />
+<script type="text/javascript" src="../../../static/js/jquery/jquery.jedate.js"></script>
+<style>
+	#home{
+		width: 100%;
+		height: calc(100vh - 260px);
+		min-height: 500px;
+		position: relative;
+	}
+	#myCanvas{
+		position: absolute;
+		left: 50%;
+		margin-left: -490px;
+	}
+</style>
+<div class="header-v2">
+		<div class="header-bg-v2"><span class="title-v2">人员管理</span></div>
+</div>
+<ul id="myTab" class="nav nav-tabs tabs">
+	<li class="active"><a href="#home" data-toggle="tab"> 区域信息</a></li>
+	<li><a href="#ios" data-toggle="tab">当前场地人员信息</a></li>
+	<li><a href="#follow" data-toggle="tab">人员位置历史记录</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+	<div class="tab-pane fade in active" id="home" style=" margin-top: 10px;">
+		<canvas id="myCanvas" width="980" height="700"></canvas>
+	</div>
+
+	<div class="tab-pane fade" id="ios" style=" margin-top: 10px;">
+		<a href="../Tracking_imformation/"><!--<button class="btn btn-success" style="margin-left:10px;margin-top:20px;margin-bottom: 20px;">人员位置跟踪记录</button>--></a>
+		<table class="table table1 table-striped" id="tab2">
+
+  <thead>
+    <tr>
+      <th>人员</th>
+      <th>区域名称</th>
+       <th>工种</th>
+       <th>公司</th>
+       <th>进入区域时刻</th>
+       <th>人员追踪</th>  
+    </tr>
+  </thead>
+ 
+  <tbody id="data2">
+  	
+  </tbody>
+ 
+</table>
+
+	</div>
+	
+	<div class="tab-pane fade in " id="follow" style="margin-top:10px;">
+<div  class="form-inline" style="margin-bottom: 20px;">
+
+	            <div class="input-group" style="margin-right: 10px;">
+					<label class="input-group-addon" >开始时间</label>
+					<input class="form-control" type="text" id="inpstart" placeholder="YYYY-MM-DD hh:mm:ss" readonly>
+					<small class="help-block" data-bv-validator="notEmpty" data-bv-for="hysrq" data-bv-result="NOT_VALIDATED" style="display: none;">开始时间不能为空</small><small class="help-block" data-bv-validator="callback" data-bv-for="hysrq" data-bv-result="NOT_VALIDATED" style="display: none;">开始日期不能大于结束日期</small>
+				 </div>
+
+	            <div class="input-group" style="margin-right: 10px;">
+					<label class="input-group-addon" >结束时间</label>
+					<input class="form-control" type="text" id="inpend" placeholder="YYYY-MM-DD hh:mm:ss" readonly>
+					<small class="help-block" data-bv-validator="notEmpty" data-bv-for="hyerq" data-bv-result="VALID" style="display: none;">结束时间不能为空</small><small class="help-block" data-bv-validator="callback" data-bv-for="hyerq" data-bv-result="VALID" style="display: none;">结束日期不能小于开始日期</small>
+				 </div>
+
+					
+			<button class="btn btn-info btn-sm" id="search" style="min-width: 80px;"><i class="fa fa-search" ></i>查询</button>
+						
+							
+</div>				
+
+<table class="table table-striped table4" id="tabrecord" style="margin-top:10px;">
+
+  <thead>
+    <tr>
+      <th>人员</th>
+      <th>区域名称</th>
+       <th>进入区域的时刻</th>
+       <th>区域状态</th>   
+    </tr>
+  </thead>
+  <tbody id="data3">
+
+  </tbody>
+</table>
+		
+		
+	
+	</div>
+	
+	
+	
+	</div>		
+	
+	
+</div>
+<script type="text/javascript">
+$(function() {
+
+//开始时间和结束时间
+$("#inpstart").jeDate({
+    isinitVal:true,
+    festival: false,
+    format:''
+});
+$("#inpend").jeDate({
+    isinitVal:true,
+    festival: false,
+    format:''
+});
+
+})
+</script>
+</div>
+	{% endblock %}

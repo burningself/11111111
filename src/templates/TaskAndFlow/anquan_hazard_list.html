@@ -1,0 +1,175 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %} 
+
+<link href="/css/project/common_mobile.css" media="all" rel="stylesheet" type="text/css" />
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script src="/js/common/weixianyuan_mobile.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block content %} 
+<style type="text/css">
+.issk {
+
+    padding: 0.2em 0.4em 0.2em 0.4em;
+    border: none;
+    border-radius: 0.2em;
+    -webkit-appearance: none;
+    background: #ffffff;
+
+}
+.middle{
+    vertical-align: middle !important;
+    text-align: center;
+}
+th{text-align: center;}
+</style>
+<div class="crEvent">
+	<label class="titleLabel"><i class="fa fa-cogs" ></i> 当日危险源  </label>
+	
+	<div class="widget-container">
+	<table class="table table-bordered table-striped " >
+      <thead>
+        <tr>
+		  <th style="max-width:60vw;">危险源描述</th>
+		  <th style="width:20vw;">状态</th>
+          <th style="width:20vw;">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+		  <tr>
+	         <td colspan="3"><h3>没有相关记录！</h3></td>
+		  </tr>
+	  {% endifequal %}
+	  {% for item in hazardlist %}
+        <tr value="{{item.id}}">
+            <td>{{item.text}}</td>
+            
+            {% for s in hazard_status_list %}
+                {% ifequal item.isctr s.id %}
+                    <td class="middle"><a value='{{s.id}}' onclick="changestatus(this)">{{s.statusname}}</a></td>
+                {% endifequal %}
+            {% endfor %}
+
+            
+            <td class="middle"><span  id="update_chooseImage" style="color: #337ab7;">添加附件</span></td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+	</div>	
+</div>
+
+<script type="text/javascript">
+wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+      ]
+    });
+    var images = {
+        localId: [],
+        serverId: []
+    };
+    document.querySelector('#update_chooseImage').onclick = function () {
+            images.localId=[];
+            images.serverId=[];
+
+            var haid = this.parentNode.parentNode.getAttribute('value');//当前危险源id
+            wx.chooseImage({
+              success: function (res) {
+                images.localId = res.localIds;
+                var length = images.localId.length;
+
+                var i = 0, length = images.localId.length;
+                function uploadcomplete(){
+                    //上传到微信成功后，发给django后台
+                    var sdata={
+                        'haid':haid,
+                        'imageserverids':JSON.stringify(images.serverId)
+                    }
+                    $.ajax({
+                        type:"POST",
+                        url:"/task/anquan/hazard/attachment/",
+                        cache:"false",
+                        dataType: "json",
+                        data:sdata,
+                        success: function(data){
+
+                        },
+						error: function(e){
+							if(e.status==403){
+								alert("您没有权限编辑危险源，请联系管理员！");
+							}
+						}
+
+                    })
+                }
+
+                function upload() {
+                  wx.uploadImage({
+                    localId: images.localId[i],
+                    isShowProgressTips: 1,
+                    success: function (res) {
+                      i++;
+                      alert(res.serverId);
+                      images.serverId.push(res.serverId);
+                      if (i < length) {
+                        upload();
+                      }else{
+                        uploadcomplete()
+                      }
+
+                    },
+                    fail: function (res) {
+                      alert(JSON.stringify(res));
+                    }
+                  });
+                }
+                upload();
+
+              }
+            });
+        };
+</script>
+
+{% endblock %}
+

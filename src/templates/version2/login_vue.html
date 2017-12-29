@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录页</title>
+    <style>
+        html,body,div,img,h1,h2,h3,h4,h5,h6,p,pre,dl,dt,table,tr,td,ul,li,ol,frameset,frame,form,input,option,select,textarea,header,footer,section{
+            margin: 0px 0px 0px 0px;padding: 0px 0px 0px 0px;list-style: none;
+        }
+        body{  position: absolute;  top:0px;  left: 0px;  right: 0px;  bottom: 0px;  font-family: '黑体';  background: rgb(208, 83, 84) url("../../dist_vue/images/login-bg.png") no-repeat;  background-size: cover;  }
+        .header-login{  width: 100%;  height: 84px;  background-color: #D05354;  position: relative;  z-index: 200;  }
+        .header-login img{  margin: 15px 0px 0px 20px;  }
+        .title-login{  display: inline-block;  color: #fff;  position: relative;  top: -6px;  }
+        .title-login .font10{  font-size: 10px;  }
+        .tielu{  position: absolute;  bottom: 20px;  left: 30px;  }
+        .login-project{  color: #fff;  text-align: center;  letter-spacing: 1px;  position: absolute;  bottom: 250px;  left: 50%;  margin-left: -292px;  }
+        .login-project h1{  font-size: 40px;  text-align: center;  }
+        .login-project div{  margin-top: 20px;  }
+        .login-project div label{  font-size: 18px;  font-weight: normal;  }
+        .login-project div input{  font-size: 18px;  font-weight: normal;  }
+        input:-webkit-autofill {  -webkit-box-shadow: 0 0 0px 1000px rgba(218,218,218,0.9) inset;  border: 1px solid #CCC!important;  }
+        .btn-login{  width: 221px;  height: 30px;  line-height:30px;  background-color:rgb(208, 83, 84) ;  margin-left: 215px;  }
+    </style>
+</head>
+<body>
+    <div class="header-login">
+        <img src="dist_vue/images/logo.png" alt="logo" title="logo">
+        <div class="title-login">
+            <p style="font-size: 18px;">智慧建造管理平台</p>
+            <p class="font10">上海建工四建集团有限公司</p>
+        </div>
+    </div>
+    <img class="tielu" src="dist_vue/images/tielu.png" alt="logo" title="logo">
+    <form class="login-project" action=" ">
+        <h1>上海轨道交通信息中心指挥大楼</h1>
+        <div>
+            <label>用户名</label>
+            <input type="text">
+        </div>
+        <div>
+            <label>密&nbsp;&nbsp;码</label>
+            <input type="password">
+        </div>
+        <div class="btn-login">登&nbsp;&nbsp;录</div>
+    </form>
+</body>
+</html>

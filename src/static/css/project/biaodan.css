@@ -1,0 +1,32 @@
+
+
+.row{width:99.8%; margin:2px 0.1% 0 0.1%; padding: 0 5px 0 5px; border-radius:5px; display:inline-block; background: white; color: #007aff;min-height:calc(100vh - 95px);}
+
+.header-row{width:100%; margin:5px 0 5px 5px; padding: 0;text-align:left;font-size: 18px;font-weight:bold;color: #2e6da4;}
+.header-row h3{font-weight:bold; margin-bottom:10px; text-align:left; width:100%; }
+.content-row, .content-row > div{ text-align:left;}
+.content-row > div{overflow:auto;}
+
+#viewer{padding:0;}
+#.form-horizontal{min-height:300px;}
+.form-group div button{margin-left:30px; font-size:20px;}
+.button-group{margin-top:30px;}
+
+.btn-row { margin-top:20px; }
+.btn-row .btn{  font-size:16px; margin-left:10px;margin-top:5px; border-radius:10px;}
+
+.trSelected{ 
+	background-color: #C5C490; 
+} 
+
+.task-from { margin-bottom:5px; }
+.sample-label{
+	color:white;
+	height: 30px !important;
+	margin-right:5px;
+	padding:5px;
+}
+
+#progressdlg 
+{ margin: 136px 0 0 0px; 
+} 

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <div class="heading">
+       <i class="fa fa-table"></i>存量盘点-{{record.date | date:"Y-m-d" }}
+    </div>
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+          <th>钢筋材料明细</th>
+		  <th>验收数量</th>
+		  <th>计量单位</th>
+          <th>盘点时间</th>
+		  <th>盘点人</th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% for item in list_items %}
+        <tr >
+          <td>{{item.reforce.number}}</td>
+		  <td>{{item.quantity}}</td>
+		  <td>{{item.reforce.unit}}</td>
+		  <td>{{item.date | date:"Y-m-d" }}</td>
+		  <td>{{item.actor}}</td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="btn-toolbar" align="right">
+	<button class="btn btn-primary" onclick="javascript:history.back(1)"><i class="fa fa-arrow-left"></i>&nbsp&nbsp返回&nbsp&nbsp</button>
+</div>
+				
+</div>
+</div>
+{% endblock %}

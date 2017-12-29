@@ -1,0 +1,7 @@
+.*
+*.pyc
+*uwsgi.ini
+*settings.py
+upload
+!.gitignore
+

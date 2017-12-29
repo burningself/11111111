@@ -1,0 +1,414 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>文件管理</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+<link rel="stylesheet" href="../../../static/js/weui-master/style/weui.css"/>  
+<link rel="stylesheet" href="../../../static/js/weui-master/style/weui2.css"/>  
+<link rel="stylesheet" href="../../../static/js/weui-master/style/weui3.css"/>  
+<!-- 引用雪碧图 -->
+<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/css/elfinder.full.css">
+<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/theme.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/js/elFinder-2.1.12/themes/Material/css/theme-gray.css">
+<script type="text/javascript" src="../../../static/js/jquery/jquery-2.2.3.min.js"></script>
+<script type="text/javascript" src="../../../static/js/weui-master/zepto.min.js"></script>
+<!-- 上传图片 -->
+<script type="text/javascript" src="../../../static/js/weui-master/lrz.min.js"></script>
+<script>
+    $(function(){
+                Date.prototype.toLocaleString = function() {//时间
+                      return this.getFullYear() + "/" + (this.getMonth() + 1) + "/" + this.getDate() + "/ " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
+                };
+                function UpTime(date){//定义返回时间
+                    var upTime = new Date( date*1000 );
+                    upTime = upTime.toLocaleString();
+                    return upTime;
+                };
+                function UpSize( date ){//计算文件大小
+                    var upSize = parseInt( date / 1024);
+                            if( date == 0){
+                                upSize = date + "KB";
+                            }else if( date < 1024 ){
+                                upSize = date + "b";
+                            }
+                            else if( upSize >= 1024 ){
+                                upSize = parseInt(upSize/1024) + "MB";
+                            }else{
+                                upSize = upSize + "KB";
+                            }
+                            return upSize;
+                };
+                function  sortMethod(a, b) {//文件名排序大于1等于0小于-1
+                    var aa;
+                    if (window.Intl && window.Intl.Collator) {
+                        aa = new Intl.Collator("zh-CN", {numeric: true}).compare;
+                    } else {
+                        aa = function(a, b) {
+                            return a.localeCompare(b, "zh-CN", {numeric: true});
+                        };
+                    }
+                    return  aa(a,b);
+                };
+                 function disArr( arrDisorder ){//冒泡排序从小到大（文件名）
+                    for(var z = 0;z < arrDisorder.length - 1;z++){
+                        for(var x = z+1;x < arrDisorder.length;x++){
+                            var disTemp;
+                           if(sortMethod(arrDisorder[z],arrDisorder[x]) == 1 ){
+                                disTemp = arrDisorder[z];
+                                arrDisorder[z] = arrDisorder[x];
+                                arrDisorder[x] = disTemp;
+                           } 
+                        }
+                    }
+                    return(arrDisorder); 
+                };
+                 function size( data,subpage){//文件排序
+                    var tempS = [];
+                     for(var w = 0;w < data.length; w++){
+                            for(var q=0; q < subpage.length; q++){
+                               if(data[w] == subpage[q].name){
+                                        tempS.push( subpage[q] );
+                                        break;
+                                    }
+                            }
+                        }
+                    return tempS;
+                };
+                 function getData(data){
+                        var subpage = eval(data.files);//获取数组
+                        var tempa = " ";
+                        if(subpage.length == 0){
+                            $("#search-result").html("<p class='gray'>无匹配结果</p>");
+                        }else{
+                            var arrSort = [];arrFile = [];//wenjian数组
+                            //对文件名进行排序
+                            for( var a = 0;a < subpage.length; a++){
+                                if( subpage[a].hasOwnProperty("phash") ){
+                                    if( subpage[a].url ){
+                                        arrSort.push(subpage[a].name);
+                                    }else{
+                                        arrFile.push(subpage[a].name);
+                                    }
+                                }
+                            }
+                            //文件sort()
+                            disArr(arrSort);
+                            disArr(arrFile);
+
+                            for(var m=0; m < size(arrFile,subpage).length; m++){//文件夹列表
+                                 tempa  += "<a href='javascript:void(0);' class='weui_media_box weui_media_appmsg' id='"+size(arrFile,subpage)[m].hash +"'><div class='weui_media_hd'><div class='elfinder-cwd-icon elfinder-cwd-icon-directory ui-corner-all'></div></div><div class='weui_media_bd'><h4 class='weui_media_title directory'>"+ size(arrFile,subpage)[m].name +"</h4><p class='weui_media_desc' style='float:right'>"+ UpTime( size(arrFile,subpage)[m].ts ) +"</p></div></a>";
+                            }
+                            for(var n=0; n < size(arrSort,subpage).length;n++){
+                                     var url = size(arrSort,subpage)[n].mime.split("/");//截取文件类型
+                                        if( url[1].indexOf(".") ){
+                                            url[1] = url[1].replace(".","-");
+                                        }
+                                         var imgTemp = size(arrSort,subpage)[n].url.split(".").pop();
+                                        if( imgTemp == "png" || imgTemp == "jpg"|| imgTemp == "jpeg"|| imgTemp == "gif"){//如果是图片
+                                                previewSrc.push( size(arrSort,subpage)[n].url );
+                                            tempa  += "<a value='"+size(arrSort,subpage)[n].url+"' target='_blank' class='weui_media_box weui_media_appmsg' id='"+size(arrSort,subpage)[n].hash +"'><div class='weui_media_hd'><div class='elfinder-cwd-icon elfinder-cwd-icon-"+ url[0]+" elfinder-cwd-icon-"+url[1] +" ui-corner-all'></div></div><div class='weui_media_bd'><h4 class='weui_media_title'>"+ size(arrSort,subpage)[n].name +"</h4><p class='weui_media_desc' style='float:left'>"+ UpSize(size(arrSort,subpage)[n].size) +"</p><p class='weui_media_desc' style='float:right'>"+ UpTime( size(arrSort,subpage)[n].ts ) +"</p></div></a>";
+                                        }else{
+                                            tempa  += "<a href='"+size(arrSort,subpage)[n].url+"' target='_blank' class='weui_media_box weui_media_appmsg' id='"+size(arrSort,subpage)[n].hash +"'><div class='weui_media_hd'><div class='elfinder-cwd-icon elfinder-cwd-icon-"+ url[0]+" elfinder-cwd-icon-"+url[1] +" ui-corner-all'></div></div><div class='weui_media_bd'><h4 class='weui_media_title'>"+ size(arrSort,subpage)[n].name +"</h4><p class='weui_media_desc' style='float:left'>"+ UpSize(size(arrSort,subpage)[n].size) +"</p><p class='weui_media_desc' style='float:right'>"+ UpTime( size(arrSort,subpage)[n].ts ) +"</p></div></a>";
+                                        }
+                            }
+                            return tempa;
+                        }
+                    };
+
+                var sum = [];previewSrc = [];previewDiv = [];Dname = [];//设置全局变量
+                 $.ajax({
+                        url:"/task/ziliao/connector",
+                        dataType : "json",
+                        type:'get',
+                        data:{cmd:"open",target:""},
+                        timeout:15000, //超时时间
+                        beforeSend:function(XMLHttpRequest){ 
+                            $("#loading").show(); //在后台返回success之前显示loading图标
+                        }, 
+                        success:function(data){
+                            $("#loading").hide();
+                             $("#files").append( getData(data) );
+                        },
+                        error:function(){
+                            console.log('读取失败');
+                        }
+                    });
+                     // 如果点击子目录进行跳转
+                    $("#files,#search-result").delegate("a","click",function(){
+                            var pageIndex = $( this ).attr('id');
+                            var name = $( this ).find(".directory").html();
+                            Dname.unshift( name );
+                            $(".directory-name").html( name );
+                            if( pageIndex.split("_").pop() == 'dir'){ //判断打开的文件是文件夹，还是file
+                                $.ajax({
+                                  url:"/task/ziliao/connector",
+                                        dataType : "json",
+                                        type:'get',
+                                        data:{cmd:"open",target:pageIndex},
+                                        timeout:15000, //超时时间
+                                        beforeSend:function(XMLHttpRequest){ 
+                                            $("#loading").show(); //在后台返回success之前显示loading图标
+                                        }, 
+                                        success:function(data){
+                                            $("#loading").hide();
+                                            $("#for-file").hide();//隐藏搜索层
+                                            sum.unshift(  $("#files").html() ); //对上一页面进行存储数组
+                                            previewDiv.unshift( previewSrc );//对上一级图片做存储
+                                            previewSrc = [];//清空图片缓存
+                                            $("#files").html( getData(data) );
+                                         },
+                                        error:function(){
+                                            console.log('读取失败');
+                                        }
+                                    });
+                            }else{
+                                //如果是图片的话，查看
+                                var imgUrl = $(this).attr("value");
+                                if( imgUrl ){
+                                $("#gallery_url").css({backgroundImage:"url('"+imgUrl+"')"});
+                                 var h;
+                                 for(var a = 0; a < previewSrc.length; a++){
+                                        if( previewSrc[a] == imgUrl ){
+                                            h = a;
+                                        }
+                                    }
+                                    $("#showImage").show();
+                                }
+                                
+                                     // 支持手机端左右滑动
+                                        var nStartY;
+                                        var nStartX;
+                                        var nChangY;
+                                        var nChangX;
+                                        document.getElementById('showImage').addEventListener('touchstart',function(e){
+                                            nStartY = e.targetTouches[0].pageY;
+                                            nStartX = e.targetTouches[0].pageX;
+                                        });
+                                        document.getElementById('showImage').addEventListener('touchmove',function(e){
+                                            e.preventDefault();
+                                        });
+                                        document.getElementById('showImage').addEventListener('touchend',function(e){
+                                            nChangY = e.changedTouches[0].pageY;
+                                            nChangX = e.changedTouches[0].pageX;
+                                            var distance = nChangX - nStartX;
+                                            var distance1 = nChangY - nStartY;
+
+                                            if(distance > 50){//左滑
+                                                if( h > 0 ){
+                                                    h = h - 1;
+                                                    $("#gallery_url").css({backgroundImage:"url('"+previewSrc[h]+"')"});
+                                                }
+                                            }else if(distance < -50){//右滑
+                                                if( h < previewSrc.length - 1 ){
+                                                    h = h + 1;
+                                                    $("#gallery_url").css({backgroundImage:"url('"+previewSrc[h]+"')"});
+
+                                                }
+                                            }
+                                        });
+                            }
+                    });
+                    
+                   $("#back").click(function(){
+                        if( sum.length > 1){
+                            $("#files").html( sum.shift() );
+                            previewSrc = [];
+                            var previewTemp = previewDiv.shift();
+                            previewSrc = previewSrc.concat( previewTemp );
+                            var name = Dname.shift();
+                            if( $(".directory-name").html() == name ){
+                                   $(".directory-name").html( Dname.shift() );
+                            }else{
+                                    $(".directory-name").html( name );
+                            }
+                        }else if( sum.length == 1){
+                            $("#files").html( sum.shift() );
+                            previewSrc = [];
+                            var previewTemp = previewDiv.shift();
+                            previewSrc = previewSrc.concat( previewTemp );
+                            $(".directory-name").html("");
+                        }else{
+                            window.history.go(-1);
+                        }
+                   }); 
+                   $("#backImg").click(function(){
+                            $("#showImage").hide();
+                    }); 
+
+                    //上传图片
+                    $("#upImg").click(function(){
+                        sum.unshift(  $("#files").html() ); 
+                        $("#files").html( $("#imgUpLoader").html() );
+                    });
+                    //查找文件
+                    $("#search-for").click(function(){
+                        $("#for-file").show();
+                    }); 
+                    $("#blck-file").click(function(){
+                        $("#for-file").hide();
+                         $("#search-result").html(" ");
+                    }); 
+                    $("#click-input").click(function(){
+                       var content =$(".input-search").val();
+                       if(content == null||content==undefined||content =="" ){
+                       }else{
+                             $.ajax({
+                                url:"/task/ziliao/connector/",
+                                dataType:"json",
+                                type:"get",
+                                data:{cmd:"search",q:content,target:'all'},
+                                timeout:15000, //超时时间
+                                beforeSend:function(XMLHttpRequest){ 
+                                    $("#loading").show(); //在后台返回success之前显示loading图标
+                                }, 
+                                success:function( datas ){
+                                    $("#loading").hide();
+                                    $(".input-search").val("");//清空值
+                                    $("#search-result").html( getData(datas) );
+                                },error:function(){
+                                    console.log("读取失败");
+                                }
+                            });
+                       }
+                        
+
+                    });
+        });
+  
+</script>
+<style>
+html,body,div,img,h1,h2,h3,h4,h5,h6,p,pre,dl,dt,table,tr,td,ul,li,frameset,frame,form,input,option,select,textarea{
+            margin: 0px;padding: 0px;
+        }
+        #showImage{position: fixed; top: 0; right: 0; bottom: 0; left: 0; background-color: #000000; z-index: 1000; }
+        #gallery_url{position: absolute; top: 0; right: 0; bottom: 0px; left: 0; background: center center no-repeat; background-size: contain; } 
+        #for-file{position: fixed; top: 0; right: 0; bottom: 0px; left: 0; z-index: 20000; background: #fff; overflow:auto; overflow-x: hidden; }
+        .input-search:focus{outline:none; } 
+        .gray{color: gray; text-align: center; margin-top: 35%; font-size: 16px; }
+        #click-input{position: absolute; right:15%; top: 16px; color: #18b4ed; font-size:20px; }
+        .elfinder-cwd-icon{margin:-3px auto; }
+        .weui_media_box{padding: 10px; }
+        .weui_media_box .weui_media_title{font-size: 16px; }
+        .weui_media_box.weui_media_appmsg .weui_media_hd{height: 42px; }
+        @media screen and (min-width:260px) and (max-width:350px){ 
+            .input-search{width: 55%; }
+           }
+</style>
+</head>
+
+<body ontouchstart style="background-color: #f8f8f8;">
+       <div  class="weui_panel weui_panel_access">
+       <!-- weui_panel_hd -->
+            <div class="weui-header bg-blue" style="text-align: center;color: #fff;height: 50px;line-height: 50px;padding: 0px 22px;">
+                <a href="javascript:;" id = "back" class="icon icon-109 f-white" style="font-size: 16px;font-weight: 100;float: left;">返回</a>
+                <span class="directory-name" style="font-size: 18px;font-weight: 400;"></span>
+                <!--<a href="javascript:;" id = "upImg" class="f-white" style="font-weight: 900;float: right;font-size:18px">＋</a>-->
+                <span id="search-for" class="ui-icon ui-icon-search" title="查找文件" style="float: right;margin: 15px 15px;font-size: 18px"></span>
+            </div>
+            <div class="weui_panel_bd" id="files"></div>
+            <div id="loading" style="display: none">
+                <div class="weui_toast weui_loading_toast weui_toast_visible" style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);"><div class="weui_loading"><div class="weui_loading_leaf weui_loading_leaf_0"></div><div class="weui_loading_leaf weui_loading_leaf_1"></div><div class="weui_loading_leaf weui_loading_leaf_2"></div><div class="weui_loading_leaf weui_loading_leaf_3"></div><div class="weui_loading_leaf weui_loading_leaf_4"></div><div class="weui_loading_leaf weui_loading_leaf_5"></div><div class="weui_loading_leaf weui_loading_leaf_6"></div><div class="weui_loading_leaf weui_loading_leaf_7"></div><div class="weui_loading_leaf weui_loading_leaf_8"></div><div class="weui_loading_leaf weui_loading_leaf_9"></div><div class="weui_loading_leaf weui_loading_leaf_10"></div><div class="weui_loading_leaf weui_loading_leaf_11"></div></div><p class="weui_toast_content">数据加载中</p></div>
+            </div>
+             <!-- 画廊（显示图片） -->
+            <div  id ="showImage" style="display: none">
+               <a href="javascript:;" id = "backImg" class="icon icon-109 f-white" style="position: absolute;left: 10px;top: 10px;z-index: 1005;">返回</a>
+               <span id="gallery_url" style="background-image: url(images/login2.png);"></span>
+           </div>
+
+           <!-- 搜索 -->
+           <div  id="for-file" style="display: none">
+               <p class="weui-header bg-blue" style="text-align: center;height: 50px;line-height: 50px;padding: 0px 22px;position: relative;">
+               <a href="javascript:;" id = "blck-file" class="icon icon-109 f-white" style="float: left;">返回</a>&nbsp;&nbsp;&nbsp;<input class="input-search" type="text" placeholder="查找文件" style="font-size: 16px;padding: 7px;border-radius: 5px;border:1px solid #18b4ed;width:65%;">&nbsp;&nbsp;&nbsp;<span id="click-input" class="ui-icon ui-icon-search" title="查找文件"></span></p>
+               <div id="search-result"></div>
+           </div>
+<!-- 文件上传 -->
+           <div  id = "imgUpLoader" style="display: none">
+                 <div class="weui_cell" >
+                    <div class="weui_cell_bd weui_cell_primary">
+                            <div class="weui_uploader">
+                                <div class="weui_uploader_hd weui_cell">
+                                    <div class="weui_cell_bd weui_cell_primary">文件上传</div>
+                                    <div class="weui_cell_ft"></div>
+                                </div>
+                                <div class="weui_uploader_bd">
+                                    <ul class="weui_uploader_files" id="img1">
+                                    </ul>
+                                    <div class="weui_uploader_input_wrp">
+                                        <input class="weui_uploader_input" type="file" accept="image/jpg,image/jpeg,image/png,image/gif" id="i1" onchange="previewImage(this)">
+                                        <input type="hidden" id="i4">
+                                    </div>
+                                </div>
+                            </div>
+                     </div>
+                </div>
+            </div>                    
+<!-- 结束 -->
+        </div>           
+</body>
+<script>
+//图片上传处理 
+  
+function previewImage(file) {
+    var MAXWIDTH = 100;
+    var MAXHEIGHT = 200;
+    if (file.files && file.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (evt) {         
+            $('#img1').html('<li class="weui_uploader_file" style="background-image:url('+evt.target.result+')"></li>');          
+        };
+        reader.readAsDataURL(file.files[0]);
+        console.log(file.files[0]);
+    }
+}
+
+
+       
+$(function(){
+ var f = document.querySelector('#headimgurl');
+f.onchange = function () {
+    lrz(this.files[0],{width:640,fieldName:"file"}).then(function (rst) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '1.php');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                var obj = eval('(' + xhr.responseText + ')');
+                  $('#img').html('<li onclick="var delimg=$(this);$.confirm(\'您确定要删除吗?\', \'确认删除?\', function() {delimg.remove();},function(){$.toast(\'取消操作\', \'cancel\');});" class="weui_uploader_file weui_uploader_status" style="background-image:url('+obj.src+')"><div class="weui_uploader_status_content"><i class="weui_icon_cancel"></i></div></li>');
+                $("#headimgurl1").val(obj.src);
+                } else {
+                    // 处理其他情况
+                }
+            };
+            xhr.onerror = function () {
+                // 处理错误
+            };
+            xhr.upload.onprogress = function (e) {
+                // 上传进度
+                var percentComplete = ((e.loaded / e.total) || 0) * 100;
+ }
+
+            // 添加参数
+            rst.formData.append('size', rst.fileLen);
+            rst.formData.append('base64', rst.base64);
+            // 触发上传
+            xhr.send(rst.formData);
+
+            return rst;
+        })
+
+        .catch(function (err) {
+alert(err);
+        })
+
+        .always(function () {// 不管是成功失败，这里都会执行
+        });
+}
+
+
+})
+
+
+
+ </script>
+
+</html>

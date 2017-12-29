@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://cdn.bootcss.com/iview/2.7.3/styles/iview.css" rel="stylesheet">
+    <style>
+        #app{
+            padding: 8px 0;
+            position: relative;
+            width:100%;
+            height: 100vh;
+            display: flex;
+            flex-flow: column;
+            overflow: hidden;
+        }
+        .info li{
+            line-height: 1.5;
+            border:1px solid #DDDEE1;
+            margin-bottom: -1px;
+            font-size: 16px;
+            padding: 4px 0.5rem;
+        }
+        .info li:first-child{
+            border-radius: 6px 6px 0 0;
+        }
+        .info li:last-child{
+            border-radius: 0 0 6px 6px;
+        }
+        .after{
+            float: right;
+            font-size: 14px;
+            color:dodgerblue;
+            margin-right: 0.5rem;
+            display: none;
+            line-height: 24px;
+        }
+        .after i{
+            cursor: pointer;
+        }
+        .before{
+
+        }
+        .info li:hover .after{
+            display: block;
+        }
+        .main-content{
+            margin: 0;
+            height: calc(100vh - 50px);
+        }
+        footer{
+            padding: 0!important;
+            line-height: 50px;
+            font-size: 16px;
+        }
+        .addLoop i{
+            animation: ani-load-loop 1s linear infinite;
+        }
+        li{
+            background-color: white;
+        }
+        .ivu-icon-checkmark-round{
+            color: #19be6b;
+        }
+        .ivu-form-item{
+            margin-bottom:20px;
+        }
+        .ivu-form-item-content:before,.ivu-form-item-content:after.clearfix:before,.clearfix:after {
+            content: " ";
+            display: table;
+        }
+        .ivu-form-item-content:after,.clearfix:after {
+            clear: both;
+        }
+        .card:not(:empty){
+            border: 1px solid #dddee1;
+            border-radius: 5px;
+            height: 100%;
+            overflow: auto;
+            padding-left: 1rem;
+        }
+        .card:not(:empty):hover{
+            border-color: #57a3f3;
+        }
+    </style>
+</head>
+<body>
+{% verbatim %}
+<div id="app">
+    <template>
+        <row :gutter="8" style="height: 100%">
+            <i-col :sm="24" :md="16" style="padding: 0 15px;" style="height: 100%">
+                <section style="margin-bottom: 2rem;background-color: #fbfbfb">
+                    <label>构件类型：</label>
+                    <i-select v-model="pbType" style="width:200px">
+                        <i-option v-for="i in SSR.pbType" :value="i.id" :key="i.name">{{i.name}}</i-option>
+                    </i-select>
+                </section>
+                <row style="height: 100%;">
+                    <i-col span="12">
+                        <label style="color: #19be6b;line-height: 22px;font-size: 16px">合格状态</label>
+                        <Spin v-if="loadingQualified"></Spin>
+                        <draggable  v-model="qualified" @end="e=>{sortEnd(e,qualified)}" :options="{filter:'.ivu-poptip-popper,.noDrag'}">
+                            <transition-group tag="ul" class="info" ref="qualifiedList">
+                                <li v-for="i,index in qualified" :key="i.statusname">
+                                    <Icon :type="type(i.iscritical,i.iscritical)" class="before"></Icon>
+                                    {{i.statusname}}
+                                    <span class="after">
+										<i class="ivu-icon ivu-icon-edit" @click="handelClick(index,i,'edit')">编辑</i>
+                                        <Poptip title="确认删除？" confirm  @on-ok="handelClick(index,i,'qualified')">
+                                            <i class="ivu-icon ivu-icon ivu-icon-trash-b">{{i.pending?'':'删除'}}</i>
+                                        </Poptip>
+									</span>
+                                </li>
+                            </transition-group>
+                        </draggable>
+                        <div style="line-height: 1.5;border: 1px solid #DDDEE1;margin-bottom: -1px;font-size: 16px;padding: 4px 0.5rem;background-color: #FFF;text-align: right; border-radius: 0 0 6px 6px;"
+                             v-if="qualified.length>0&&!loadingQualified">
+                            <i-Button type="info" @click="showModal('添加状态')">添加新的状态</i-Button>
+                        </div>
+                        <p v-if="qualified.length===0&&!loadingQualified">暂无数据，<a href="javascript:void 0" @click="showModal('添加状态')">点击这里</a>添加一条新的数据。</p>
+                    </i-col>
+                    <div style="height: 100%;border-left: 1px solid #e9eaec;margin-left: -1px;display: inline-block;float: left;"></div>
+                    <i-col span="12">
+                        <label style="color: #ed3f14;line-height: 22px;font-size: 16px">不合格状态</label>
+                        <Spin v-if="loadingQualified"></Spin>
+                        <ul class="info" ref="unQualifiedList">
+                            <li v-for="i,index in unqualified" :key="i.statusname">
+                                <Icon type="close-round" style="color:#ed3f14"></Icon>
+                                {{i.statusname}}
+                                <span class="after">
+                                    <i class="ivu-icon ivu-icon-edit" @click="handelClick(index,i,'edit')">编辑</i>
+                                    <Poptip title="确认删除？" confirm  @on-ok="handelClick(index,i,'unqualified')">
+                                        <i class="ivu-icon ivu-icon ivu-icon-trash-b">{{i.pending?'':'删除'}}</i>
+                                    </Poptip>
+                                </span>
+                            </li>
+                        </ul>
+                    </i-col>
+                </row>
+            </i-col>
+            <div style="height: 100%;border-left: 1px solid #e9eaec;margin-left: -1px;display: inline-block;float: left;"></div>
+            <i-col :sm="24" :md="8" style="padding: 0 15px;">
+                <section style="margin-bottom: 2rem;background-color: #FBFBFB" class="clearfix">
+                    <i-button style="float: right;margin-right: 12px;" type="primary" icon="plus" @click="showModal('添加渲染样式')">添加渲染样式</i-button>
+                </section>
+                <label style="line-height: 22px;font-size: 16px">渲染样式：</label>
+                <draggable v-model="SSR.renderList" @end="e=>{sortEnd(e,SSR.renderList,false)}" :options="{filter:'.ivu-poptip-popper,.ivu-color-picker-picker'}">
+                    <transition-group tag="ul" class="info" ref="renderList">
+                        <li v-for="i,index in SSR.renderList" :key="i.name">
+                            <Icon type="stop" style="margin-right: 1rem" :style="'color:' + i.color "></Icon>
+                            <span>{{i.name}}</span>
+                            <span class="after">
+                                <a href="javascript:void 0" @click="editColor(i,index)"><Icon type="edit"></Icon>修改</a>
+                                <Poptip placement=left title="确认删除？" confirm  @on-ok="trash(i,index)">
+                                    <i class="ivu-icon" :class="{'ivu-icon-trash-b':!i.pending,'ivu-load-loop ivu-icon-load-c':i.pending}">{{i.pending?'':'删除'}}</i>
+                                </Poptip>
+                            </span>
+                        </li>
+                    </transition-group>
+                </draggable>
+                <p v-if="SSR.renderList.length===0">暂无数据，<a href="javascript:void 0" @click="showModal('添加渲染样式')">点击这里</a>添加一条新的数据。</p>
+            </i-col>
+        </row>
+        <Modal
+                :value="modal&&color"
+                :title="title"
+                :closable="false" :mask-closable="false"
+                @on-visible-change="clear">
+            <i-form ref="color" :model="colorValue" :label-width="80" @submit.native.prevent>
+                <form-item prop="name" label="名称" prop="name" :rules="{required: true, message: '请输入样式名称', trigger: 'change'}">
+                    <i-input v-model="colorValue.name"></i-input>
+                </form-item>
+                <form-item prop="color" label="颜色" prop="color" :rules="{required: true, message: '请选择颜色', trigger: 'change'}">
+                    <Color-Picker v-model="colorValue.color" recommend />
+                </form-item>
+            </i-form>
+            <div slot="footer">
+                <i-Button type="ghost" @click="modal = false">取消</i-Button>
+                <i-Button type="primary" @click="addColor" :loading="loading">{{loading?'提交中':'确定'}}</i-Button>
+            </div>
+        </Modal>
+        <Modal
+                :value="modal&&!color"
+                :title="title"
+                :closable="false" :mask-closable="false"
+                @on-visible-change="clear">
+            <i-Form ref="formValidate" :model="formValue" :label-width="80">
+                <form-item prop="statusname" label="状态名称" :rules="{ required: true, message: '请输入状态名称', trigger: 'change' }">
+                    <i-input v-model="formValue.statusname" placeholder="请输入状态名"></i-input>
+                </form-item>
+                <form-item prop="flowtemplate" label="流程模板">
+                    <i-select v-model="formValue.flowtemplate" :transfer="true">
+                        <i-option v-for="i in SSR.flowTemplate" :value="i.id" :key="i.name">{{i.name}}</i-option>
+                    </i-select>
+                </form-item>
+                <form-item prop="formtemplate" label="表单模板">
+                    <i-select v-model="formValue.formtemplate" :transfer="true">
+                        <i-option v-for="i in SSR.formtemplate" :value="i.id" :key="i.name">{{i.name}}</i-option>
+                    </i-select>
+                </form-item>
+                <form-item prop="factoryarea" label="所属场地">
+                    <i-select v-model="formValue.factoryarea" :transfer="true">
+                        <i-option v-for="i in SSR.factoryarea" :value="i.id" :key="i.name">{{i.name}}</i-option>
+                    </i-select>
+                </form-item>
+                <form-item prop="userlist" label="操作者" :rules="{required: true, message: '请选择操作者', trigger: 'change',type:'array'}" >
+                    <row :gutter="8" style="height: 200px;overflow: auto;">
+                        <i-col :span="12" style="height: 100%">
+                            <Tree :data="SSR.user" show-checkbox @on-check-change="saveNodes" ref="userTree" class="card"> </Tree>
+                        </i-col>
+                        <i-col :span="12" style="height: 100%">
+                            <ul class="card">
+                                <li v-for="i,index in checkedNodes" :key="i.text">{{index+1}}.{{i.text}}</li>
+                            </ul>
+                        </i-col>
+                    </row>
+                </form-item>
+                <form-item prop="color" label="精细样式" :rules="{required: true, message: '请选择精细样式', trigger: 'change'}">
+                    <i-select v-model="formValue.color" placeholder="模型颜色" :transfer="true">
+                        <i-option v-for="i in SSR.renderList" :value="i.id" :key="i.name"><Icon type="record" :style="'color:' + i.color "></Icon>{{i.name}}</i-option>
+                    </i-select>
+                </form-item>
+                <form-item prop="cucolor" label="粗略样式">
+                    <i-select v-model="formValue.cucolor" placeholder="模型颜色" :transfer="true">
+                        <i-option v-for="i in SSR.renderList" :value="i.id" :key="i.name"><Icon type="record" :style="'color:' + i.color "></Icon>{{i.name}}</i-option>
+                    </i-select>
+                </form-item>
+                <form-item prop="isqualify" label="合格">
+                    <i-Switch v-model="formValue.isqualify">
+                        <span slot="open">是</span>
+                        <span slot="close">否</span>
+                    </i-Switch>
+                </form-item>
+                <form-item prop="iswancheng" label="完成" v-show="formValue.isqualify">
+                    <i-Switch v-model="formValue.iswancheng">
+                        <span slot="open">是</span>
+                        <span slot="close">否</span>
+                    </i-Switch>
+                </form-item>
+                <template  v-if="!formValue.isqualify">
+                    <form-item prop="buhegenext" :rules="{required: true, message: '不合格状态必须选择下一步', trigger: 'change'}" label="下一步">
+                        <i-select v-model="formValue.buhegenext" placeholder="选择下一步" :transfer="true">
+                            <i-option v-for="i in allStatus" :key="i.statusname" :value="i.id.toString()">{{i.statusname}}</i-option>
+                        </i-select>
+                    </form-item>
+                </template>
+            </i-form>
+            <div slot="footer">
+                <i-Button type="ghost" @click="modal = false">取消</i-Button>
+                <i-Button type="primary" @click="asyncOK" :loading="loading">{{loading?'提交中':'确定'}}</i-Button>
+            </div>
+        </Modal>
+    </template>
+</div>
+{% endverbatim %}
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<!--<script src="/js/vue/vue.min.js"></script>-->
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
+<script src="https://cdn.bootcss.com/iview/2.7.3/iview.min.js"></script>
+<!--<script src="/js/sortable/Sortable.min.js"></script>-->
+<script src="https://cdn.bootcss.com/Sortable/1.6.0/Sortable.min.js"></script>
+<script src="/js/vuedraggable/vuedraggable.min.js"></script>
+
+<script>
+    !function () {
+        initVue();
+    }();
+    function initVue() {
+        new Vue({
+            el:"#app",
+            data(){
+                return {
+                    SSR:{
+                        pbType:[{% for i in list_items %}{ id:'{{i.id}}' , name:'{{i.name}}' },{% endfor %}],
+                        renderList:[{% for each in list_color %}{ name:'{{each.name}}',name2:'{{each.name}}',id:'{{each.id}}',color:'{{each.rendercolor}}',defaultColor:'{{each.rendercolor}}',edit:!1,pending:'',editColor:false },{% endfor %}],
+                        flowTemplate:[{% for each in list_flowtemplate %}{ name:'{{each.name}}',id:'{{each.id}}' },{% endfor %}],
+                        formtemplate:[{% for each in list_formtemplate %}{ name:'{{each.name}}',id:'{{each.id}}' },{% endfor %}],
+                        factoryarea:[{% for each in list_factoryarea %}{ name:'{{each.number}}',id:'{{each.id}}' },{% endfor %}],
+                        user:[],
+                    },
+
+                pbType:'',
+                modal:!1,
+                title:'',
+                loading:!1,
+                formValue:{
+                    statusname:'',
+                    flowtemplate:"",
+                    formtemplate:"",
+                    factoryarea:'',
+                    userlist:[],
+                    color:"",
+                    cucolor:'',
+                    isqualify:!0,
+                    iswancheng:!1,
+                    buhegenext:''
+                },
+                colorValue:{
+                    name:"",
+                        color:""
+                },
+                color:!1,
+                qualified:[],
+                unqualified:[],
+                loadingQualified:false,
+                id:'',
+                checkedNodes:[]
+                }
+            },
+            methods:{
+                editColor(i,index){
+                    this.colorValue.name = i.name;
+                    this.colorValue.color = i.color;
+                    this.modal = true;
+                    this.color = true;
+                    this.title = '修改样式';
+                    window.config = {id:i.id,index};
+                },
+                close(i){
+                    const id =i.id;
+                    this.SSR.user.forEach(group=>{
+                        group.children.forEach(list=>{
+                            if(list.id==id) {debugger; list.checked = false}
+                        })
+                    })
+//                    i.checked = false
+
+                },
+//                delayBlur(i){
+//                    setTimeout(()=>{
+//                        if (!this.blurStop) {
+//                            i.name2=i.name;
+//                            i.edit=false
+//                        } else {
+//                            this.blurStop = false
+//                        }
+//                    },150);
+//                },
+                saveNodes(nodes){
+                    let temp = [];
+                    nodes.forEach(t=>{
+                        if(!t.children){
+                            temp.push(t.id);
+                        }
+                    });
+                    this.formValue.userlist = temp;
+                    this.$refs.formValidate.validateField('userlist')
+                },
+                sortEnd(e,data,type=true){
+                    let lisort = [];
+                    data.forEach(t=>{
+                        lisort.push(t.id.toString());
+                    });
+                    lisort = JSON.stringify(lisort);
+                    $.ajax({
+                        url:type?'/xadmin/pbstatus/':"/xadmin/stylecolor/",
+                        type:'POST',
+                        data:{
+                            lisort,
+                            opt:"sort"
+                        }
+                    })
+                },
+                type(isOver,isQualified){
+                    if(isOver&&isQualified){
+                        return 'checkmark-round'
+                    } else if(!isOver&&!isQualified){
+                        return 'ios-minus-outline'
+                    }
+                },
+                clear(bool){
+                    if(!bool){
+                        this.$refs.formValidate.resetFields();
+                        this.$refs.color.resetFields();
+                        this.formValue.userlist = [];
+                        this.loading = false;
+                        this.formValue.userlist = [];
+                        this.SSR.user = JSON.parse(JSON.stringify(uesrs));
+                        window.config = undefined;
+                        Vue.nextTick(()=>{
+                            this.checkedNodes = [];
+                        })
+                    }
+                },
+                asyncOK(){
+                    this.$refs.formValidate.validate(bool=>{
+                        if(bool){
+                            let value = JSON.parse(JSON.stringify(this.formValue));
+                            value.pbType = this.pbType;
+                            value.opt = this.title==='修改状态'?'change':'add';
+                            value.isqualify = !value.isqualify;
+                            value.userlist = JSON.stringify(value.userlist);
+                            value.pbtype = value.pbType;
+                            this.loading = true;
+                            'change'===value.opt&&(value.id = this.id);
+                            $.ajax({
+                                url:"/xadmin/pbstatus/",
+                                type:"POST",
+                                data:value
+                            }).then(t=>{
+                                if(t.issuc=='true'){
+                                    this.id = '';
+                                    this.loading = false;
+                                    this.modal = false;
+                                    this.$Message.success('提交成功');
+                                    this.unqualified=[];
+                                    this.qualified=[];
+                                    this.loadingQualified = true;
+                                    $.ajax({
+                                        url:"/xadmin/pbstatus/",
+                                        data:{
+                                            pbtype:this.pbType
+                                        }
+                                    }).then(t=>{
+                                        this.loadingQualified = false;
+                                        t.data.forEach(t=>{
+                                            if(t.isqualify){
+                                                this.unqualified.push(t);
+                                            } else {
+                                                this.qualified.push(t);
+                                            }
+                                        })
+                                    })
+                                } else {
+                                    this.$Message.error(t.error);
+                                    this.loading = false
+                                }
+                            })
+                        }
+                    })
+                },
+                addColor(){
+                    this.$refs.color.validate(bool=>{
+                        let value = false;
+                        if(typeof config === 'object'){
+                            value = config;
+                        }
+                        if(bool){
+                            $.ajax({
+                                url:"/xadmin/stylecolor/",
+                                type:"POST",
+                                data:{
+                                    opt:value?"add":'edit',
+                                    colorname:this.colorValue.name,
+                                    rendercolor:this.colorValue.color
+                                }
+                            }).then(r=>{
+                                if(r.issuc=='true'){
+                                    let a = r.color;
+                                    if (!value) {
+                                        this.SSR.renderList.push( { name:a.name,name2:a.name,id:a.id.toString(),color:a.rendercolor,edit:!1,pending:'',editColor:false });
+                                    } else {
+                                        let b = this.SSR.renderList[value.index];
+                                        b.name = a.name;
+                                        b.color = a.rendercolor
+                                    }
+                                    window.config = undefined;
+                                    this.$Message.success('操作成功');
+                                    this.modal = !1;
+                                } else {
+                                    this.$Message.error('操作失败');
+                                }
+                            })
+                        }
+                    })
+                },
+//                edit(i,e){
+//                    let p = e.currentTarget.parentElement.parentElement.parentElement;
+//                    i.edit = true;
+//                    this.$nextTick(()=>{
+//                        const input = p.getElementsByTagName('input');
+//                        input[input.length-1].focus();
+//                    })
+//                },
+                showModal(title){
+                    this.title = title;
+                    this.color = title.indexOf("状态")===-1;
+                    this.modal = !0;
+                },
+                change(bool){
+
+                },
+                handelClick(index,i,type){
+                    if(type === 'edit'){
+                        $.ajax({
+                            url:"/xadmin/pbstatus/",
+                            type:"POST",
+                            data:{
+                                id:i.id,
+                                opt:'getone'
+                            }
+                        }).then(res=>{
+                            let a = res.data;
+                            this.formValue.userlist=[];
+                            a.users.forEach(t=>{
+                                this.formValue.userlist.push(t.toString());
+                            });
+                            $.each(this.formValue,t=>{
+                                if(a[t]!==undefined) this.formValue[t] = a[t];
+                            });
+                            this.formValue.iswancheng = a.iscritical;
+                            try {
+                                this.formValue.isqualify = !this.formValue.isqualify;
+                                this.formValue.color = a.detailcounttype_id.toString();
+                                this.formValue.cucolor = a.roughcounttype_id.toString();
+                                this.formValue.buhegenext = a.nextstatus_id.toString();
+                            } catch (e){
+                                console.log(e)
+                            }
+                            a.users.forEach(user=>{
+                                this.SSR.user.forEach(group=>{
+                                    group.children.forEach(list=>{
+                                        if(list.id==user) list.checked = true;
+                                    })
+                                })
+                            });
+                            this.title = '修改状态';
+                            this.color = false;
+                            this.modal = !0;
+                            this.id = i.id;
+                        })
+                    } else {
+                        $.ajax({
+                            url:"/xadmin/pbstatus/",
+                            type:"POST",
+                            data:{
+                                opt:'del',
+                                id:i.id
+                            }
+                        }).then(()=>{
+                            this[type].splice(index,1);
+                        })
+                    }
+                },
+                trash(i,index){
+                    i.pending = true;
+                    $.ajax({
+                        type:"POST",
+                        url:"/xadmin/stylecolor/",
+                        data:{
+                            opt:'del',
+                            id:i.id
+                        }
+                    }).then(t=>{
+                        i.pending = false;
+                        if(t.issuc=='true'){
+                            this.SSR.renderList.splice(index,1);
+                            this.$Message.success('删除成功');
+                        } else {
+                            this.$Message.error('删除失败');
+                        }
+                    })
+                },
+//                checkAndClose(i){
+//                    let vm = this;
+//                    vm.blurStop = true;
+//                    i.editColor = false;
+//                    (i.color === '')&&(i.color = i.defaultColor);
+//                    if(i.name2.length===0){
+//                        i.name2 = i.name;
+//                        i.edit = false;
+//                    } else {
+//                        i.pending = 'load-c';
+//                        $.ajax({
+//                            type:'POST',
+//                            url:"/xadmin/stylecolor/",
+//                            data:{
+//                                opt:'edit',
+//                                id:i.id,
+//                                colorname:i.name2,
+//                                rendercolor:i.color
+//                            }
+//                        }).then(r=>{
+//                            i.pending = '';
+//                            if(r.issuc=='true'){
+//                                i.name = i.name2;
+//                                i.edit = false;
+//                            } else {
+//                                vm.$Message.error('提交失败，请稍后再试');
+//                            }
+//                        })
+//                    }
+//                }
+            },
+            mounted(){
+                this.pbType = this.SSR.pbType[0].id;
+                $.ajax({
+                    url:'/user/prjusertree/',
+                    data:{
+                        id:'#'
+                    }
+                }).then(res=>{
+                    this.SSR.user = res;
+                    window.uesrs = JSON.parse(JSON.stringify(res));
+                })
+            },
+            computed:{
+                allStatus(){
+                    return this.unqualified.concat(this.qualified);
+                },
+//                componentType(){
+//                    let a = this.SSR.renderList;
+//                    let bool = false;
+//                    a.forEach(t=>{
+//                        bool = bool||t.editColor;
+//					});
+//                    return bool?'div':'draggable';
+//				}
+            },
+            watch:{
+                pbType(value){
+                    this.unqualified=[];
+                    this.qualified=[];
+                    this.loadingQualified = true;
+                    $.ajax({
+                        url:"/xadmin/pbstatus/",
+                        data:{
+                            pbtype:value
+                        }
+                    }).then(t=>{
+                        this.loadingQualified = false;
+                        t.data.forEach(t=>{
+                            if(t.isqualify){
+                                this.unqualified.push(t);
+                            } else {
+                                this.qualified.push(t);
+                            }
+                        })
+                    })
+                },
+                'SSR.user':{
+                    handler(){
+                        let nodes;
+                        try {
+                            nodes = this.$refs.userTree.getCheckedNodes();
+                        } catch (e) {
+                            nodes = []
+                        }
+                        let array = [];
+                        nodes.forEach(t=>{
+                            if(!t.children){
+                                array.push(t);
+                            }
+                        });
+                        this.checkedNodes =  array;
+                    },
+                    deep:true
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

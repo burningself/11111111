@@ -1,0 +1,442 @@
+{% extends "base_v2.html" %} {% block ownerhead %}
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/loading/jq_mydialog.js"></script>
+<link href="/js/loading/my_dialog.css" type="text/css" rel="stylesheet" />
+<link href="/js/jQuery.filer-1.3.0/css/jquery.filer.css" rel="stylesheet">
+<script src="/js/jQuery.filer-1.3.0/js/jquery.filer.js" type="text/javascript"></script>
+
+<script src="js/jquery/jquery.form-3.51.0.js"></script>
+
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<script type="text/javascript" src="/js/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="/js/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/project/lurujindu.css" />
+<!--<link href="/css/project/goujian_update_mobile.css?ver=111" media="all" rel="stylesheet" type="text/css" />-->
+<script src="/js/common/lurujindu.js" type="text/javascript"></script>
+<script src="/js/common/guanlianyuansu_mobile.js?ver=20171114" type="text/javascript" charset="utf-8"></script>
+{% endblock %} {% block content %}
+<div class="qiehuan">
+	<div class="add-two">
+		<p>{{title}}
+			<a href="/task/gongxuyanshou/">点击进入工序验收</a>
+			<a download="" href="/doctemplate/构件导入模板.xls"  class="c-btn-gray c-btn-sm pull-right" style="margin: -10px 0px 0px 0px;" target="_blank">模板下载 <i class="profont pro-font-daoru"> </i></a>
+			<a data-toggle="modal" data-target="#uploadpb" class="c-btn-gray c-btn-sm pull-right" style="margin: -10px 10px 0px 0px;">导入元素<i class="profont pro-font-songbangongshixietiao"></i></a>
+		</p>
+	</div>
+	<div class="widget-content padded" style="text-align: center;width: 100%;min-height: 80vh;padding-top: 40px;">
+		<div class="add-one">
+			<form method="post" action="" name="updateForm" id="goujianUpdateForm">
+				{% csrf_token %}
+				<div class="row-fluid" >
+					<div class="input-group form-group" >
+					         <span class="input-group-addon">
+					         <i class="fa fa-barcode" ></i>元素编号：
+					         </span>
+					         	{% if acc %}
+									<input type="hidden" class="form-control" id="goujian" name="goujian" value='[{"typetable":"{{acc.monitoring.typetable}}","relatedid":"{{acc.monitoring.relatedid}}"}]'>
+									<input type="text" class="form-control" id="relateYuanSu" name="relateYuanSu" value="{{accdesc}}">
+								{% else %}
+									<input type="hidden" class="form-control" id="goujian" name="goujian" value="">
+									<input type="text" class="form-control" id="relateYuanSu" name="relateYuanSu" value="">
+								{% endif %}
+								
+					         <span class="input-group-addon" id="saoma_goujian" onclick="FunGuanLianYuanSu('goujian','relateYuanSu',true);">选择元素
+					         </span>
+					</div>
+					{{form.goujian.errors}}
+					 <div >
+					  <!--<p data-toggle="modal" data-target="#uploadpb"><span class="input-group-addon">点击从文件导入元素编号</span></p>-->
+					 </div>
+					 
+					<div class="input-group form-group" >
+						<span class="input-group-addon">
+				      <i class="fa fa-list"></i>选择状态：</span>
+				      <select name="status"  class="form-control" id="status">
+				      		{% if acc %}
+									
+									 <option value="{{acc.status.id}}" selected>{{acc.status.statusname}}</option>
+								{% else %}
+									  <option value="0" selected>请选择状态</option>
+								{% endif %}  
+					         {% for opt in statuslist %} 
+				         			<option value="{{opt.id}}">{{opt.statusname}}</option>
+			             {% endfor %}
+				        </select>
+				    </div>
+				    {{form.status.errors}}
+					<div class="input-group">
+					         <span class="input-group-addon">
+					         	完成工作量：
+					         </span>
+							 <input type="number" class="form-control" id="percent" name="percent" value="100" min="1" max="100">
+					</div>
+					
+					<div class="form-group" id="addZhijian" >
+			      			<input type="file" name="files" id="uploadfile" multiple="multiple" style="width: 100%;">
+					</div>
+         			 <div class="input-group form-group" id="addBeizhu" >
+				         <span  class="input-group-addon" >
+				         <i class="fa fa-edit" ></i>验收备注：</span>
+				         <textarea  name="beizhu" class="form-control" placeholder="选填" id="beizhu" > </textarea>
+					</div>
+					
+					<div class="input-group form-group" id="grplurushijian">
+					         <span class="input-group-addon">
+					         <i class="fa fa-clock-o" ></i>录入时间：
+					         </span>
+							<input type="text" class="form-control" id="lururq" name="lururq" >
+					</div>
+					
+					<div class="input-group form-group">
+				         <span class="input-group-addon">
+				         <i class="fa fa-hdd-o"></i>场地仓位：</span>
+				         <select name="duichang" class="form-control" id="duichang" >
+				        	 <option value selected>请选择堆场</option>
+				        	 {% for opt in duichanglist %} 
+				         			<option value="{{opt.id}}">{{opt.number}}</option>
+			             {% endfor %}
+				         </select>
+					</div>
+					{{form.duichang.errors}}
+					
+					<input type="hidden" id="relatefiles" name="relatefiles" type="text" value="[]" />
+					<div>
+							<p style="text-align: center;" id="res_updatestatus"></p>
+							<button class="btn btn-danger uploadBtn pull-right" type="button" id="uploadStatus" ><i class="fa fa-upload" ></i> 点击提交</button>
+					</div>
+				</div>		      
+			</form>
+		</div>
+	</div>
+</div>
+
+
+    	<div class="modal fade" id="uploadpb" aria-hidden="true">
+			<div class="modal-dialog" >
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">×</button>
+						<a>导入构件</a>
+					</div>
+					<div class="modal-body" >
+						 <input type="file" id="excel-file">
+					</div>
+					<div class="modal-footer">
+						<a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+						<button class="btn btn-primary" id="btnUploadPbs" data-dismiss="modal" aria-hidden="true">导入</button>
+					</div>
+    			</div>
+    		</div>
+    	</div>
+
+<style>
+	.DivTrees{
+		float:left;
+		width: 48%;
+		margin-left: 1%;
+	}
+	#jstree_pbgrp,#jstree_anquanwenmingsheshi,#jstree_goujian,#jstree_renwu{
+		width: 100%;
+		border: 1px solid darkgrey;
+		overflow:auto;
+		height: 480px;
+		text-align: left;
+	}
+	.DivSelect
+	{
+		float:left;
+		width: 48%;
+		margin-left: 1%;
+		height: 480px;
+		border: 1px #A29D9D solid;
+	}
+	/*设置Select样式*/
+	.SelectList{
+		width: 100%;
+		margin-top: 2px;
+	}
+
+</style>
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true" style="text-align: center;">
+	<div class="modal-dialog">
+		<div class="modal-content modal-content-custom" style="min-height: 500px;min-width: calc(30vw);">
+			<div class="modal-header" style="padding: 5px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<div style="text-align: left;font-size: 1.3em;padding: 5px;">
+				<span style="color:#337ab7;">选择元素</span>
+				<select id="guanlianyuansumajor" style="float: right;margin-right: 10px;" >
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				 </select>	
+				</div>
+
+			</div>
+			<div class="modal-body" style="padding: 0px;min-height: 500px;margin-bottom: 2px;">
+			<div class="tabbable" id="tabs-615644" >
+				<ul class="nav nav-tabs chooseGLYS" style="margin-bottom: 2px;">
+						<li class="active">
+							 <a href="#goujianTab" data-toggle="tab">构件</a>
+						</li>
+						{% if havesheshi %}
+						<li>
+							 <a href="#anquanwenmingsheshiTab" data-toggle="tab">安全设施</a>
+						</li>
+						{% endif%}
+						
+						{% if havejixie %}
+						<li >
+							 <a href="#shigongjixieTab" data-toggle="tab">施工机械</a>
+						</li>
+						{% endif%}
+						
+						{% if haverenwu %}
+						<li>
+							 <a href="#renwuTab" data-toggle="tab">任务</a>
+						</li>
+						{% endif%}
+				</ul>
+				<div class="tab-content" style="height:480px">		
+						<div class="tab-pane active" id="goujianTab" style="height:480px">
+								<div class="DivTrees">
+								<div id="jstree_goujian" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect" >
+									<select class="choosegoujian SelectList"  name="choosegoujian" id="choosegoujian"  multiple>
+									</select>
+								</div>
+	
+						</div>
+					{% if havesheshi %}	
+					<div class="tab-pane" id="anquanwenmingsheshiTab" style="height:480px">
+							<div class="DivTrees">
+								<div id="jstree_anquanwenmingsheshi" class="DivJsTree">
+					
+								</div>
+							</div>
+							<div class="DivSelect" >
+								<select class="choosesheshi SelectList" name="choosesheshi" id="choosesheshi"  multiple>
+					
+								</select>
+							</div>
+						</div>
+						{% endif%}
+						{% if havejixie %}
+						<div class="tab-pane" id="shigongjixieTab" style="height:480px">
+								<div class="DivSelect" style="margin-left: 1%;width: 98%;">
+									<select class="chooseshigongjixie SelectList"  name="chooseshigongjixie" id="chooseshigongjixie"  >
+									</select>
+								</div>
+						</div>
+						{% endif%}
+						
+						{% if haverenwu %}
+						<div class="tab-pane" id="renwuTab" style="height:480px">
+							<div class="DivTrees">
+								<div id="jstree_renwu" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect" >
+									<select class="chooserenwu SelectList"  name="chooserenwu" id="chooserenwu"  multiple>
+									</select>
+								</div>
+						</div>
+					{% endif%}
+
+				</div>
+			</div>
+		</div>
+			<div class="modal-footer">
+				<a class="btn btn-default btn" role="button" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定选择</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+	<script src="/js/fullcalendar/moment.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://cdn.bootcss.com/xlsx/0.10.4/cpexcel.js"></script>
+    <script src="http://cdn.bootcss.com/xlsx/0.10.4/jszip.js"></script>
+    <script src="http://cdn.bootcss.com/xlsx/0.10.4/xlsx.core.min.js"></script>
+	<script src="http://cdn.bootcss.com/xlsx/0.10.4/xlsx.full.min.js"></script>
+	<script src="http://cdn.bootcss.com/xlsx/0.10.4/xlsx.js"></script>
+	<script src="http://cdn.bootcss.com/xlsx/0.10.4/xlsx.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		init_tree({{curMajorId}},"");
+		
+		var selDate = moment(new Date()).format('YYYY-MM-DD HH:mm'); //格式化日期
+		$('#lururq').val(selDate);
+		if('{{canChangeTime}}'=='False'){
+			$('#grplurushijian').css("display","none");
+		}
+        $('#lururq').datetimepicker({
+            language: 'zh-CN',//显示中文
+            autoclose: true,//选中自动关闭
+        });
+
+    });
+	
+
+	function formValidator(){
+		if(!$("#goujian").val()){
+			alert("请选择元素！");
+			return false;
+		}
+
+		if($("#status").val()=="0" || !$("#status").val()){
+			alert("请选择状态！");
+			return false;
+		}
+
+		if(parseFloat($("#percent").val())>100){
+			alert("工作量不能超过100！");
+			return false;
+		}
+
+		return true;
+	}
+
+	document.querySelector('#uploadStatus').onclick = function () {
+			//判断是否可以提交表单
+		if(!formValidator()){
+			return ;
+		}
+
+
+		 $.myloading({
+			title: "正在提交，请稍后……"
+		});
+
+				var options ={
+				url:'/task/goujian/update/',
+				type:'post',
+				data:null,
+				success:function(data){
+					 $.myloading("hide");
+					$("#res_updatestatus").css("color",data.color_code);
+					$("#res_updatestatus").text(data.result_string);
+
+						$(".icon-jfi-trash").click();//清空附件插件
+						IssueRelateFileDocIds=[];
+						$("#relatefiles").val(JSON.stringify(IssueRelateFileDocIds));
+					},
+					error:function(data){
+					$.myloading("hide");
+					$("#res_updatestatus").css("color",data.color_code);
+					$("#res_updatestatus").text(data.result_string);
+				  },
+
+				};
+
+				$("#goujianUpdateForm").ajaxSubmit(options);
+
+		};
+
+	$("#goujian").bind("change", function() {
+				var chooseStatus = $("#status").val();
+
+								$.ajax({
+											  type:"post",
+											  url:"/task/getelestatuslist/",
+											  cache:false,
+											  dataType:"json",
+											  data:{"elelist": $("#goujian").val()},
+											  success: function(data){
+											  	if(data.issuc=="true"){
+											  		var optHtml="";
+											  		
+											  		for(i in data.statuslist){
+											  			optHtml+="<option value=" + data.statuslist[i].id.toString()+ ">" + data.statuslist[i].statusname + "</option>";
+											  		}
+											  		
+											  		$("#status").html(optHtml);
+														$("#status").val(data.defaultstatus);
+
+											  	}
+											  	else{
+											  		alert(data.error);
+											  	}
+											  },
+											  error:function(data){
+											  	alert("服务器错误");
+										      	return false;
+										      },
+											});
+
+		});
+
+
+	    var excelPbs='';
+	    $('#excel-file').change(function(e) {
+            var files = e.target.files;
+
+            var fileReader = new FileReader();
+            fileReader.onload = function(ev) {
+                try {
+                    var data = ev.target.result,
+                        workbook = XLSX.read(data, {
+                            type: 'binary'
+                        }), // 以二进制流方式读取得到整份excel表格对象
+                        persons = []; // 存储获取到的数据
+                } catch (e) {
+                    alert('文件类型不正确');
+                    return;
+                }
+
+                // 表格的表格范围，可用于判断表头是否数量是否正确
+                var fromTo = '';
+                // 遍历每张表读取
+                for (var sheet in workbook.Sheets) {
+                    if (workbook.Sheets.hasOwnProperty(sheet)) {
+                        fromTo = workbook.Sheets[sheet]['!ref'];
+                        console.log(fromTo);
+                        persons = persons.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
+                        break; // 如果只取第一张表，就取消注释这行
+                    }
+                }
+				
+				excelPbs='';
+				for(var each in persons){
+					if("构件编码" in persons[each])
+					{
+						excelPbs=excelPbs+persons[each].构件编码+",";
+					}
+				}
+				console.log(excelPbs);
+				if(excelPbs.length>0){
+					excelPbs= excelPbs.substring(0,excelPbs.length-1);
+				}
+				
+				console.log(excelPbs);
+				
+               
+            };
+
+            // 以二进制方式打开文件
+            fileReader.readAsBinaryString(files[0]);
+        });
+        
+          $("#btnUploadPbs").click(function(){
+			$("#goujian").val(excelPbs).change();
+		});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+#calendar {
+	margin: 0 auto;
+	max-width: 950px;
+	background-color: #fff;
+	padding-top: 10px;
+}
+.rq{width: 50%;float:left;margin-right: 20px;}
+.sj{width: 30%;}
+.nav_tool{display: none;}
+.timevalid{
+	color:#a94442;display:none;
+}
+.timekjerr{
+	border-color:#a94442;
+}
+.fc-time{
+	display: none;
+}
+
+.attend{
+	color:green;
+}
+.noattend{
+	color:red;
+}
+.attendunkown{
+	color:blue;
+}
+.shownoattend{
+	width: 120px;
+	right: 15px;
+	position: absolute;
+	border-radius: 5px;
+	padding: 5px;
+	font-size: 14px;
+	margin-top: 25px;
+	background-color: rgba(72, 71, 71, 0.36);
+}
+.modal-dialog{
+	width: 795px;
+}
+table thead tr{
+	background-color: transparent;
+}
+
+
+.typelabel {
+	color: white;
+    float: right;
+    width: 140px;
+    position: absolute;
+    top: 140px;
+    text-align: left;
+    margin-left: 960px;
+}
+
+.typelabel label{
+	padding: 2px 20px;
+}

@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<style type="text/css">
+	.heading{
+		height:50px;
+		padding-top:10px!important;
+	}
+	
+	.infoState{
+		text-align:center;
+		background-color:white;
+		margin-top:20px;
+	}
+	
+	.infoState thead tr th{
+		text-align:center;
+		font-size:1.2em;
+	}
+	
+	.infoState tbody tr td{
+		font-weight:bold;
+		font-size:1em;
+		background-color:white!important;
+	}
+</style>
+<div class="row">
+<div class="col-lg-12" style="padding:0;">
+   <div class="widget-container fluid-height clearfix">
+   		<label class="btn btn-primary" style="width:100%;font-size:1.5em; margin-top:-10px;"> <i class="fa fa-paperclip"></i>附件查看</label>
+	    <div class="heading">
+	        <div><i class="fa fa-barcode" style="margin-right:5px;"></i>梁段编号：{{pbinfo.number}}</div>
+	        <div><i class="fa fa-hdd-o" style="margin-right:5px;"></i>梁段信息：{{pbinfo.postion}}</div>
+	    </div>
+	     
+		<table class="table table-striped infoState">
+	   	   {% if count > 0 %}
+			   <thead style="border-top:solid 2px #DDDDDD">
+			      <tr>
+			         <th style="width:40%;">附件信息</th>
+			         <th>相关链接</th>
+			         <th></th>
+			      </tr>
+			   </thead>
+			   <tbody>
+			   		{% for item in list_items_picture %}
+					<tr>
+				      <td>梁段照片<br>{{item.submitor.truename}}<br>{{item.submittime|date:"Y-m-d H:i"}}</td>
+					  <td>
+						{% if item.IsPic %}
+							<a href="{{item.content}}"><img src="{{item.content}}" height="100" width="100"  /></a>	
+						{% else %}
+							<a href="{{item.content}}">{{item.name}}</a>	
+						{% endif %}
+					  </td>
+					  <td>
+					  	<button type="button" class="btn btn-danger" onclick="delAttach('{{item.content}}')">删除</button>
+					  </td>
+					</tr>
+				   {% endfor %}
+				   
+				   {% for item in list_items_reforce %}
+					<tr>
+				      <td>钢筋保护层台账<br>{{item.submitor.truename}}<br>{{item.submittime|date:"Y-m-d"}}</td>
+					  <td>
+						{% if item.IsPic %}
+							<a href="{{item.content}}"><img src="{{item.content}}" height="100" width="100"  /></a>	
+						{% else %}
+							<a href="{{item.content}}">{{item.name}}</a>	
+						{% endif %}
+					  </td>
+					  <td>
+					  	<button type="button" class="btn btn-danger" onclick="delAttach('{{item.content}}')">删除</button>
+					  </td>
+					</tr>
+				   {% endfor %}
+				   
+				   {% for item in list_items_concret %}
+					<tr>
+				      <td>混凝土强度台账<br>{{item.submitor.truename}}<br>{{item.submittime|date:"Y-m-d"}}</td>
+					  <td>
+						{% if item.IsPic %}
+							<a href="{{item.content}}"><img src="{{item.content}}" height="100" width="100"  /></a>	
+						{% else %}
+							<a href="{{item.content}}">{{item.name}}</a>	
+						{% endif %}
+					  </td>
+					  <td>
+					  	<button type="button" class="btn btn-danger" onclick="delAttach('{{item.content}}')">删除</button>
+					  </td>
+					</tr>
+				   {% endfor %}
+				   
+				   {% for item in list_items_waiguang %}
+					<tr>
+				      <td>外观尺寸台账<br>{{item.submitor.truename}}<br>{{item.submittime|date:"Y-m-d"}}</td>
+					  <td>
+						{% if item.IsPic %}
+							<a href="{{item.content}}"><img src="{{item.content}}" height="100" width="100"  /></a>	
+						{% else %}
+							<a href="{{item.content}}">{{item.name}}</a>	
+						{% endif %}
+					  </td>
+					  <td>
+					  	<button type="button" class="btn btn-danger" onclick="delAttach('{{item.content}}')">删除</button>
+					  </td>
+					</tr>
+				   {% endfor %}
+				   
+				   {% for item in list_items_others %}
+					<tr>
+				      <td>梁段其他附件<br>{{item.submitor.truename}}<br>{{item.submittime|date:"Y-m-d"}}</td>
+					  <td>
+						{% if item.IsPic %}
+							<a href="{{item.content}}"><img src="{{item.content}}" height="100" width="100"  /></a>	
+						{% else %}
+							<a href="{{item.content}}">{{item.name}}</a>	
+						{% endif %}
+					  </td>
+					  <td>
+					  	<button type="button" class="btn btn-danger" onclick="delAttach('{{item.content}}')">删除</button>
+					  </td>
+					</tr>
+				   {% endfor %}
+				   <tr style="height:0;"> <td></td> <td></td> <td></td> </tr>
+			   </tbody>
+		   {% else %}
+		   	  <div style="height:30%; padding-top:20%;text-align:center; font-weight:bold; font-size:2em;padding-bottom:20%;">无相关附件！</div>
+		   {% endif %}
+		</table>
+		<div class="input-group" style="width:80%;margin-left:10%; margin-top:0%; margin-bottom:7%;">
+			<span class="input-group-addon" 
+		         	style="background-color:#069CD8; border:0; color: white; font-weight:bold; font-size:1.2em;" id="chooseImage">
+		         	<i class="fa fa-camera" style="margin-right:5px;"></i>上传梁段质检图片
+		    </span>
+		</div>
+ 	</div>
+</div>
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+	function delAttach(name){
+  		$.ajax({ 
+        	type:"POST",
+            url: "/delete_uploadfile_doc/", 
+            cache:false,   
+            dataType: "json",
+            data: {"name": name},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+                	location.reload(); 	
+                }
+                else{
+                	alert(data.msg);
+                	location.reload(); 	
+                }
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+        });
+ 	}
+ 	
+	wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+      ]
+	});
+	
+	wx.ready(function(){
+		var images = {
+	    localId: [],
+	    serverId: []
+	  	};
+	  	document.querySelector('#chooseImage').onclick = function () {
+		    wx.chooseImage({
+		      success: function (res) {
+		        images.localId = res.localIds;
+		        
+		        var i = 0, length = images.localId.length;
+			    images.serverId = [];
+			    function upload() {
+			      wx.uploadImage({
+			        localId: images.localId[i],
+			        success: function (res) {
+			          i++;
+			          images.serverId.push(res.serverId);
+			          if (i < length) {
+			            upload();
+			          }
+			          else{
+			          	var pbNum= "{{pbinfo.number}}";
+			          	var name="{{pbinfo.number}}_info";
+			          	if(pbNum && name && images.serverId.length){
+					  		$.ajax({ 
+					        	type:"POST",
+					            url: "/uploadfile_weixin/", 
+					            cache:false,   
+					            dataType: "json",
+					            data: {'photoList': images.serverId.join(";"), "pbNum": pbNum, "type": 3, "name": name, "userid":{{user.id}}, "access_token":'{{config.access_token}}'},
+					            success: function(data) { 
+					                if (data.status=="Succeed") {
+					                	alert("上传成功！");
+					            		location.reload();
+					                }
+					                else{
+					                	alert(data.msg);
+					                }
+					            },
+					            error: function(){
+					        		alert("连不上服务器,网络错误！");
+					       		}
+					        });
+			  			}
+			  			else{
+			  				alert("提交信息不全！");
+			  			}
+			          }
+			        },
+			        fail: function (res) {
+			          alert(JSON.stringify(res));
+			        }
+			      });
+			    }
+			    upload();
+		      }
+	        });
+	  	};		    
+  	});
+	
+	wx.error(function(res){
+		alert("授权失败！");
+	});
+	
+	
+	
+	
+</script>
+
+{% endblock %}

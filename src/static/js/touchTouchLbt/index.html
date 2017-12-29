@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>图片展示效果</title>
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<link rel="stylesheet" type="text/css" href="css/touchTouch.css">
+</head>
+<style type="text/css">
+    ul li{ list-style: none }
+    img{ border:none; }
+    .exc1 a{ margin: 0 5px; }
+    .exc1 a img{ max-width: 200px; }
+
+    .list li{ display: inline-block; *display: inline; *zoom:1; margin: 0 5px; max-width: 200px; }
+    .list li img{ max-width: 200px; }
+</style>
+<body>
+    <!-- 实例1 -->
+    <h3>单个列表展示</h3>
+    <div class="exc1">
+      <a href="images/imgb1.jpg"><img src="images/imgb1.jpg"></a><a href="images/imgb2.jpg"><img src="images/imgb2.jpg"></a><a href="images/imgb3.jpg"><img src="images/imgb3.jpg"></a>
+    </div>
+    <!-- 实例2 -->
+    <h3>多个列表图片展示</h3>
+    <div class="exc2">
+     <div class="list">
+       <ul>
+           <li><a href="images/imgb1.jpg"><img src="images/imgb1.jpg"></a></li>
+           <li><a href="images/imgb2.jpg"><img src="images/imgb2.jpg"></a></li>
+           <li><a href="images/imgb3.jpg"><img src="images/imgb3.jpg"></a></li>
+           <li><a href="images/imgb4.jpg"><img src="images/imgb4.jpg"></a></li>
+       </ul>
+     </div>
+     <div class="list">
+       <ul>
+           <li><a href="images/imgb1.jpg"><img src="images/imgb1.jpg"></a></li>
+           <li><a href="images/imgb2.jpg"><img src="images/imgb2.jpg"></a></li>
+           <li><a href="images/imgb3.jpg"><img src="images/imgb3.jpg"></a></li>
+           <li><a href="images/imgb4.jpg"><img src="images/imgb4.jpg"></a></li>
+       </ul>
+     </div>
+    </div>
+</body>
+<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<script src="js/touchTouch.jquery.js"></script>
+<script>
+$(function(){
+    $(".exc1 a").touchTouch();
+    $(".exc2 .list").each(function(){
+        $(this).find("a").touchTouch();
+    });
+});
+</script>
+</html>

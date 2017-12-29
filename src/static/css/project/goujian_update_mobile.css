@@ -1,0 +1,30 @@
+.btn-primary:hover{background:#337ab7; border-color:#2e6da4;}
+.titleLabel{width:100%; font-size:1.5em; margin-bottom:0px;color: white;
+		background-color: #4C87C7;text-align:center;}
+
+#myTab > li{ width:50%; text-align:center; background:white;}
+#myTab > .active a {background: aliceblue; font-weight:bold;}
+
+.row-fluid{
+	background-color:white;
+	margin-top:2px;
+	margin-bottom:5%;
+	display:inline-block; 
+	border: 5px solid white;
+	#border-radius: 20px;
+	text-align:right;
+}
+
+.row-fluid .input-group{ width:96%;margin-left:2%; margin-top:4.5%; }
+
+.row-fluid .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.row-fluid .input-group .fa { margin-right:2px; }
+
+.uploadBtn {width:100%;font-size:1.5em; margin-bottom:7%;}
+/*select { height:2em; width:100%; padding-left:5px; border-radius: 0; }*/
+
+.topBtn {width:100%}
+.topBtn .btn {width:50%; font-weight:bold;}
+
+.errorlist{color: red; text-align: left;}
+

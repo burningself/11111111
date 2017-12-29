@@ -1,0 +1,64 @@
+/*general_model*/
+.right-model{
+    width: 25%;
+    float: left;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: rgb(231, 224, 220);
+    bottom: 0px;
+}
+#echarts_zhiliang{
+    width: 100%;
+    height: calc(50vh - 72px);
+}
+#echarts_anquan{
+    width: 100%;
+    height: calc(50vh - 71px);
+}
+.right-model-top{
+    position: absolute;
+    left: 15px;
+    background: #fff;
+    top: 0px;
+    right: 0px;
+}
+.right-model-top p{
+    text-align: center;
+    font-size: 1.1vw;
+    font-weight: 600;
+    width: 8vw;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    margin-left: -4vw;
+    z-index: 10;
+}
+.right-model-bottom p{
+    text-align: center;
+    font-size: 1.1vw;
+    font-weight: 600;
+    width: 8.0vw;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    margin-left: -4vw;
+    z-index: 10;
+}
+#zhiliang_sum,#anquan_sum{
+    display: block;
+    color: #999;
+}
+.right-model-bottom{
+    position: absolute;
+    left: 15px;
+    background: #fff;
+    right: 0px;
+    bottom: 0px;
+}
+.fenge {
+    padding: 16px 0px 0px 6px;
+    margin-left: 6px;
+    border-left: 1px solid gray;
+    font-size: 0;
+}

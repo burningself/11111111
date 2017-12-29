@@ -1,0 +1,335 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<script src="/js/echarts/echarts.min.js"></script>
+<style>
+		#num,#now-pro,#grade,#ontime{width: 96%; padding: 2% 2%; background-color:#fff!important; border: 1px solid #E4E5E7;position: absolute;bottom: 0px; top: 30px;} 
+		.static-pro{position: relative; min-height: 250px;}
+		.static-loader{position: absolute; top: 50%; left: 50%; margin-left: -65px; z-index: 200; }
+</style>
+<script type = "text/javascript">
+ 	$(function(){
+ 			var heiWin = ( $(window).height() - 160 )/2;
+			var hei1 = heiWin + 20;
+				$(".static-height1").height( heiWin );
+
+		   	var  numChart = echarts.init( document.getElementById("num") );
+		  	var  nowChart = echarts.init( document.getElementById("now-pro") );
+		  	var  gradeChart = echarts.init( document.getElementById("grade") );
+		  	var  onTimeChart = echarts.init( document.getElementById("ontime") );
+		 	 $.ajax({
+                        url:"/task/issue/issuecount/",
+                        dataType : "json",
+                        type:'post',
+                        data:{issuetype:"{{issuetypeorg}}"},
+                        cache: false,
+                        timeout:15000, //超时时间
+                        beforeSend:function(XMLHttpRequest){ 
+                        		$(".static-loader").show();
+                        }, 
+                        success:function(data){
+                        		$(".static-loader").hide();
+                           	if( data.issuc == 'true'){
+                           		nowOption.xAxis[0].data = data.majorlist;
+                           		nowOption.series[0].data = data.issuelistUnDo;
+                           		onTimeOption.xAxis[0].data = data.majorlist;
+                           		onTimeOption.series[0].data = data.issuelistDoneOnTime;
+                           		gradeOption.xAxis.data = data.majorlist;
+                           			gradeOption.series[0].data =[];
+                       				gradeOption.series[1].data =[];
+                       				gradeOption.series[2].data =[];
+                           		for( var i =0 ; i < data.issuelistPriority.length ; i++){
+                           				var gradeData = data.issuelistPriority[i];
+                           				gradeOption.series[0].data.push( gradeData[0] );
+		                           		gradeOption.series[1].data.push( gradeData[1] );
+		                           		gradeOption.series[2].data.push( gradeData[2] );
+                           		}
+                           		numOption.xAxis.data = data.timelist;
+                           		numOption.legend.data = data.majorlist;
+                           		numOption.series = [];
+                           		for(var m = 0; m < data.issuelistCount.length; m++){
+	                           			var numData = data.issuelistCount[m];
+	                           			var name = data.majorlist[m];
+	                           			var shuju = {type:'line',data:numData,name:name}
+	                           			numOption.series.push(shuju);
+	                           	}
+					   			nowChart.setOption( nowOption ,true);
+					   			numChart.setOption( numOption ,true);
+						   		onTimeChart.setOption( onTimeOption ,true);
+						   		gradeChart.setOption( gradeOption ,true);
+                           	}
+                        },
+                        error:function(){
+                            console.log('读取失败');
+                        }
+                    });
+		 
+		 	var  numOption = {
+			   		title: {
+			        	text: '问题次数统计',
+			        	padding:'0px 0px 15px 0px'
+				    },
+				    tooltip: {
+				        trigger: 'axis'//自动找节点
+				    },
+				    legend: {
+				        data:['土建','钢结构','机电安装'],
+				        right:'0px',
+				        top:'30px'
+				    },
+				    grid: {
+				        left: '3%',
+				        right: '4%',
+				        bottom: 40,
+				        containLabel: true
+				    },
+				    xAxis: {
+				        type: 'category',
+				        boundaryGap: false,
+				        data: ['7.12','4.15','7.17','7.18','8.23','6.23','2.3']
+				    },
+				    yAxis: {
+				        type: 'value',
+				        name:'次数'
+				    },
+				    dataZoom: [{//视图缩放组件
+				        type: 'inside',
+				        start: 60,
+				        end: 100
+				    }, {
+				        start: 90,
+				        end: 100,
+				        handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+				        handleSize: '50%',
+				        handleStyle: {
+				            color: '#fff',
+				            shadowBlur: 3,
+				            shadowColor: 'rgba(0, 0, 0, 0.6)',
+				            shadowOffsetX: 2,
+				            shadowOffsetY: 2
+				        }
+				    }],
+				    series: [
+				        {
+				            name:'土建',
+				            type:'line',
+				            data:[120, 132, 101, 134, 90, 230, 210]
+				        },
+				        {
+				            name:'钢结构',
+				            type:'line',
+				            data:[220, 182, 191, 234, 290, 330, 310]
+				        },
+				        {
+				            name:'机电安装',
+				            type:'line',
+				            data:[150, 232, 201, 154, 190, 330, 410]
+				        }
+				    ]
+			   	};
+
+		var nowOption = {
+						title:{
+							text:'当前未关闭问题统计',
+			        		padding:'0px 0px 15px 0px'
+						},
+					    color: ['#56B8EB'],
+					    tooltip : {
+					        trigger: 'axis',
+					        axisPointer : {         
+					            type : 'shadow'       
+					        }
+					    },
+					    grid: {
+					        left: '3%',
+					        right: '4%',
+					        bottom: '3%',
+					        containLabel: true
+					    },
+					    xAxis : [
+					        {
+					            type : 'category',
+					            data :  ['土建', '钢结构', '机电安装'],
+					            axisTick: {
+					                alignWithLabel: true
+					            }
+					        }
+					    ],
+					    yAxis : [
+					        {
+					            type : 'value',
+					            name:'个数'
+					        }
+					    ],
+					    series : [
+					        {
+					            name:'问题个数',
+					            type:'bar',
+					            barWidth: '60%',
+					            data:[10, 52, 200]
+					        }
+					    ]
+					};
+
+		var onTimeOption = {
+						title:{
+							text:'各专业按时整改率统计',
+							padding:'0px 0px 15px 0px'
+						},
+					    color: ['#56B8EB'],
+					    tooltip : {
+					        trigger: 'axis',
+					        axisPointer : {        
+					            type : 'shadow'       
+					        }
+					    },
+					    grid: {
+					        left: '3%',
+					        right: '4%',
+					        bottom: '3%',
+					        containLabel: true
+					    },
+					    xAxis : [
+					        {
+					            type : 'category',
+					            data : ['土建', '钢结构', '机电安装'],
+					            axisTick: {
+					                alignWithLabel: true
+					            }
+					        }
+					    ],
+					    yAxis : [
+					        {
+					            type : 'value',
+					             axisLabel: {
+						         	formatter: '{value}%'
+						        },
+						        max:100,
+						        name:'整改率'
+					        }
+					    ],
+					    series : [
+					        {
+					            name:'整改率',
+					            type:'bar',
+					            barWidth: '60%',
+					            data:[10, 52, 80]
+					        }
+					    ]
+					};
+
+
+
+ 				var gradeOption = {
+ 						title:{
+ 							text:'问题等级统计',
+ 							padding:'0px 0px 15px 0px'
+ 						},
+					    tooltip : {
+					        trigger: 'axis',
+					        axisPointer : {   
+					            type : 'shadow'      
+					        }
+					    },
+					    legend: {
+					        data: ['轻微', '一般','严重'],
+					        right:'0px',
+					        top:'30px'
+					    },
+					    grid: {
+					        left: '3%',
+					        right: '4%',
+					        bottom: '3%',
+					        containLabel: true
+					    },
+					    xAxis:  {
+					        type: 'category',
+					        data: ['土建','钢结构','机电设备']
+					    },
+					    yAxis: {
+					        type: 'value',
+					        name:'个数'
+					    },
+					    barMaxWidth:150,
+					    series: [
+					        {
+					            name: '轻微',
+					            type: 'bar',
+					            stack: '总量',
+					            itemStyle:{
+					            	normal:{
+					            		color:'#55CCF4'
+					            	}
+					            },
+					            data: [31, 56, 43]
+					        },
+					        {
+					            name: '一般',
+					            type: 'bar',
+					            stack: '总量',
+					             itemStyle:{
+					            	normal:{
+					            		color:'#FEBC11'
+					            	}
+					            },
+					            data: [55, 53, 57,]
+					        },
+					        {
+					            name: '严重',
+					            type: 'bar',
+					            stack: '总量',
+					             itemStyle:{
+					            	normal:{
+					            		color:'#EC465A'
+					            	}
+					            },
+					            data: [10, 11, 20]
+					        }
+					    ]
+				};
+					
+
+ 	})
+</script>
+{% endblock %}
+{% block content %}
+<div class="static-pro col-md-6 static-height1">
+	<div class="static-loader" style="display: block;">
+			<div class="loader-inner ball-pulse">
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+			</div>
+		</div>
+		<div id="num" class="col-md-6"></div>
+</div>
+<div class="static-pro col-md-6 static-right static-height1">
+	<div class="static-loader" style="display: block;">
+			<div class="loader-inner ball-pulse">
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+			</div>
+		</div>
+		<div id="now-pro" class="col-md-6"></div>
+</div>
+<div class="static-pro col-md-6 static-height1">
+	<div class="static-loader" style="display: block;">
+			<div class="loader-inner ball-pulse">
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+			</div>
+		</div>
+		<div id="ontime" class="col-md-6"></div>
+</div>
+<div class="static-pro col-md-6 static-right static-height1">
+	<div class="static-loader" style="display: block;">
+			<div class="loader-inner ball-pulse">
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+				<div style="background-color:#3C8DBC"></div>
+			</div>
+		</div>
+		<div id="grade" class="col-md-6"></div>
+</div>	
+{% endblock %}

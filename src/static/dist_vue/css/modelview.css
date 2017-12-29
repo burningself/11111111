@@ -1,0 +1,85 @@
+.pro-title{
+    position: absolute;
+    z-index: 102;
+    padding: 10px;
+    left:220px;
+}
+.ResizeBottombar{
+    width: 240px;
+    cursor: n-resize;
+    height: 5px;
+}
+.table {
+    font-size: 0.8em;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 5px 3px;
+}
+#viewerContent {
+    width: calc(100% - 250px);
+    height: calc(100vh - 140px);
+    display: inline-block;
+    color:white;
+    text-align: left;
+}
+#viewer {
+    padding:0;
+    width: 100%;
+    height: calc(100vh - 129px);
+}
+.pbwell-operator {
+    text-align: center;
+    margin-top:5px;
+}
+
+.model-from {
+    margin-top:5px;
+    margin-bottom:5px;
+}
+.tdproprtytitle{
+    width: 32px;
+    font-weight: bold;
+}
+#left {
+    position: absolute;
+    width: 215px;
+    height: calc(100vh - 251px);
+    display: inline-block;
+    z-index: 101;
+}
+
+#right {
+    width: 250px;
+    height: calc(100vh - 129px);
+    display: inline-block;
+    background: #E7E0DC;
+    padding-left: 10px;
+    overflow: hidden;
+}
+.panel-group .panel{
+    border-radius: 0px!important;
+}
+.panel-group .panel-body {
+    background: white;
+    padding: 0px 0px;
+    text-align: left;
+}
+.panel-group .panel+.panel {
+    margin-top: 0px;
+}
+#right .panel-default{
+    border:none;
+}
+#right .panel-group .panel+.panel{
+    margin-top: 10px;
+}
+.panel-group .panel-heading {
+    font-weight: bold;
+}
+#left .panel{
+    background-color: rgba(255,255,255,0.2) ;
+}
+#left .panel-group .panel-body{
+    background-color: transparent;
+    padding: 10px;
+}

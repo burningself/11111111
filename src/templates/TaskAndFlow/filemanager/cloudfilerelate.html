@@ -1,0 +1,228 @@
+{% extends "base.html" %} {% block ownerhead %}
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="/css/project/uploadview.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/select2/select2.min.css">
+<script src="/js/select2/select2.min.js"></script>
+<script src="/js/select2/i18n/zh-CN.js"></script>
+        <!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script src="/js/common/guanlianyuansufile.js" type="text/javascript" charset="utf-8"></script>
+<style>
+
+</style>
+	
+{% endblock %} {% block content %}
+<div class="row">
+	<div class="header-row">
+		    <i class="fa fa-cloud-upload"></i>云端资料关联
+	</div>
+	<div class="row content-row">
+		<div class="col-lg-12 task-from form-inline" style="padding-left: 0px;padding-right: 0px;">
+			<button class="btn btn-primary" id="btnLoadFileSelectDlg" style="margin-left: 1%;"><i class="fa fa-folder-open-o">选择云端文件</i></button>
+			<button class="btn btn-primary" type="button" style="margin-left: 20px;" onclick="FunGuanLianYuanSu()"><span>选择关联元素</span></button>
+			<button class="btn btn-success" id="btnSaveFileRelate" style="margin-left:20px;"><i class="fa fa-link"></i>保存关联</button>
+		</div>
+		<div class="mod-panel-container">
+			<div class="panel-filelist-wrap">
+				<div class="panel-item">
+					<table class="table table-striped" id="file_relate_table" >
+								<thead>
+									<tr>
+										<th  style="width: 82%;" >关联文件</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+
+								</tbody>
+					</table>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+</div>
+
+
+ <div class="modal fade" id="relatefiledlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4 align="left">关联文件</h4>
+            </div>
+            <div class="modal-body" style="text-align: left;">
+	          	<div class="widget-content padded">
+					<div id="filetree_div" style="max-height:500px; overflow:auto;"> </div>
+			  	</div>
+			  	<input type="hidden" id="file_relatetype"  value="" />
+			  	<input type="hidden" id="file_relatetypeId"  value='' />
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnFaqiWenTiCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="FunCommonRelateFile()" id="btnFaqiWenTi" >确认</button>
+            </div>
+    </div>
+    </div>
+    </div>
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择关联元素</h4>
+			</div>
+			<div class="tabbable" id="tabs-615644">
+					<select class="pull-right" name="guanlianyuansumajor" id="guanlianyuansumajor">
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				</select>
+				<ul class="nav nav-tabs chooseGLYS" style="padding-left: 5px;">
+					<li class="active">
+						<a href="#renwu" data-toggle="tab">任务</a>
+					</li>
+					<li >
+						<a href="#kongjianjiegou" data-toggle="tab">空间</a>
+					</li>
+					<li>
+						<a href="#fenleixinxi" data-toggle="tab">分类信息</a>
+					</li>
+					<li>
+						<a href="#pbgrpTab" data-toggle="tab">分区</a>
+					</li>
+					<li>
+						<a href="#goujian" data-toggle="tab">构件</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+						<div class="tab-pane active" id="renwu">
+						<div class="add-three">
+							<i class="fa fa-search" onclick="guolvrw()" style="float: right;margin-right: 20px;line-height: 25px;"></i>
+							<input id="guolvrw" type="text" />
+						</div>
+						<div class="add-six">
+							<div id="jstree_renwu">
+							</div>
+							<select class="renwuselect" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" ondblclick="moveright('rw')">
+								</select>
+						</div>
+						<div class="add_six">
+							<a href="#" onclick="moveleft('rw')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('rw')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="three">
+							<select class="chooserenwu" style="width: 100%;height: 422px;" multiple name="right" id="right" size="20" ondblclick="moveleft('rw')">
+								</select>
+						</div>
+
+					</div>
+					
+					<div class="tab-pane" id="kongjianjiegou">
+						<div class="add-eight">
+							<div id="jstree_kongjian">
+
+							</div>
+
+						</div>
+						<div class="add-seven">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+								<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div class="add-nine">
+							<select class="choosekongjian" style="width: 100%;height: 422px;" multiple name="right" id="right" size="20">
+					
+								</select>
+						</div>
+
+					</div>
+					
+					<div class="tab-pane" id="fenleixinxi">
+						<div class="five">
+							<div id="jstree_fenleixinxi">
+							</div>
+						</div>
+						<div class="add-ten">
+							<!--<a href="#" onclick="moveleft()"><i class="fa  fa-arrow-circle-left"></i></a>
+								<a href="#" onclick="moveright()"><i class="fa  fa-arrow-circle-right"></i></a>-->
+						</div>
+						<div class="six">
+							<select id="fenleixinxi_right"  style="width: 100%;height: 422px;"  multiple name="right" size="20">
+								</select>
+						</div>
+
+					</div>
+					
+					<div class="tab-pane" id="pbgrpTab">
+						<div class="add-three">
+
+						</div>
+						<div class="add-four">
+							<div id="jstree_pbgrp">
+							</div>
+							<select id="pbgrp_left" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" style="" ondblclick="moveright('pbgrp')">
+								</select>
+						</div>
+						<div class="add-five">
+							<a href="#" onclick="moveleft('pbgrp')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('pbgrp')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="four">
+							<select id="pbgrp_right" style="width: 100%;height: 422px;" multiple name="right" id="right" size="20" ondblclick="moveleft('pbgrp')">
+								</select>
+						</div>
+					</div>
+					
+					<div class="tab-pane" id="goujian">
+						<div class="add-three">
+							<i class="fa fa-search" onclick="guolvgj()" style="float: right;margin-right: 20px;line-height: 25px;"></i>
+							<input id="guolvgj" type="text" />
+						</div>
+						<div class="add-four">
+							<div id="jstree_goujian">
+							</div>
+							<select class="goujianselect" style="margin-top: 22px;width: 100%;height: 200px;" multiple name="left" id="left" size="7" style="" ondblclick="moveright('gj')">
+								</select>
+						</div>
+						<div class="add-five">
+							<a href="#" onclick="moveleft('gj')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('gj')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="four">
+							<select class="choosegoujian" style="width: 100%;height: 422px;" multiple name="right" id="right" size="20" ondblclick="moveleft('gj')">
+								</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="two">
+				<a class="btn btn-default btn" role="button" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="mod-dialog-masklayer" style="display: none;"></div>
+<script src="/js/common/cloudfilerelate.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/common/filerelate.js" ></script>
+<script>
+	$(document).ready(function() {
+		//init_uploadfile()
+		init_tree()
+		//changeliucheng();
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,287 @@
+{% extends "base_v2.html" %}
+{% block content %}
+<!--iview-->
+<link href="../../dist_vue/plugin/iview/theme/my-theme/dist/iview.css" rel="stylesheet">
+<script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+<script src="../../dist_vue/plugin/clickEditor/Meditor.js"></script>
+<style>
+    *{ padding: 0;margin: 0;letter-spacing: 1px;}
+    #app{padding: 10px;min-width: 1049px;}
+    .leftMenu{  width: 250px;  margin: 0px auto;  }
+    .title2{height: 24px;line-height: 24px;margin-bottom: 5px;}
+    .mar10{  margin-top: 5px;  padding-left: 15px;  }
+    .pointer{  cursor: pointer;  }
+    .pointer span{  display: inline-block;  padding:0 2px;  border-radius: 3px;  }
+    .pointer span:hover{  background-color: rgba(208,83,84,0.1);  }
+    .pad5{padding: 10px 5px;}
+    .ivu-tabs-nav-scroll-disabled{display: none}
+    .ivu-tabs-bar{margin-bottom: 0px;}
+    .table123{margin-top: 35px;}
+</style>
+<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2">项目通讯录</span>
+    </div>
+</div>
+<div id="app">
+    <Row>
+        <i-col :span="4" style="overflow: auto">
+            <p class="title2">通讯录筛选</p>
+            <tabs class="leftMenu" value="name1" size="small" type="line">
+                <tab-pane label="组织架构" name="name1">
+                    <tree :data="leftData" @on-select-change="searchCompany"></tree>
+                </tab-pane>
+                <tab-pane label="参建方" name="name3">
+                    <ul class="pad5">
+                        <li class="pointer" @click="searchDivision()"><span>全部</span></li>
+                        <li class="pointer mar10" v-for="site in division.DivisionDatas" @click="searchDivision( site )"><span>[[site.name]]</span></li>
+                    </ul>
+                </tab-pane>
+                <tab-pane label="专业" name="name2">
+                    <ul class="pad5">
+                        <li class="pointer" @click="searchMajor()"><span>全部</span></li>
+                        <li class="pointer mar10" v-for="site in leftMajorData" @click="searchMajor( site )"><span>[[site.name]]</span></li>
+                    </ul>
+                </tab-pane>
+            </tabs>
+        </i-col>
+        <i-col :span="20" style="background-color: #fff;">
+            <i-input v-model="searchValue" placeholder="用户搜索" style="width: 300px;float: right;" @on-change="find" icon="ios-search" size="small"></i-input>
+            <i-table class="table123" ref="selection" :columns="columnsData" :data="dataTable" @on-sort-change="sortAll" :height="tableHeight"></i-table>
+            <page show-total :total="pages" :page-size="pageSize" @on-change="userTable" style="margin:20px auto;float:right;" show-elevator ref="page"></page>
+            <spin size="large" fix v-if="spinShow"></spin>
+        </i-col>
+    </Row>
+</div>
+<script>
+    var user = new Vue({
+        el:'#app',
+        delimiters:['[[',']]'],
+        data () {
+            return {
+                tableHeight:this.tableHeight1(),
+                spinShow:false,
+                leftMajorData:[],
+                leftData:[],
+                dataTable:[],
+                leftcompany:[],
+                columnsData: [
+                    {
+                        title: '姓名',
+                        sortable: 'custom',
+                        key:'truename'
+                    },
+                    {
+                        title: '联系方式',
+                        key:'contract'
+                    },
+                    {
+                        title: '专业',
+                        sortable: 'custom',
+                        key:'majorname'
+                    },
+                    {
+                        title: '公司',
+                        sortable: 'custom',
+                        key:'companyname'
+                    },
+                    {
+                        title:'参建方',
+                        width:120,
+                        render: (h , params) => {
+                            if(params.row.userdivisions.length > 0){
+                                return  h('span', params.row.userdivisions[0].divisionname)
+                            }
+                        }
+                    },
+                    {
+                        title:'角色',
+                        render: (h, params) => {
+                            let nodes = [];
+//                           角色展现
+                            if( params.row.is_admin === true && params.row.userPrjRoles.length == 0) {
+                                nodes.push("管理员");
+                            }else if(params.row.is_admin === true){
+                                nodes.push("管理员、");
+                            }
+                            if(params.row.userPrjRoles.length == 1 ){
+                                nodes.push(params.row.userPrjRoles[0].rolename)
+                            }else if(params.row.userPrjRoles.length > 1 ){
+                                for(let i = 0;i < params.row.userPrjRoles.length ;i++){
+                                    nodes.push(params.row.userPrjRoles[i].rolename + "、")
+                                }
+                            }
+                            return h('div', nodes );
+                        }
+                    }
+                ],
+                pageSize:15,
+                pages:0,
+                searchValue: null,
+                division:{
+                    DivisionDatas:[],
+                    divisionId:null
+                }
+            }
+        },
+        methods:{
+            tableHeight1 () {
+                let temp =parseInt( document.body.clientHeight - 325);
+                return temp
+            },
+            sortAll ( value ) {
+                switch (value.column.title){
+                    case "姓名":
+                        user.userTable(1, (value.order == "asc") ? "truename" : "-truename");
+                        break;
+                    case "公司":
+                        user.userTable(1, (value.order == "asc") ? "company__name" : "-company__name");
+                        break;
+                    case "专业":
+                        user.userTable(1, (value.order == "asc") ? "major__name" : "-major__name");
+                        break;
+                }
+            },
+            leftMenu () {
+                let that = this;
+                $.ajax({
+                    url:"/user/companytree/",
+                    dataType:"json",
+                    type:"get",
+                    success:function( datas ){
+                        that.leftData = datas;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                $.ajax({
+                    url:"/user/companys/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage : 9999},
+                    success:function( datas ){
+                        that.leftcompany = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            leftMajor () {
+                let that = this;
+                $.ajax({
+                    url:"/user/majors/",
+                    dataType:"json",
+                    type:"get",
+                    data:{isAll : "True"},
+                    success:function( datas ){
+                        that.leftMajorData = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            userTable ( page ,order) {
+                let that = this;
+                $.ajax({
+                    url:"/user/users/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        ordering:order,
+                        isAll:'',
+                        company:that.company,
+                        major:that.major,
+                        search:that.searchValue,
+                        page:page,
+                        divisionId:that.division.divisionId
+                    },
+                    beforeSend:function(){
+                        that.spinShow = true;
+                    },
+                    success:function( datas ){
+                        that.spinShow = false;
+                        that.dataTable = datas.results;
+                        that.pages = datas.count;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            searchMajor ( ele ) {
+                if(ele == '' ||ele == undefined||ele ==null){
+                    this.$refs.page.currentPage = 1;
+                    this.major = null;
+                    this.userTable(1,"name");
+                }else {
+                    this.$refs.page.currentPage = 1;
+                    this.major = ele.id;
+                    this.userTable(1,"name");
+                }
+            },
+            searchDivision ( division ) {
+                if(division == '' ||division == undefined||division ==null){
+                    this.$refs.page.currentPage = 1;
+                    this.division.divisionId = null;
+                    this.userTable(1,"name");
+                }else {
+                    this.$refs.page.currentPage = 1;
+                    this.division.divisionId = division.id;
+                    this.userTable(1,"name");
+                }
+            },
+            searchCompany ( event ) {
+                try{
+                    this.$refs.page.currentPage = 1;
+                    if(event[0].id === "all"){
+                        this.company = null;
+                        this.major = null;
+                        this.userTable(1,"name");
+                    }else {
+                        this.company = event[0].id;
+                        this.userTable(1,"name");
+                    }
+
+                }catch(e){
+                    this.company = null;
+                    this.major = null;
+                    this.userTable(1,"name");
+                }
+
+            },
+            find ( event ) {
+                this.$refs.page.currentPage = 1;
+                this.searchValue = event.target.value;
+                this.userTable(1,"name");
+            },
+            getDivision () {
+                let that = this;
+                $.ajax({
+                    url:"/config/divisions/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        prePage:99999
+                    },
+                    success:function( datas ){
+                        that.division.DivisionDatas = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            }
+        },
+        mounted:function () {
+            let that = this;
+            that.leftMenu();
+            that.leftMajor();
+            that.userTable(1,"truename");
+            that.getDivision();
+        }
+    })
+</script>
+{% endblock %}

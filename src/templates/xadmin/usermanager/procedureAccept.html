@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        #container {
+            position: relative;
+            width: 100%;
+            min-width: 980px;
+            padding: 0;
+        }
+        
+        #content {
+            padding: 20px 40px;
+        }
+        
+        .content-head {
+            position: relative;
+            height: 36px;
+        }
+        
+        .content-head h1 {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        
+        #content-main>.ivu-table-wrapper {
+            margin-top: 15px;
+        }
+        
+        .content-head>.ivu-btn-info {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        
+        #content-main>.ivu-btn-info {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        
+        .ivu-page {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .ivu-table-body,
+        .ivu-table {
+            overflow: visible;
+        }
+        
+        .ivu-table-cell>div>.ivu-input-type,
+        .ivu-table-cell .ivu-select,
+        .ivu-table-cell .ivu-cascader {
+            float: left;
+            width: 80%;
+            max-width: 190px;
+        }
+        
+        .perserveData {
+            width: 20%;
+            padding-left: 10px;
+            float: left;
+            height: 32px;
+            line-height: 32px;
+        }
+        
+        .perserveData>div {
+            width: 17.5px;
+            height: 100%;
+            float: left;
+        }
+        
+        .ivu-tooltip {
+            width: 100%;
+        }
+        
+        .perserveData .ivu-btn {
+            padding: 0;
+        }
+        
+        .ivu-modal-body {
+            padding: 16px 40px 16px 16px;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-checkmark-round {
+            color: #2DB7F5;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-close-round {
+            color: #ED3F14;
+        }
+        
+        .perserveData>div:nth-child(1):hover .ivu-icon-checkmark-round {
+            color: #2D8CF0
+        }
+        
+        .perserveData>div:nth-child(2):hover .ivu-icon-close-round {
+            color: #8b0706;
+        }
+        
+        .ivu-modal-footer .ivu-col {
+            text-align: center;
+            height: 100%;
+        }
+        
+        .ivu-modal-footer .ivu-btn-long {
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="content" class="flex">
+            <div id="content-main">
+                <div class="content-head">
+                    <h1>工序验收提醒管理</h1>
+                    <i-button type="info" @click="updata_value(true)">添加工序验收提醒</i-button>
+                </div>
+                <i-table border :columns="columns" :data="dataAll"></i-table>
+                <Spin size="large" fix v-if="spinShow"></Spin>
+                <Page :total="count" @on-change="changeData" show-elevator show-total :page-size="page_one_count" :current.sync="current"></Page>
+
+                <!--弹窗-->
+                <Modal v-model="modal" @updata:modal="val=>modal=val" width="450">
+                    <p slot="header" style="text-align:left">
+                        <span>添加工序验收提醒 </span>
+                    </p>
+                    <div style="text-align:left">
+                        <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+                            <Form-item label="触发状态" prop="cascader">
+                                <Cascader :data="cascaderArray" v-model="formValidate.cascader" :render-format="label => label.join('-')" :load-data="loadData">
+                                </Cascader>
+                            </Form-item>
+                            <Form-item label="下一状态" prop="next_status">
+                                <i-select v-model="formValidate.next_status" placeholder="请先选择触发状态">
+                                    <i-option v-for="item,index in selectArray" :key="index" :value="item.value">{{ item.value }}</i-option>
+                                </i-select>
+                            </Form-item>
+                            <Form-item label="时间间隔" prop="time_span">
+                                <i-input v-model="formValidate.time_span" />
+                            </Form-item>
+                        </i-form>
+                    </div>
+                    <div slot="footer">
+                        <Row>
+                            <i-col span="12">
+                                <i-button type="success" size="large" long @click="add_still('formValidate')" :loading="modal_loading">保存并持续添加</i-button>
+                            </i-col>
+                            <i-col span="12">
+                                <i-button type="primary" size="large" long @click="add_component('formValidate')" :loading="modal_loading">保存</i-button>
+                            </i-col>
+                        </Row>
+                    </div>
+                </Modal>
+                <!--弹窗end-->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var cookieValue = null,
+            loc = window.location.origin;
+        (function() {
+            var name = 'csrftoken';
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = $.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+        })()
+
+        //获取当前pbtypename的id
+        Vue.prototype.$pbtypeId = function(arr, pbtypename, obj) {
+            arr.forEach(value => {
+                if (value.value == pbtypename) {
+                    obj.id = value.id;
+                }
+            })
+        }
+
+        //提交修改的ajax
+        Vue.prototype.$ajax = function(id, data, callback) {
+            $.ajax({
+                url: '/task/pbstatusreminds/' + id + '/',
+                type: 'put',
+                headers: {
+                    'X-CSRFTOKEN': cookieValue,
+                },
+                data: data,
+                success: function() {
+                    callback();
+                }
+            })
+        }
+
+        Vue.prototype.$sequence = function(array, pbtypename, pbstatusname, callback) {
+            array.forEach(val => {
+                if (val.value == pbtypename) {
+                    val.children.forEach((value, index) => {
+                        if (value.value == pbstatusname) {
+                            callback(value.id);
+                        }
+                    })
+
+                }
+            })
+        }
+
+        Vue.prototype.$loadData = function(item, callback) {
+                item.loading = true;
+                var id = item.id;
+                $.ajax({
+                    url: '/task/pbstatuss/?ordering=sequence&pbtype__major=&pbtype=' + id,
+                    type: 'get',
+                    success: function(res) {
+                        var result = res.results;
+                        if (result.length != 0) {
+                            result.forEach(value => {
+                                item.children.push({
+                                    value: value.statusname,
+                                    label: value.statusname,
+                                    id: value.id
+                                })
+                            })
+
+                        } else {
+                            item.children.push({
+                                value: "暂无数据",
+                                label: "暂无数据"
+                            })
+                        }
+                        callback();
+                        item.loading = false;
+                    }
+                });
+            }
+            //删除组件
+        var operation = {
+            template: `
+                <div>
+                    <Poptip confirm title="您确认删除这条内容吗？" @on-ok="ok" placement="left-start" :transfer="true">
+                        <Button type="error">删除</Button>
+                    </Poptip>
+                </div>
+            `,
+            methods: {
+                ok() {
+                    this.$emit('del');
+                },
+            }
+        }
+
+        //下拉单选组件
+        var sele = {
+            template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="edit=true" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-select v-model="value" @updata:value="val=>value=val">
+                        <i-option v-for="item,index in list" :key="index" :value="item.value">{{ item.value }}</i-option>
+                    </i-select>
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    edit: false,
+                    value: '',
+                    list: []
+                }
+            },
+            watch: {
+                cascaderArray() {
+                    console.log(1);
+                    this.changeSele();
+                },
+                value() {
+                    if (this.cascaderArray.length != 0) {
+                        this.changeSele();
+                    }
+
+                }
+            },
+            props: {
+                cascaderArray: {
+                    type: Array,
+                    default: function() {
+                        return [];
+                    }
+                },
+                data: {
+                    type: String
+                },
+                valueAll: {
+                    type: Object,
+                    default: function() {
+                        return {};
+                    }
+                },
+            },
+            methods: {
+                changeSele() {
+                    var obj = {},
+                        that = this,
+                        valueAll = this.valueAll,
+                        pbtypename = valueAll.pbtypename,
+                        sequence;
+                    this.$pbtypeId(this.cascaderArray, pbtypename, obj);
+
+                    $.ajax({
+                        url: '/task/pbstatuss/?pbtype__major=&pbtype=' + obj.id,
+                        type: 'get',
+                        success: function(result) {
+                            var res = result.results;
+                            that.list = [];
+                            res.forEach(val => {
+                                if (val.statusname == valueAll.pbstatusname) {
+                                    sequence = val.sequence;
+                                }
+                            })
+                            res.forEach(val => {
+                                if (val.sequence > sequence) {
+                                    that.list.push({
+                                        value: valueAll.pbtypename + '-' + val.statusname
+                                    })
+                                }
+
+                            })
+
+
+                        }
+                    })
+                },
+                perserve() {
+                    var obj = this.valueAll,
+                        value = this.value.split('-'),
+                        that = this,
+                        data = {};
+
+                    this.$pbtypeId(this.cascaderArray, value[0], data);
+
+                    $.ajax({
+                        url: '/task/pbstatuss/?ordering=sequence&pbtype__major=&pbtype=' + data.id,
+                        type: 'get',
+                        success: function(res) {
+                            var result = res.results;
+                            result.forEach(val => {
+                                if (val.statusname == value[1]) {
+                                    obj.next_status = loc + '/task/pbstatuss/' + val.id + '/';
+                                    obj.next_statusname = value[1];
+                                }
+                            })
+
+                            that.$ajax(that.valueAll.id, obj, function() {
+                                that.edit = false;
+                                that.$Message.success('修改成功');
+                                that.$nextTick(() => {
+                                    that.$emit('input', obj);
+                                    that.$slots.default[0].elm.innerText = that.value;
+                                })
+                            })
+                        }
+                    });
+
+                },
+                cancel() {
+                    this.value = this.data;
+                    this.edit = false;
+                }
+            },
+            created() {
+                this.value = this.data;
+                var id = this.valueAll.id;
+
+            }
+        }
+
+
+        //输入框组件
+        var inputText = {
+            template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="editing" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-input  v-model="currentValue"/>
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div> 
+                </div>
+            `,
+            data() {
+                return {
+                    edit: false,
+                    currentValue: '',
+                }
+            },
+            props: ['value', 'dataAll', 'type'],
+            methods: {
+                editing() {
+                    this.edit = true;
+                },
+                perserve() {
+                    var obj = this.dataAll,
+                        that = this,
+                        val = this.currentValue;
+
+                    var reg = /^[0-9]+.?[0-9]*$/;
+
+                    if (this.type = "time_span") {
+                        if (!reg.test(val)) {
+                            this.$Message.error('时间间隔必须为数字值');
+                            return false;
+                        }
+                    }
+
+                    obj.time_span = val;
+                    this.$ajax(this.dataAll.id, obj, function() {
+                        that.edit = false;
+                        that.$Message.success('修改成功');
+                        that.$nextTick(() => {
+                            that.$emit('input', obj);
+                            that.$slots.default[0].elm.innerText = val;
+                        })
+                    })
+
+                },
+                cancel() {
+                    this.currentValue = this.value;
+                    this.edit = false;
+                }
+            },
+            mounted() {
+                this.currentValue = this.value;
+            }
+        }
+
+        var app = new Vue({
+            el: '#container',
+            data: {
+                columns: [{
+                    title: '触发状态',
+                    key: 'meeting_type',
+                }, {
+                    title: '下一状态',
+                    key: 'nextStatus',
+                    render(h, params) {
+                        var allData = app.data[params.index].value,
+                            result = allData.pbtypename + '-' + allData.next_statusname;
+                        return h(sele, {
+                            props: {
+                                cascaderArray: app.cascaderArray,
+                                data: result,
+                                valueAll: allData,
+                            },
+                            on: {
+                                input(value) {
+                                    allData.next_status = value.next_status;
+                                    allData.next_statusname = value.next_statusname;
+                                }
+                            }
+                        }, [
+                            h('p', result)
+                        ])
+                    }
+                }, {
+                    title: '时间间隔',
+                    key: 'time_interval',
+                    render(h, params) {
+                        var result = app.data[params.index].value,
+                            time_span = result.time_span;
+                        return h(inputText, {
+                            props: {
+                                value: time_span,
+                                dataAll: result,
+                                type: 'time_span'
+                            },
+                            on: {
+                                input(value) {
+                                    result.time_span = value.time_span;
+                                }
+                            }
+                        }, [
+                            h('p', time_span)
+                        ])
+
+                    },
+                }, {
+                    title: '操作',
+                    key: 'action',
+                    width: 100,
+                    align: 'center',
+                    render(h, params) {
+                        return h(operation, {
+                            on: {
+                                del: function() {
+                                    app.del(params.index);
+                                }
+                            }
+                        })
+
+                    }
+                }],
+                data: [],
+                selectArray: [], //添加modal中下一状态下拉数据
+                cascaderArray: [],
+                dataAll: [], //table数据
+                count: 0, //数据总数量
+                page_one_count: 15, //单页数据数量
+                current: 1, //当前第几页
+                spinShow: true,
+                modal: false,
+                modal_loading: false, //添加构件按钮的动画显示是否
+                formValidate: {
+                    cascader: [],
+                    next_status: '',
+                    time_span: ''
+                },
+                ruleValidate: {
+                    cascader: [{
+                        required: true,
+                        message: '触发状态不能为空',
+                    }, {
+                        validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (value[0] == undefined) {
+                                callback('请完整填写触发状态....');
+                            } else if (value[1] == "暂无数据") {
+                                callback('请完整填写触发状态....');
+                            }
+                            callback(errors);
+                        }
+                    }],
+                    next_status: [{
+                        required: true,
+                        message: '下一状态不能为空',
+                    }],
+                    time_span: [{
+                        required: true,
+                        message: '时间间隔不能为空',
+                        trigger: 'blur'
+                    }, {
+                        validator(rule, value, callback, source, options) {
+                            var errors = [];
+                            if (!/^[0-9]+$/.test(value)) {
+
+                                callback('时间间隔必须为数字值....');
+                            }
+
+                            callback(errors);
+                        }
+                    }]
+                }
+            },
+            watch: {
+                "formValidate.cascader" () {
+                    var obj = {},
+                        cascader = this.formValidate.cascader,
+                        sequence,
+                        that = this;
+                    if (this.cascaderArray.length != 0) {
+                        if (cascader.length != 0 && cascader[1] != "暂无数据") {
+                            this.$pbtypeId(this.cascaderArray, cascader[0], obj);
+
+                            $.ajax({
+                                url: '/task/pbstatuss/?pbtype__major=&pbtype=' + obj.id,
+                                type: 'get',
+                                success: function(result) {
+                                    var res = result.results;
+                                    that.selectArray = [];
+                                    res.forEach(val => {
+                                        if (val.statusname == cascader[1]) {
+                                            sequence = val.sequence;
+                                        }
+                                    })
+                                    res.forEach(val => {
+                                        if (val.sequence > sequence) {
+                                            that.selectArray.push({
+                                                value: cascader[0] + '-' + val.statusname
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    }
+
+                }
+            },
+            methods: {
+                loadData(item, callback) {
+                    this.$loadData(item, callback);
+                },
+                updata_value() {
+                    this.modal = true;
+                    this.$refs.formValidate.resetFields();
+                },
+                changeData(page) {
+                    this.page = page;
+                    this.getPageData(page);
+                },
+                del(index) {
+                    var id = this.data[index].value.id,
+                        that = this;
+
+                    $.ajax({
+                        url: '/task/pbstatusreminds/' + id + '/',
+                        type: 'delete',
+                        headers: {
+                            'X-CSRFTOKEN': cookieValue,
+                        },
+                        success: function(res) {
+                            that.count--;
+                            that.data.splice(index, 1);
+                            that.dataAll.splice(index, 1);
+                            that.$Message.success('删除成功');
+                        }
+                    })
+                },
+                add(status) {
+
+                    var that = this;
+
+                    this.$refs.formValidate.validate((valid) => {
+                        if (valid) {
+                            that.modal_loading = true;
+                            var formValidate = that.formValidate;
+                            var data = {
+                                time_span: formValidate.time_span,
+                                pbtypename: formValidate.cascader[0],
+                            };
+
+
+                            that.$sequence(that.cascaderArray, formValidate.cascader[0], formValidate.cascader[1], function(id) {
+                                data.pbstatus = loc + '/task/pbstatuss/' + id + '/';
+                            })
+                            that.$sequence(that.cascaderArray, formValidate.cascader[0], formValidate.next_status.split('-')[1], function(id) {
+                                data.next_status = loc + '/task/pbstatuss/' + id + '/';
+                            })
+
+                            $.ajax({
+                                type: 'post',
+                                url: '/task/pbstatusreminds/',
+                                data,
+                                headers: {
+                                    'X-CSRFTOKEN': cookieValue,
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    that.modal_loading = false;
+                                    that.$Message.success('添加成功');
+                                    that.modal = status;
+                                    that.$refs.formValidate.resetFields();
+
+                                    if (!that.modal) {
+                                        that.getPageData();
+                                    } else {
+                                        that.dataAll.push({
+                                            meeting_type: res.pbtypename + '-' + res.pbstatusname
+                                        })
+
+
+                                        that.data.push({
+                                            value: res
+                                        });
+                                        that.count++;
+                                    }
+                                },
+
+                            })
+                        }
+                    })
+                },
+                add_component(obj) { //添加会议类型
+                    this.add(false);
+                },
+                add_still(obj) { //持续添加会议类型
+                    this.add(true);
+                },
+                getPageData(page) {
+                    this.spinShow = true;
+                    var page = page || 1,
+                        that = this;
+                    $.ajax({
+                        url: '/task/pbstatusreminds/?page=' + page,
+                        type: 'get',
+                        success: function(res) {
+                            that.count = res.count;
+                            that.data = [];
+                            that.dataAll = [];
+                            var result = res.results;
+                            if (result.length != 0) {
+                                result.forEach(value => {
+                                    that.dataAll.push({
+                                        meeting_type: value.pbtypename + '-' + value.pbstatusname
+                                    })
+                                    that.data.push({
+                                        value
+                                    })
+                                })
+                            }
+                            that.spinShow = false;
+                        }
+                    })
+                }
+            },
+            created() {
+                var that = this;
+                this.getPageData();
+                $.ajax({
+                    url: '/task/pbtypes/?isAll=true&perPage=1000',
+                    type: 'get',
+                    success: function(res) {
+                        var result = res.results;
+                        if (result.length != 0) {
+                            result.forEach((val, index) => {
+                                that.cascaderArray.push({
+                                    value: val.name,
+                                    label: val.name,
+                                    id: val.id,
+                                    children: [],
+                                    loading: false,
+                                    index: index
+                                })
+                            })
+                        }
+                    }
+                })
+            }
+
+
+
+        })
+    </script>
+</body>
+
+</html>

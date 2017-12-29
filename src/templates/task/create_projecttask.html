@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<link rel="stylesheet" href="/css/style.min.css" />
+ <script src="/js/jstree.min.js"></script>
+  <script src="/js/datastruct.js"></script>
+  <script src="/js/taskselect.js"></script>
+<script type="text/javascript">
+
+$(function () {
+    // 6 create an instance when the DOM is ready
+	$('#jstree').jstree({
+		"core" : {'data' : {
+		      'url' : '/task/precastbeam/tree/',
+		      'data' : function (node) {
+					return { 'id' : node.id };
+			}
+		  }
+		},
+		"plugins" : [ "themes", "html_data" ,"checkbox","search" ] 
+		});
+});
+
+  
+$(document).ready(function(){
+	$("#btnReleatePbs").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbAddSignRow(pbs);
+	});
+	
+	$("#btnCancle").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbDeleteUnSelect(pbs);
+	});
+});
+
+
+
+</script>
+{% endblock %}
+
+
+{% block content %} 
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container fluid-height clearfix">
+      <div class="heading">
+        <i class="fa fa-plus-square"></i>新建生产任务
+      </div>
+	  <div class="widget-content padded">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+    <form id="tab" action="" method="POST"> {% csrf_token %}
+					  <table border="0" cellpadding="2" cellspacing="1" style="width:100%">
+					  <tr>
+					    <td align="right" width="10%"><i class="fa fa-star" style="color:red;">&nbsp</i>技术负责人：</td>
+							<td width="40%">
+							{{ form.technology.errors }}
+							 <select name="technology" class="form-control">
+							{% for technology in technologys %}
+								<option value="{{technology.id}}">{{technology.truename}}</option>
+							{% endfor %}
+							</td>
+						<td nowrap align="right"><i class="fa fa-star" style="color:red;">&nbsp</i>材料负责人：</td>
+					    <td>
+							{{ form.material.errors }}
+							 <select name="material" class="form-control">
+							{% for material in materials %}
+								<option value="{{material.id}}">{{material.truename}}</option>
+							{% endfor %}
+						</td>
+					    </tr>
+					  <tr>
+					    <td nowrap align="right"><i class="fa fa-star" style="color:red;">&nbsp</i>计划开始时间：</td>
+					    <td style="padding-top:30px;">
+							{{ form.planstart.errors }}
+							<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+							<input class="form-control" type="text"  value="{{planstart|date:"Y-m-d"}}" name="planstart">
+							<span class="add-on"><i class="icon-remove"></i></span>
+							<span class="add-on"><i class="icon-th"></i></span>
+							</a>
+						</td>
+					    <td align="right"><i class="fa fa-star" style="color:red;">&nbsp</i>计划结束时间：</td>
+					    <td style="padding-top:30px;">
+							{{ form.planfinish.errors }}
+							<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+							<input class="form-control" type="text"  value="{{planfinish|date:"Y-m-d"}}" name="planfinish">
+							<span class="add-on"><i class="icon-remove"></i></span>
+							<span class="add-on"><i class="icon-th"></i></span>
+							</a>
+						</td>
+					  </tr>
+					  <tr>
+					    <td nowrap align="right" valign="middle"><i class="fa fa-star" style="color:red;">&nbsp</i>任务描述：</td>
+					    <td>
+							{{ form.description.errors }}
+							<input class="form-control proConfig" type="text" data-date-format="yyyy年mm月生产任务" name="description">
+						</td>
+						<td>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+					    <td valign="top">
+							<a href="#" class="btn btn-success btn" data-toggle="modal" data-target="#update"><i class="fa fa-plus"></i>添加梁段</a>
+						</td>
+						<td colspan="3">
+							<table class="table" id="RelatePbItem">
+								<tr >
+								  <td colspan="2" style="height:20px;border-top:none;" ><h3 style="text-align:center; margin:0;">关联梁段</h3></td>
+								</tr>
+								<tr id="tr1" >
+								   <td >编号 </td>	  
+								   <td >编辑
+									<input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value="1" />
+								   </td>		
+								</tr>
+							</table>
+						</td>
+					  </tr>
+					  <input name='PbSelected' type='hidden' id='PbSelected' value="" />
+					  </table>
+      </div>
+	  <div class="btn-toolbar" align="right">
+    <button type="submit" class="btn btn-primary" ><i class="fa fa-save"></i> 保存</button>
+    <a class="btn btn-default btn" onclick="javascript:history.back(1)" > 返回</a>
+</div>
+  </div>
+
+</div>
+
+
+  </form>
+		
+		
+
+	<div class="modal fade" id="update" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <a>选择梁段</a>
+            </div>
+            <div class="modal-body" style="overflow:scroll;min-height:100px;max-height:300px;">
+				  <div id="jstree" >
+					<!-- the tree is populated from inline HTML -->
+				  </div>
+            </div>
+            <div class="modal-footer">
+				<input type="text" value="" id="search_pb" onkeyup="searchFunction()" placeholder="搜索" />
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnReleatePbs" data-dismiss="modal" aria-hidden="true">确定</button>
+            </div>
+    </div>
+    </div>
+    </div>
+		
+				
+        </div>
+    </div>
+<script type="text/javascript">    
+	$('.proConfig').datetimepicker({
+        language:'zh-CN',
+		autoclose: 1,
+		startView: 3,
+		minView: 3,
+		maxView: 4,
+		forceParse: 0
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<div class="row">
+<div class="col-lg-12">
+   <div class="widget-container fluid-height clearfix">
+    <div class="heading">
+        <i class="fa fa-paperclip"></i>梁段[{{pbinfo.number}}][{{pbinfo.postion}}]附件
+    </div>
+ <ul class="nav nav-tabs">
+      <li class="active"><a href="#pictureattach" data-toggle="tab">梁段照片</a></li>
+      <li><a href="#reforceattach" data-toggle="tab">钢筋保护层台账</a></li>
+	  <li><a href="#concreteattach" data-toggle="tab">混凝土强度台账</a></li>
+	  <li><a href="#waiguangattach" data-toggle="tab">外观尺寸台账</a></li>
+	  <li><a href="#others" data-toggle="tab">梁段其他附件</a></li>
+    </ul>
+	<input name='relateid' type='hidden' id='relateid' value="{{relateid}}" />
+	
+    <div id="myTabContent" class="tab-content">
+     <div class="tab-pane active in" id="pictureattach">
+    <form id="tab" class="form-horizontal">
+	 <div class="widget-content padded">
+		    <table class="table table-striped" >
+			  <thead>
+				<tr>
+				  <th>提交人</th>
+				  <th>提交时间</th>
+				  <th>预览下载</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {% for item in list_items_picture %}
+				<tr>
+				  {% if item.submitor %}
+					  <td>{{item.submitor}}</td>
+				  {% else %}		
+					  <td>未知</td>
+				  {% endif %}
+				  <td>{{item.submittime|date:"Y-m-d H:i:s"}}</td>
+				  <td>
+					{% if item.IsPic %}
+						 <img src="{{item.content}}" height="100" width="100"  />		
+					{% endif %}
+					 <a href="{{item.content}}">{{item.name}}</a>
+				  </td>
+				</tr>
+			   {% endfor %}
+			  </tbody>
+			</table>
+	</div>
+    </form>
+    </div>
+	  
+	<div class="tab-pane fade" id="reforceattach">
+    <form id="tab" class="form-horizontal">
+	 <div class="widget-content padded">
+		    <table class="table table-striped" >
+			  <thead>
+				<tr>
+				  <th>提交人</th>
+				  <th>提交时间</th>
+				  <th>预览下载</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {% for item in list_items_reforce %}
+				<tr>
+				  {% if item.submitor %}
+					  <td>{{item.submitor}}</td>
+				  {% else %}		
+					  <td>未知</td>
+				  {% endif %}
+				  <td>{{item.submittime|date:"Y-m-d H:i:s"}}</td>
+				  <td>
+					{% if item.IsPic %}
+						 <img src="{{item.content}}" height="100" width="100"  />		
+					{% endif %}
+					 <a href="{{item.content}}">{{item.name}}</a>
+				  </td>
+				</tr>
+			   {% endfor %}
+			  </tbody>
+			</table>
+	</div>
+    </form>
+    </div>
+	
+	<div class="tab-pane fade" id="concreteattach">
+    <form id="tab" class="form-horizontal">
+	 <div class="widget-content padded">
+		    <table class="table table-striped" >
+			  <thead>
+				<tr>
+				  <th>提交人</th>
+				  <th>提交时间</th>
+				  <th>预览下载</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {% for item in list_items_concret%}
+				<tr>
+				  {% if item.submitor %}
+					  <td>{{item.submitor}}</td>
+				  {% else %}		
+					  <td>未知</td>
+				  {% endif %}
+				  <td>{{item.submittime|date:"Y-m-d H:i:s"}}</td>
+				  <td>
+					{% if item.IsPic %}
+						 <img src="{{item.content}}" height="100" width="100"  />		
+					{% endif %}
+					 <a href="{{item.content}}">{{item.name}}</a>
+				  </td>
+				</tr>
+			   {% endfor %}
+			  </tbody>
+			</table>
+	</div>
+    </form>
+    </div>
+	
+	 <div class="tab-pane fade" id="waiguangattach">
+    <form id="tab" class="form-horizontal">
+	 <div class="widget-content padded">
+		    <table class="table table-striped" >
+			  <thead>
+				<tr>
+				  <th>提交人</th>
+				  <th>提交时间</th>
+				  <th>预览下载</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {% for item in list_items_waiguang %}
+				<tr>
+				  {% if item.submitor %}
+					  <td>{{item.submitor}}</td>
+				  {% else %}		
+					  <td>未知</td>
+				  {% endif %}
+				  <td>{{item.submittime|date:"Y-m-d H:i:s"}}</td>
+				  <td>
+					{% if item.IsPic %}
+						 <img src="{{item.content}}" height="100" width="100"  />		
+					{% endif %}
+					 <a href="{{item.content}}">{{item.name}}</a>
+				  </td>
+				</tr>
+			   {% endfor %}
+			  </tbody>
+			</table>
+	</div>
+    </form>
+    </div>
+	
+	 <div class="tab-pane fade" id="others">
+    <form id="tab" class="form-horizontal">
+	 <div class="widget-content padded">
+		    <table class="table table-striped" >
+			  <thead>
+				<tr>
+				  <th>提交人</th>
+				  <th>提交时间</th>
+				  <th>预览下载</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {% for item in list_items_others %}
+				<tr>
+				  {% if item.submitor %}
+					  <td>{{item.submitor}}</td>
+				  {% else %}		
+					  <td>未知</td>
+				  {% endif %}
+				  <td>{{item.submittime|date:"Y-m-d H:i:s"}}</td>
+				  <td>
+					{% if item.IsPic %}
+						 <img src="{{item.content}}" height="100" width="100"  />		
+					{% endif %}
+					 <a href="{{item.content}}">{{item.name}}</a>
+				  </td>
+				</tr>
+			   {% endfor %}
+			  </tbody>
+			</table>
+	</div>
+    </form>
+    </div>
+	  
+
+ </div>
+ </div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base_mobile.html" %}
+{% block content %}
+<link type="text/css" href="/css/project/morris.css" media="all" rel="stylesheet" />
+<script src="/js/morris.js-0.5.1/raphael-min.js"></script>
+<script src="/js/morris.js-0.5.1/morris.min.js" type="text/javascript"></script>
+
+<div>
+	<label class="btn btn-primary col-xs-6" style=""> 请选择项目:</label>
+	<select class="col-xs-6 proChoose" style="height:2.5em;">
+    	 {% for opt in optList %} 
+         	<option value="{{opt.ProId}}">{{opt.ProName}}</option>
+         {% endfor %}
+	</select>
+</div>
+<div style="width:100%;">
+   <table class="table table-striped infoState">
+	   <thead>
+	      <tr>
+	         <th>状态</th>
+	         <th>标示</th>
+	      </tr>
+	   </thead>
+	   <tbody>
+	      <tr>
+	         <td>已完成</td>
+	         <td><div style="width:100%; height:15px;background-color:#6AEC87;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>正在预制</td>
+	         <td><div style="width:100%; height:15px;background-color:#FCD209;;"></div></td>
+	      </tr>
+	      <tr>
+	         <td>未启动</td>
+	         <td><div style="width:100%; height:15px;background-color:#A2B5CD;"></div></td>
+	      </tr>
+
+	   </tbody>
+	</table>
+</div>
+ 	            
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped dataList" >
+      <thead>
+        <tr>
+          <th style="width:50%;">任务描述</th>
+		  <th>任务状态</th>
+        </tr>
+      </thead>
+      <tbody> 
+	  {% if optNum = 0 %}
+	    <tr>
+          <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+	    </tr>
+	  {% else %}
+		<tr>
+		  <td id="lizhu_title"> 立柱完成率<br>计划完成:片 <br>已完成：片 </td>
+		  <td><div id='lizhu' style="height: 140px;"></div></td>
+        </tr>
+        <tr>
+		  <td id="gailiang_title">盖梁完成率<br>计划完成：片 <br>已完成：片</td>
+		  <td><div id='gailiang' style="height: 140px;"></div></td>
+        </tr>
+        <tr>
+		  <td id="chengtai_title">承台完成率<br>计划完成：片 <br>已完成：片</td>
+		  <td><div id='chengtai' style="height: 140px;"></div></td>
+        </tr>
+        <tr>
+		  <td id="gangjing_title">钢筋完成率<br>计划完成：片 <br>已完成：片</td>
+		  <td><div id='gangjing' style="height: 140px;"></div></td>
+        </tr>
+	  {% endif %}
+      </tbody>
+    </table>
+</div>
+
+<style>
+	.infoState{
+		text-align:center;
+		background-color:whitesmoke;
+	}
+	
+	.infoState thead tr th, .dataList thead tr th{
+		text-align:center;
+		font-size:1.2em;
+	}
+	
+	.infoState tbody tr td{
+		font-weight:bold;
+		font-size:1.0em;
+	}
+	
+	.dataList tbody tr td{
+		font-weight:bold;
+		font-size:1.1em;
+		vertical-align:middle;
+	}
+	
+	.dataList tbody tr td{
+		text-align:center;
+	}
+	
+	tr{background:#f9f9f9;}
+</style>
+<script type="text/javascript">
+$(window).ready(function() {
+	$(".proChoose").bind("change", function() { 
+		var proid=$(".proChoose").val();
+		reload(proid);
+		
+	});
+	
+	var proid=$(".proChoose").val();
+	reload(proid);
+});
+
+function reload(proid){
+	$.ajax({
+		  type:"post",
+		  url:"/task/query_projecttask/",
+		  cache:false,
+		  dataType:"json",
+		  data:{"proid": proid},
+		  success: function(data){
+		  	if(data.status==1){
+		  		$("#lizhu_title").html("立柱完成率<br>计划完成:" + String(data.lizhu[0]) + '片 <br>已完成:' + String(data.lizhu[1]) +"片 ");
+		  		$("#gailiang_title").html("盖梁完成率<br>计划完成:" + String(data.gailiang[0]) + '片 <br>已完成:' + String(data.gailiang[1]) +"片 ");
+		  		$("#chengtai_title").html("承台完成率<br>计划完成:" + String(data.chengtai[0]) + '片 <br>已完成:' + String(data.chengtai[1]) +"片 ");
+		  		$("#gangjing_title").html("钢筋完成率<br>计划完成:" + String(data.gangjing[0]) + '片 <br>已完成:' + String(data.gangjing[1]) +"片 ");
+				refreshDraw('lizhu', data.lizhu);
+				refreshDraw('gailiang', data.gailiang);
+				refreshDraw('chengtai', data.chengtai);
+				refreshDraw('gangjing', data.gangjing);
+		  	}
+		  	else{
+		  		alert("服务器错误，请重试！");
+		  	}
+		  },
+		  error:function(data){
+		  	alert("");
+	      	return false;
+	      },
+		});
+}
+
+function refreshDraw(id, dataList){
+	$("#"+id).html("");
+	if(dataList[1] || dataList[2] || dataList[3]){
+		$("#"+id).height("140");
+		Morris.Donut({
+	            element: (id),
+	            resize:true,
+	            data: [
+	                {label: '已完成', value: dataList[1]  },
+	                {label: '在加工', value: dataList[2] },
+	                {label: '未生产', value: dataList[3] },
+	            ],
+	            colors: ["#9D6C7D","#008000",'grey'],
+	            formatter: function (y) { return y }
+	        });
+	}
+	else{
+		$("#"+id).html("无数据");
+		$("#"+id).height("100%");
+	}
+}
+</script>
+{% endblock %}

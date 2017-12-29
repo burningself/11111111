@@ -1,0 +1,48 @@
+.row {
+	width: 99.8%;
+	margin: 2px 0.1% 0 0.1%;
+	padding: 0 5px 0 5px;
+	border-radius: 5px;
+	display: inline-block;
+	background: white;
+	color: #000810;
+	min-height: 640px;
+	height:calc(100vh - 135px);
+}
+
+.header-row {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000810;
+    background-color: #ffffff;
+    padding: 5px;
+    margin: -10px -10px 20px -10px;
+    text-align: left;
+    border-bottom: 1px solid #c5c5c5;
+}
+
+.nav_tool{display: none;}
+
+.dealform{
+	width: 760px;
+    border: 1px solid #c5c5c5;
+    padding: 10px;
+    margin: 3px auto;
+    height: 98%;
+    #background-color:#eee;
+}
+
+.divissuedesc{
+	border-bottom: 1px #ccc solid;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+.spansplit{
+	margin: 0px 5px;
+    color: black;
+}
+.jFiler-row{
+		max-height: 300px;
+		overflow: auto;
+	}

@@ -1,0 +1,67 @@
+.titleLabel{width:100%; font-size:1.5em; margin-bottom:0px;color: white;
+		background-color: #007aff;text-align:center;}
+
+#myTab > li{ width:50%; text-align:center; background:white;}
+#myTab > .active a {background: aliceblue; font-weight:bold;}
+
+.row-fluid{
+	background-color:white;
+	margin-top:5%;
+	margin-bottom:5%;
+	display:inline-block; 
+	border: 5px solid white;
+	border-radius: 20px;
+	text-align:center;
+	width:100%;
+	padding
+}
+
+.btn-primary:hover{background:#337ab7; border-color:#2e6da4;}
+
+.row-fluid .input-group{ width:96%;margin-left:2%; margin-top:7%; }
+
+.row-fluid .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.row-fluid .input-group .fa { margin-right:2px; }
+
+.uploadBtn {width:100%;font-size:1.5em; margin-bottom:7%;background-color: white;}
+#duichang { height:2em; width:100%; padding-left:5px; border-radius: 0; }
+#status {width:35%;}
+
+.topBtn {width:100%; text-align:right;background-color: #B6CCDE;}
+.topBtn .btn {font-weight:bold;}
+
+.errorlist{color: red; display:inline-block;}
+
+.mainContent {background:white; margin:2px;  text-align:center; min-height:calc(100vh - 175px); }
+
+.mainContent .input-group{ width:98%;margin-left:1%; margin-top:2%; }
+
+.mainContent .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.mainContent .input-group .fa { margin-right:2px; }
+
+.section{ border-bottom: solid 1px #ddd; padding:10px 0px 10px 0px; }
+.section select { width:150px; line-height:25px; font-size:18px;}
+.section .sub-group{width:49%; display:inline-block;}
+.section .sub-group span{ margin-left:15px; font-size:14px; line-height:20px; height:20px;} 
+.basicInfo{ font-weight:bold;}
+.basicInfo label span{font-size:14px;}
+.actorSection{padding:0px; color:darkgrey;}
+h3{margin:0; color:dodgerblue; font-weight:bold; font-size:20px;}
+h4{font-weight:bold; line-height:10px;}
+#infoTab form{margin-top:20px;}
+#infoTab li{
+	margin:10px 0 10px 0; height:35px; line-height:20px; font-size:14px; display:block; text-align:center;
+}
+#infoTab li label{width:30%; text-align:right; min-width:100px;}
+#infoTab li input, #infoTab li select{width:50%;text-align:left;}
+#infoTab li a{font-size:20px;  margin:0 -25px auto; line-height:30px; position:absolute; }
+#infoTab .submitBtn {width:150px; margin:10px; font-size:20px;}
+
+#updateTab .section label{width:100%; padding:5px; margin:0;} 
+#updateTab .btnSection{border: none; margin-top:10px;margin-bottom: 250px;    padding-bottom: 100px;}
+
+#recordTab .section{ border-bottom: solid 1px #ddd; padding:10px; text-align:center;}
+#recordTab .recordStepSection label{width:100%; text-align:left; margin-left:10px;}
+#recordTab .recordAttach img{ height:50px; }
+#recordTab .recordStepSection .recordDetail{color:grey;}
+#recordTab .recordStepSection .stepInfo{color:green;}

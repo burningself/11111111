@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+ 	<style>
+ 	@media (min-width: 767px) {
+	 	.content_main{
+	 		width:70%;
+	 		border:solid 1px;
+	 		background:white;
+	 		margin-top:-5px;
+	 		margin-left:15%;
+	 		border: 5px solid white;
+			border-radius: 20px;
+	 	}
+	 	
+	 	#mycarousel{
+	 		width:70% !important;
+	 	}
+	 	
+		.carousel-inner{
+			width:90% !important;
+			height:40% !important;
+			
+		}
+	 		
+		.carousel-indicators{
+			display:none;
+		}	
+		
+		.carousel-indicators li{
+			background-color: white !important;
+			border: #5BC0DE solid 1px;
+			margin-top:100px;
+		}
+		
+		#mycarousel > a{
+			width:5%;
+			background:inherit;
+			vertical-align:middle;
+			text-align:center;
+		}
+		
+		#mycarousel > a > span{
+			color: #AFFE9B;
+			margin:0;
+			padding:0;
+			margin-left:-15px;
+			font-size:30px;
+		}
+		
+		h3{
+			text-align:center;
+			color: #5BC0DE;
+			color:black;
+		}
+	}
+	
+	@media (max-width: 767px) {
+	 	.content_main{
+	 		width:100%;
+	 		border:solid 1px;
+	 		background:white;
+	 		border: 5px solid white;
+			border-radius: 20px;
+	 	}
+	 	
+	 	#mycarousel{
+	 		width:100% !important;
+	 	}
+	 	
+		.carousel-inner{
+			width:90% !important;
+			height:40% !important;
+			
+		}
+	 		
+		.carousel-indicators{
+			display:none;
+		}	
+		
+		.carousel-indicators li{
+			background-color: white !important;
+			border: #5BC0DE solid 1px;
+			margin-top:100px;
+		}
+		
+		.carousel-control{
+			display:none!important;
+		}
+		
+		#mycarousel > a{
+			width:5%;
+			background:inherit;
+			vertical-align:middle;
+			text-align:center;
+		}
+		
+		#mycarousel > a > span{
+			color: #AFFE9B;
+			margin:0;
+			padding:0;
+			margin-left:-15px;
+			font-size:30px;
+		}
+		
+		h3{
+			text-align:center;
+			color: #5BC0DE;
+			color:black;
+		}
+	}
+	 		
+ 	</style> 	
+ 	<div class="content_main" align="center">
+ 		<h3><i class="fa fa-align-justify"></i> &nbsp工厂简介</h3>
+ 		<div align="right" style="margin-right:17%;  padding-bottom:1%;">
+ 			<label style="font-size:10px;">
+	 			支持
+	 			<i class="fa fa-arrow-left"> - </i> 
+	 			<i class="fa fa-arrow-right">&nbsp切换图片  | &nbsp</i>
+	 			<i  class="fa fa-th"> &nbsp图片动态  &nbsp </i>
+	 			<!-- <i  class="fa fa-th"> &nbsp列表查看  |&nbsp </i>
+	 				 <!- i class="fa fa-upload"> &nbsp上传图例 </i>
+	 			<--!>
+	 		</label>
+ 		</div>
+	  	<div id="mycarousel" class="carousel slide" data-ride="carousel">
+	      <!-- Indicators -->
+	      <ol class="carousel-indicators" id="indicatorID">
+	      </ol>
+	      <!-- Wrapper for slides -->
+	      <div class="carousel-inner" id="mycarouselID" style="align:center" align="center">
+	
+	      </div>
+	    
+	      <!-- Controls -->
+	      <a class="left carousel-control" id= "carousel_left" href="#mycarousel" data-slide="prev" style="display:none;">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+	      </a>
+	      <a class="right carousel-control" id= "carousel_right" href="#mycarousel" data-slide="next" style="display:none;">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+	      </a>
+	    </div>
+	</div>
+	<script src="/js/load_intro_photo.js"></script>
+
+{% endblock %}

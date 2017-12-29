@@ -1,0 +1,977 @@
+{% extends "base_v2.html" %} {% block ownerhead %}
+<link href="/dist_vue/plugin/iview/theme/my-theme/dist/iview.css" rel="stylesheet">
+<script src="/dist_vue/plugin/iview/iview.min.js"></script>
+<style type="text/css">
+    .tran-xy {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .text_hide {
+        overflow: hidden;
+        /*自动隐藏文字*/
+        text-overflow: ellipsis;
+        /*文字隐藏后添加省略号*/
+        white-space: nowrap;
+        /*强制不换行*/
+    }
+    
+    #app {
+        position: relative;
+    }
+    
+    .color99 {
+        color: #999;
+    }
+    
+    .ivu-tree-children .ivu-tree-children .ivu-checkbox-wrapper {
+        padding-left: 20px;
+    }
+    
+    .height_All {
+        height: 100%;
+    }
+    
+    .header-v2 {
+        font-size: 18px;
+        height: 70px;
+    }
+    
+    .header-bg-v2 div:nth-child(2) {
+        text-align: right;
+    }
+    
+    .header-bg-v2 div:nth-child(2) span:hover {
+        cursor: pointer;
+    }
+    
+    .cont {
+        margin-top: -70px;
+        padding-top: 70px;
+        box-sizing: border-box;
+        font-size: 15px;
+    }
+    
+    .cont_box {
+        width: 100%;
+        overflow: auto;
+    }
+    
+    .cont_left {
+        float: left;
+        box-sizing: border-box;
+        width: 300px;
+        position: relative;
+        z-index: 99;
+        transition: width .3s;
+        box-shadow: 1px 0px 16px 2px #ccc;
+    }
+    
+    .cont_wrap {
+        transition: width .3s;
+    }
+    
+    .cont_left_header {
+        height: 40px;
+        line-height: 40px;
+        text-align: right;
+        padding: 0 10px;
+    }
+    
+    .cont_left_header .ivu-icon-navicon-round {
+        font-size: 25px;
+    }
+    
+    .cont_left_header .content_filter {
+        line-height: 40px;
+        text-align: left;
+    }
+    
+    .cont_left_header span {
+        display: inline-block;
+        height: 100%;
+        width: 50px;
+        cursor: pointer;
+    }
+    
+    .cont_left_header i {
+        vertical-align: middle;
+    }
+    
+    .con_left_content {
+        margin-top: -40px;
+        padding-top: 40px;
+    }
+    
+    .con_left_content form {
+        overflow-y: auto;
+        padding: 0 10px;
+    }
+    
+    .con_left_content .header-bg-v2 button {
+        padding: 4px 15px;
+        color: #fff;
+        border-radius: 0px;
+    }
+    
+    .header-bg-v2 .content_filter {
+        margin-top: 6px;
+    }
+    
+    .priority {
+        margin-top: 20px;
+    }
+    
+    .priority_cont {
+        margin-top: 6px;
+    }
+    
+    .seleRow>div {
+        line-height: 32px;
+        border: 1px solid #ddd;
+        border-right: none;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    
+    .priority_cont>div:nth-last-child(1) {
+        border-right: 1px solid #ddd;
+    }
+    
+    .con_left_title ul li {
+        text-align: center;
+        height: 70px;
+        position: relative;
+    }
+    
+    .con_left_title ul li div {
+        width: 100%;
+        height: 50px;
+    }
+    
+    .con_left_title div p {
+        font-size: 12px;
+    }
+    
+    .ivu-select-multiple .ivu-select-selection .ivu-select-placeholder {
+        overflow: visible;
+    }
+    
+    .title_bz {
+        position: relative;
+        margin-left: 30px;
+    }
+    
+    .title_bz::before {
+        content: '';
+        display: block;
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        left: -20px;
+        top: 0px;
+        background-size: 100% 100%;
+    }
+    
+    .title_bz.fzPeople::before {
+        background-image: url('/images/modifyImg/launch.png');
+    }
+    
+    .title_bz.circle::before {
+        border-radius: 50%;
+        background: #5ecb8a;
+    }
+    /*.quesInfor .title_bz.circle::before {
+        left: 0px;
+        top: 3px;
+    }*/
+    
+    .priority .title_bz::before {
+        top: 4px;
+    }
+    
+    .priority .ivu-picker-panel-sidebar {
+        width: 100px;
+    }
+    
+    .priority_cont .staseleted {
+        background: #cf5353;
+        color: #fff;
+    }
+    
+    .priorityBtn {
+        width: 33.33%;
+        background-color: #f9f9f9;
+        border-color: #dfe4e9;
+        color: #657180;
+        border-left-color: #dfe4e9 !important;
+    }
+    
+    .priorityBtn:hover {
+        background-color: #f9f9f9;
+        border-left-color: #cf5353 !important;
+        color: #cf5353;
+    }
+    
+    .priorityBtn.staseleted:hover {
+        background-color: #cf5353;
+        color: #fff;
+    }
+    
+    .sureButton {
+        text-align: right;
+        margin: 30px 0 30px 0;
+    }
+    
+    .icon_title {
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+    }
+    
+    .icon_title img {
+        margin-left: -5px;
+        height: 25px;
+        transform: rotateY(180deg);
+    }
+    
+    .ivu-tree li ul {
+        padding: 0 0 0 3px;
+    }
+    /*右侧问题展示start*/
+    
+    .cont_right {
+        float: left;
+        transition: width .3s;
+    }
+    
+    .cont_right_wrap {
+        width: 100%;
+        position: relative;
+        box-sizing: border-box;
+    }
+    
+    .cont_right_header {
+        height: 40px;
+        line-height: 40px;
+        padding-left: 20px;
+    }
+    
+    .linkGo:hover {
+        cursor: pointer;
+        color: #cf5353 !important;
+    }
+    
+    .cont_right_header .ivu-input-wrapper {
+        font-size: 15px;
+        margin-top: -2px;
+        padding-left: 20px;
+    }
+    
+    .cont_right_bottom {
+        height: 70px;
+        padding: 10px 10px 20px 0;
+        box-sizing: border-box;
+        text-align: right;
+    }
+    
+    .content_question {
+        overflow-y: auto;
+    }
+    
+    .cont_right_content {
+        height: 100%;
+        margin-top: -110px;
+        padding-top: 110px;
+    }
+    /*加载动画*/
+    
+    .demo-spin-icon-load {
+        animation: ani-demo-spin 1s linear infinite;
+    }
+    
+    @keyframes ani-demo-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        50% {
+            transform: rotate(180deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .demo-spin-col {
+        height: 100px;
+        position: relative;
+        border: 1px solid #eee;
+    }
+    
+    .content_question>table tr {
+        height: 80px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .firstTd {
+        white-space: nowrap;
+    }
+    
+    .firstTd>div {
+        height: 80px;
+        padding-top: 10px;
+        box-sizing: border-box;
+    }
+    
+    .quesInfor {
+        height: 100%;
+        padding: 0px 0px 0px 20px;
+        box-sizing: border-box;
+    }
+    
+    .handelTd>div {
+        height: 30px;
+        margin-top: 10px;
+        width: 200px;
+    }
+    
+    .handelTd>div:nth-child(1) img {
+        height: 22px;
+    }
+    
+    .dele {
+        display: inline-block;
+        width: 25px;
+        cursor: pointer;
+    }
+    
+    .cont_right_header i,
+    .cont_right_header .ivu-input {
+        height: 26px;
+    }
+    
+    .cont_right_header i {
+        line-height: 26px;
+    }
+    
+    .handleIcon {
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .handleIcon:hover {
+        color: #d9534f;
+    }
+    
+    .quesInfor .ivu-col .ivu-tooltip,
+    .quesInfor .ivu-col .ivu-tooltip-rel,
+    .ques_describe .ivu-tooltip .ivu-tooltip-rel {
+        width: 100%;
+    }
+    
+    .over_span {
+        width: 100%;
+        display: inline-block;
+        padding-left: 20px;
+        box-sizing: border-box;
+    }
+</style>
+{% endblock %} {% block content %}
+<div id="app" class="height_All" ref="app">
+    <input style="display: none" type="text" name="issuetype" :value="issuetype='{{issuetypeorg}}'" />
+    <div class="header-v2">
+        <Row class="header-bg-v2">
+            <i-col span="12" style="line-height:32px;">{{title}}</i-col>
+            <i-col span="12">
+                <i-button type="primary" @click="createEvent" icon="plus-round">新增</i-button>
+            </i-col>
+        </Row>
+    </div>
+    <div class="cont height_All">
+        <div class="cont_box height_All">
+            <div class="cont_wrap height_All" ref="cont">
+                <div class="cont_left height_All" ref="cont_left_header">
+                    <div class="cont_left_header">
+                        <Row>
+                            <i-col span="12" class="content_filter" v-show="contentShow">
+                                流程筛选
+                            </i-col>
+                            <i-col span="12" class="height_All">
+                                <span @click="filterCondition" class="icon_title">
+                                    <img src="/images/modifyImg/menu.svg" alt="" ref="img">
+                                </span>
+                            </i-col>
+                        </Row>
+
+                    </div>
+                    <div class="con_left_content height_All" v-show="contentShow">
+                        <i-form ref="formValidate" :model="formValidate" :label-width="80" class="height_All">
+                            <div class="filter_tree">
+                                <Spin size="large" fix v-if="treeFlag"></Spin>
+                                <Tree :data="questionTree" show-checkbox v-if="!treeFlag" @on-check-change="getCheckedNodes" ref="tree" multiple></Tree>
+                            </div>
+                            <div class="priority">
+                                <p class="title_bz circle ">优先级</p>
+                                <button-group class="priority_cont seleRow" style="width:100%">
+                                    <i-button type="primary" :class="{ staseleted:clickNum.yz.status==0 }" class="priorityBtn">
+                                        <p @click="changeStatus('yz',0)" style="cursor:pointer">严重</p>
+                                    </i-button>
+                                    <i-button type="primary" :class="{ staseleted:clickNum.yb.status==1 }" class="priorityBtn">
+                                        <p @click="changeStatus('yb',1)" style="cursor:pointer">一般</p>
+                                    </i-button>
+                                    <i-button type="primary" :class="{ staseleted:clickNum.qw.status==2 }" class="priorityBtn">
+                                        <p @click="changeStatus('qw',2)" style="cursor:pointer">轻微</p>
+                                    </i-button>
+                                </button-group>
+                            </div>
+                            {% if majorList %}
+                            <div class="priority">
+                                <p class="title_bz circle ">负责方</p>
+                                <i-select v-model="formValidate.fuzefenbao" style="width:100%" multiple class="priority_cont">
+                                    {% for major in majorList %}
+                                    <i-option value="{{major.id}}">{{major.name}}</i-option>
+                                    {% endfor %}
+                                </i-select>
+                            </div>
+                            {% endif %} {% if issuecategory %}
+                            <div class="priority">
+                                <p class="title_bz circle ">专业类别</p>
+                                <i-select v-model="formValidate.issuecategorys" style="width:100%" multiple class="priority_cont">
+                                    {% for value in issuecategory %}
+                                    <i-option value="{{value}}">{{value}}</i-option>
+                                    {% endfor %}
+                                </i-select>
+                            </div>
+                            {% endif %}
+                            <div class="priority">
+                                <p class="title_bz circle ">创建人</p>
+                                <i-select v-model="formValidate.createuser" style="width:100%;" multiple class="priority_cont">
+                                    {% for each in createuserlist %}
+                                    <i-option value="{{each.id}}" key="{{each.id}}">{{each.truename}}</i-option>
+                                    {% endfor %}
+                                </i-select>
+                            </div>
+                            <div class="priority">
+                                <p class="title_bz circle ">创建时间</p>
+                                <date-picker type="daterange" :options="dateOptions" style="width: 100%" class="priority_cont" v-model="createTime"></date-picker>
+                            </div>
+                            <div class="priority">
+                                <p class="title_bz circle ">截止时间</p>
+                                <date-picker type="daterange" :options="dateStop" style="width: 100%" class="priority_cont" v-model="formValidate.deadline"></date-picker>
+                            </div>
+                            <div class="sureButton">
+                                <i-button type="primary" @click="filter_sure" :loading="loading_sure">确定</i-button>
+                            </div>
+                        </i-form>
+                    </div>
+                    <div class="con_left_title con_left_content height_All" v-show="!contentShow" @click="filterCondition">
+                        <ul>
+                            <li>
+                                <div class="tran-xy">
+                                    <img src="/images/modifyImg/first.png" alt="">
+                                    <p>优先级</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="tran-xy">
+                                    <img src="/images/modifyImg/responsible.png" alt="">
+                                    <p>负责方</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="tran-xy">
+                                    <img src="/images/modifyImg/launch.png" alt="">
+                                    <p>创建人</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="tran-xy">
+                                    <img src="/images/modifyImg/startTime.png" alt="">
+                                    <p>创建时间</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="tran-xy">
+                                    <img src="/images/modifyImg/overTime.png" alt="">
+                                    <p>截止时间</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="cont_right height_All" ref="cont_right">
+                    <div class="cont_right_wrap height_All">
+                        <Spin size="large" fix v-if="quesFlag"></Spin>
+                        <div class="cont_right_header">
+                            <span>共[[total]]条{{title}}</span>
+
+                            <i-input v-model="searchValue" icon="search" placeholder="关键词查询" style="width: 200px"></i-input>
+                        </div>
+                        <div class="cont_right_content">
+                            <div class="content_question height_All">
+                                <table style="width:100%">
+                                    <tr v-for="value,index in quesList">
+                                        <td class="firstTd height_All">
+                                            <div>
+                                                <span ref="titleRef" style="padding-left:20px;">
+                                                        <img :src="'/images/modifyImg/'+value.priority"  :title="imgTitle(value.priority)" alt="" style="width:25px;margin-top:-2px;">
+                                                        <span class="linkGo" @click="getReadHref(value.id)" title="编号">[[value.number]]</span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="quesInfor" ref="quesInfor" style="margin-top:10px;">
+                                                <p class="ques_describe " style="height:30px;">
+                                                    <span title="当前阶段" @click="getReadHref(value.id)" class="linkGo text_hide" style="width:100%;display:inline-block">
+                                                                [[value.describe]]
+                                                        </span>
+                                                </p>
+                                                <p style="height:30px;margin-top:10px;" class="text_hide">
+                                                    <span style="color:#333;" title="当前阶段" v-if="value.flowstep">[[value.flowstep]]</span>
+                                                    <span class="title_bz circle " title="发起人" v-if="value.faqiren">[[value.faqiren]]</span>
+                                                    <span class="title_bz circle " title="构件类型" v-if="value.guanlianyuansudis">[[value.guanlianyuansudis]]</span>
+                                                    <span class=" title_bz circle " title="负责人" v-if="value.dangqianfuzeren">[[value.dangqianfuzeren]]</span>
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td class="handelTd">
+                                            <div ref="handelDate">
+                                                <img src="/images/modifyImg/yuqi.svg" alt="" v-if="value.unfinished" title="逾期">
+                                                <span class=" color99" style="float:right;padding-right:10px;" title="发起时间">[[value.time]]</span>
+                                            </div>
+                                            <div>
+                                                <Poptip confirm title="您确认删除这条内容吗？" @on-ok="dele(value,index)" placement="left-start" :transfer="true" style="vertical-align:top;float:right">
+                                                    <span class="dele" title="删除">
+                                                            <Icon type="trash-b" v-if="value.candelete" class="color99 handleIcon"></Icon>
+                                                        </span>
+                                                </Poptip>
+                                                <span style="float:right;padding-right:10px;" title="事件处理">
+                                                        <Icon type="android-checkbox" v-if="value.needdeal" class="color99 handleIcon" @click.native="getDealHref(value.id)"></Icon>
+                                                    </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="cont_right_bottom" style="position:relative;">
+                            <Page :total="total" show-total :page-size="perPage" show-elevator @on-change="changePage" style="position:absolute;right:20px;top:20px;"></Page>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        delimiters: ["[[", "]]"], //重定义
+        data() {
+            return {
+                clickNum: {
+                    yz: {
+                        num: 0,
+                        status: -1,
+                        id: 10
+                    },
+                    yb: {
+                        num: 0,
+                        status: -1,
+                        id: 5
+                    },
+                    qw: {
+                        num: 0,
+                        status: -1,
+                        id: 1
+                    },
+                },
+
+                issuetype: '',
+                total: 0, //总条数
+                perPage: 10, //每页数量
+                page: 1, //当前页数
+                status: -1, //选中哪个优先级
+                contentShow: true, //左侧内容是否显示
+                treeFlag: true, //是否显示问题树
+                quesFlag: true, //是否显示问题信息
+                createTime: [],
+                formValidate: {
+                    issuecategorys: [],
+                    fuzefenbao: [],
+                    createuser: [],
+                    deadline: [],
+                    stepIds: [], //问题筛选id
+                    priority: [], //当前选中优先级数组
+                },
+                loading_sure: false, //确定按钮是否正在查询
+                dateOptions: {
+                    shortcuts: [{
+                        text: '今日',
+                        value() {
+                            const date = new Date();
+                            return [date, date];
+                        }
+                    }, {
+                        text: '昨天',
+                        value() {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24);
+                            return [date, date];
+                        }
+                    }, {
+                        text: '最近7天',
+                        value() {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            return [start, end];
+                        }
+                    }, {
+                        text: '最近30天',
+                        value() {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            return [start, end];
+                        }
+                    }, ]
+                },
+                dateStop: {
+                    shortcuts: [{
+                        text: '今日',
+                        value() {
+                            const date = new Date();
+                            return [date, date];
+                        }
+                    }, {
+                        text: '昨天',
+                        value() {
+                            const date = new Date();
+                            date.setTime(date.getTime() - 3600 * 1000 * 24);
+                            return [date, date];
+                        }
+                    }, {
+                        text: '最近7天',
+                        value() {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            return [start, end];
+                        }
+                    }, {
+                        text: '最近30天',
+                        value() {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            return [start, end];
+                        }
+                    }, ]
+                },
+                filterObj: {}, //过滤对象
+                quesList: [], //问题详情
+                questionTree: [], //问题树形下拉结构
+                flagStretch: true, //是否是收缩
+                searchValue: '', //关键词查询内容
+                issuecategory: '', //专业类别数据
+                majorList: '{{majorList}}', //负责方数据
+                cont_right_width: '', //右侧的宽度
+            }
+        },
+        methods: {
+            imgTitle(value) {
+                return value == 'yanzhong.svg' ? '严重' : value == 'yb.svg' ? '一般' : '轻微'
+            },
+            getReadHref: function(val) {
+                window.open('/task/issue/read/' + val);
+            },
+            getDealHref: function(val) {
+                window.open('/task/issue/issuedeal/' + val);
+            },
+            dele(value, index) {
+                var that = this;
+                $.ajax({
+                    url: "/task/projectevents/" + value.id + "/",
+                    type: "delete",
+                    error: function() {
+                        alert('删除失败');
+                    },
+                    success: function(res) {
+                        success_prompt("删除成功！");
+                        that.quesList.splice(index, 1);
+                        that.total = that.total - 1;
+                    }
+                });
+            },
+            filter_sure() {
+                console.log(this.createTime);
+                this.loading_sure = true;
+                var filterval = {};
+                filterval = Object.assign(this.formValidate);
+                this.time_filter(filterval, this.createTime, 'createtime');
+                this.time_filter(filterval, this.formValidate.deadline, 'deadline');
+                // filterval.issuecategorys=[];
+                this.filterObj = filterval;
+                this.questionAjax(this.page, filterval);
+            },
+            time_filter(obj, arr, attr) {
+                if (arr[0] != null || arr[1] != null) {
+                    var newArr = arr.map(val => {
+                        var date = new Date(val);
+                        return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+                    })
+                } else {
+                    newArr = [];
+                }
+
+                obj[attr] = newArr;
+            },
+            getCheckedNodes(value) {
+                this.formValidate.stepIds = [];
+                if (value.length != 0) {
+                    value.forEach((val, index) => {
+                        this.questionTree.forEach((v, i) => {
+                            v.children.forEach((res, num) => {
+                                if (val.nodeKey == res.nodeKey) {
+                                    this.formValidate.stepIds.push(res.id)
+                                }
+                            })
+                        })
+                    })
+                }
+            },
+            changeStatus(attr, index) {
+                var obj = this.clickNum[attr],
+                    array = this.formValidate.priority;
+                if (obj.num % 2 != 1) {
+                    array.push(obj.id);
+                    obj.status = index;
+                } else {
+                    array.forEach((val, index) => {
+                        if (val == obj.id) {
+                            array.splice(index, 1);
+                        }
+                    })
+                    obj.status = -1;
+                }
+                obj.num += 1;
+            },
+            //添加质量整改单跳转
+            createEvent: function() {
+                var that = this;
+                if (that.issuetype == "xianchangqianzheng") {
+                    window.open("/task/issue/qianzhengcreate/");
+                } else if (that.issuetype == "gcjdksq") {
+                    window.open("/task/issue/gcjdksqcreate/");
+                } else if (that.issuetype == "sjbgtz") {
+                    window.open("/task/issue/sjbgtzcreate/");
+                } else if (that.issuetype == "bgsjba") {
+                    window.open("/task/issue/bgsjbacreate/");
+                } else if (that.issuetype == "xietiao") {
+                    window.open("/task/issue/shiyicreate");
+                } else if (that.issuetype == "tzhs") {
+                    window.open("/task/issue/tzhscreate");
+                } else if (that.issuetype == "bimsh") {
+                    window.open("/task/issue/bimshcreate");
+                } else {
+                    window.open("/task/issue/createh?issuetype=" + that.issuetype);
+                }
+            },
+            //筛选页面切换
+            filterCondition() {
+                var quesInfor = this.$refs.quesInfor;
+                if (this.flagStretch) { //点击收缩
+                    this.contentShow = false;
+                    this.$refs.cont_left_header.style.width = "60px";
+                    this.$refs.img.style.transform = "rotateY(0deg)";
+                    this.$refs.img.style.marginLeft = "-5px";
+                    this.$refs.cont_right.style.width = this.$refs.app.offsetWidth - 60 + 'px';
+                    setTimeout(function() {
+                        quesInfor.forEach(val => {
+                            val.style.width = val.offsetWidth + 240 + 'px';
+                        })
+                    }, 300)
+                    this.flagStretch = false;
+                } else {
+                    this.contentShow = true;
+                    this.$refs.cont_left_header.style.width = "300px";
+                    this.$refs.cont_right.style.width = this.cont_right_width;
+                    this.$refs.img.style.transform = "rotateY(180deg)";
+                    this.$refs.img.style.marginLeft = "20px";
+                    quesInfor.forEach(val => {
+                        val.style.width = val.offsetWidth - 240 + 'px';
+                    })
+                    this.flagStretch = true;
+                }
+
+            },
+            //
+            treeAjax() {
+                var that = this;
+                $.ajax({
+                    url: "/task/issue/issuelistcount/?issuetype=" + that.issuetype,
+                    type: "get",
+                    dataType: "json",
+                    success: function(res) {
+                        if (res.issuc) {
+                            var templatetree = res.templatetree;
+                            templatetree.forEach((val, index) => {
+                                that.questionTree.push({
+                                    children: [],
+                                    render: (h, {
+                                        root,
+                                        node,
+                                        data
+                                    }) => {
+                                        return h('span', [
+                                            h('span', [
+                                                val.title
+                                            ]),
+                                            h('span', {
+                                                style: {
+                                                    display: 'inline-block',
+                                                    float: 'right',
+                                                    width: "30px",
+                                                    height: "14px",
+                                                    borderRadius: '12px',
+                                                    lineHeight: '14px',
+                                                    textAlign: 'center',
+                                                    backgroundColor: '#ddd',
+                                                    fontSize: '12px',
+                                                    marginRight: '4px',
+
+                                                }
+                                            }, [
+                                                val.count
+                                            ])
+                                        ]);
+                                    }
+                                })
+                                val.children.forEach(value => {
+                                    that.questionTree[index].children.push({
+                                        id: value.id,
+                                        render: (h, {
+                                            root,
+                                            node,
+                                            data
+                                        }) => {
+                                            return h('span', {
+                                                style: {
+                                                    display: 'inline-block',
+                                                    width: '200px',
+                                                    float: 'right'
+                                                },
+                                            }, [
+                                                h('span', [
+                                                    value.title
+                                                ]),
+                                                h('span', {
+                                                    style: {
+                                                        display: 'inline-block',
+                                                        float: 'right',
+                                                        width: "30px",
+                                                        height: "14px",
+                                                        borderRadius: '12px',
+                                                        lineHeight: '14px',
+                                                        textAlign: 'center',
+                                                        backgroundColor: '#ddd',
+                                                        fontSize: '12px',
+
+                                                    }
+                                                }, [
+                                                    value.count
+                                                ])
+                                            ]);
+                                        }
+                                    })
+                                })
+                            })
+                            that.treeFlag = false;
+                        }
+                    }
+                });
+            },
+            //改变页码
+            changePage(index) {
+                this.questionAjax(index, this.filterObj);
+            },
+            questionAjax(page, filterval) {
+                var that = this;
+                this.quesFlag = true;
+                $.ajax({
+                    url: "/task/issue/list/",
+                    type: "post",
+                    data: {
+                        "issuetype": that.issuetype,
+                        "page": page,
+                        "perPage": that.perPage,
+                        "filterval": JSON.stringify(filterval)
+                    },
+                    dataType: "json",
+                    error: function() {
+                        alert('请求列表失败')
+                    },
+                    success: function(res) {
+                        that.quesList = [];
+                        if (res.issuc == true) {
+                            that.total = res.total;
+                            that.perPage = res.perPage
+                            res.issuelist.forEach(val => {
+                                that.quesList.push({
+                                    priority: val.priority == 10 ? 'yanzhong.svg' : val.priority == 5 ? 'yb.svg' : 'qingwei.svg',
+                                    number: val.number,
+                                    describe: val.describe,
+                                    faqiren: val.faqiren,
+                                    guanlianyuansudis: val.guanlianyuansudis,
+                                    dangqianfuzeren: val.dangqianfuzeren,
+                                    time: val.faqishijian,
+                                    unfinished: val.unfinished,
+                                    candelete: val.candelete,
+                                    needdeal: val.needdeal,
+                                    flowstep: val.flowstep,
+                                    id: val.issueId
+                                })
+                            })
+                            that.quesFlag = false;
+                            that.loading_sure = false;
+
+                            if (page == 1) {
+                                that.$nextTick(function() {
+                                    var handel = this.$refs.handelDate;
+                                    if (handel) {
+                                        var quesInfor = this.$refs.quesInfor;
+                                        var handelWidth = this.$refs.handelDate[0].offsetWidth;
+                                        var titleWidth = this.$refs.titleRef[0].offsetWidth;
+                                        var result = this.$refs.app.offsetWidth - 300 - handelWidth - titleWidth - 20 + 'px';
+                                        quesInfor.forEach(val => {
+                                            val.style.width = result;
+                                        })
+                                    }
+
+                                })
+                            }
+                        }
+                    }
+                });
+            }
+        },
+        mounted() {
+            this.$refs.cont.style.width = this.$refs.app.offsetWidth + 'px';
+            //计算右侧的宽度
+            this.cont_right_width = this.$refs.app.offsetWidth - 300 + 'px';
+            this.$refs.cont_right.style.width = this.cont_right_width;
+
+
+            this.treeAjax();
+            this.questionAjax(1, {});
+
+        }
+    })
+</script>
+
+
+{% endblock %}

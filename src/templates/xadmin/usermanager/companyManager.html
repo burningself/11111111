@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <script src="../../dist_vue/plugin/clickEditor/Meditor.js"></script>
+    <style>
+        #app{padding: 10px;}
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        .add-user{  float: right;margin-left: 10px;}
+        .title{ width: 200px;display: inline-block;  margin-bottom: 15px;  line-height: 32px;  }
+        .c-input{width: 65%;}
+        .c-btn{padding: 0 0;color:#2DB7F5; }
+        .c-btn:hover{color:#2D8CF0}
+        .c-btn-red{padding: 0 0;color:#ED3F14; }
+        .c-btn-red:hover{ color: darkred;}
+    </style>
+</head>
+<body>
+<div id="app">
+    <h2 class="title">企业管理</h2>
+    <i-button class="add-user" type="info" @click="oneShow = true">添加</i-button>
+    <i-input v-model="searchValue" placeholder="查找" style="width: 300px;margin-bottom:10px;float: right;" @on-change="find" icon="ios-search"></i-input>
+    <i-table :columns="companyColumns" :data="companyData" @on-sort-change="sortAll"></i-table>
+    <page show-total :total="pages" :page-size="pageSize" @on-change="leftData" style="margin:20px auto;float:right;" show-elevator ref="page"></page>
+    <spin size="large" fix v-if="spinShow"></spin>
+    <modal
+            v-model="oneShow"
+            title="添加企业"
+            @on-ok="add"
+            @on-cancel="cancel">
+        <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+            <form-item label="名称" prop="oneName">
+                <i-input v-model="formValidate.oneName"  placeholder="请输入名称"></i-input>
+            </form-item>
+            <form-item label="上一级公司" prop="oneParent">
+                <i-select v-model="formValidate.oneParent">
+                    <i-option v-for="item in allData" :value="item.url" :key="item.id">[[item.name]]</i-option>
+                </i-select>
+            </form-item>
+        </i-form>
+    </modal>
+</div>
+</body>
+<script>
+    Vue.component('clickInput', MEditor);
+    var _app = new Vue({
+        el:'#app',
+        delimiters:['[[',']]'],
+        data () {
+            return {
+                companyColumns:[
+                    {
+                        title:'名称',
+                        sortable: 'custom',
+                        render: (h,param) => {
+                            let that = this;
+                            return  h('clickInput', {
+                                props: {
+                                    type:"input",
+                                },
+                                model:{
+                                    value:param.row.name,
+                                    callback(t){
+                                        if( param.row.name != t ){
+                                            param.row.name = t;
+                                            that.editData( param.row );
+                                        }
+                                    },
+                                    expression:"param.row.name"
+                                }
+                            },param.row.name)
+                        }
+                    },
+                    {
+                        title:'上一级公司',
+                        render: (h,param) =>{
+                            let that = this;
+                            let parentName = '------';
+                            for(let i = 0;i < that.allData.length;i ++){
+                                if(param.row.parent == that.allData[i].url ){
+                                    parentName = that.allData[i].name
+                                }
+                            }
+                            return  h('clickInput', {
+                                props: {
+                                    type:"select",
+                                    seleValue:param.row.parent,
+                                    List:_app.allData
+                                },
+                                model:{
+                                    callback(t){
+                                        if( param.row.parent != t ){
+                                            param.row.parent = t.value;
+                                            that.editData( param.row );
+                                        }
+                                    }
+                                }
+                            },parentName)
+                        }
+                    }
+                ],
+                companyData:[],
+                allData:[],
+                oneShow:false,
+                oneName:null,
+                spinShow:false,
+                pageSize:15,
+                pages:null,
+                formValidate:{
+                    oneName:null,
+                    oneParent:null
+                },
+                ruleValidate:{
+                    oneName: [
+                        { required: true, message: '不能为空', trigger: 'blur' },
+                        { type: 'string', max: 35, message: '名称长度不能超过35', trigger: 'blur' }
+                    ],
+                    oneParent:[
+                        { type: 'string', message: '请选择所属企业', trigger: 'change' }
+                    ]
+                },
+                searchValue:null,
+            }
+        },
+        methods:{
+            sortAll ( value ) {
+                this.leftData(1, (value.order == "asc") ? "name" : "-name");
+            },
+            leftData (page ,order) {
+                let that = this;
+                $.ajax({
+                    url:"/user/companys/",
+                    dataType:"json",
+                    type:"get",
+                    data:{page:page,search:that.searchValue,ordering:order},
+                    beforeSend:function(){
+                        that.spinShow = true;
+                    },
+                    success:function( datas ){
+                        that.spinShow = false;
+                        that.pages = datas.count;
+                        that.companyData = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                $.ajax({
+                    url:"/user/companys/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage:99999},
+                    success:function( data ){
+                        that.allData = data.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            editData ( row ) {
+                let that = this;
+                $.ajax({
+                    url:row.url,
+                    dataType:"json",
+                    type:"put",
+                    data: { name : row.name , parent:row.parent } ,
+                    success:function(){
+                        that.$Message.success('编辑成功');
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            add () {
+                let that = this;
+                this.$refs.formValidate.validate((valid) => {
+                    if (valid) {
+                        $.ajax({
+                            url:"/user/companys/",
+                            dataType:"json",
+                            type:"post",
+                            data: { name : that.formValidate.oneName , parent:that.formValidate.oneParent } ,
+                            success:function(){
+                                that.$Message.success('添加成功');
+                                that.$refs.page.currentPage = 1;
+                                that.$refs.formValidate.resetFields();
+                                that.leftData(1);
+                            },
+                            error:function () {
+                                console.log("加载失败");
+                            }
+                        });
+                    }else {
+                        this.$Message.error('名称不为空');
+                        this.$refs.formValidate.resetFields();
+                    }
+                })
+            },
+            cancel () {
+                this.$refs.formValidate.resetFields();
+            },
+            find ( event ) {
+                this.$refs.page.currentPage = 1;
+                this.searchValue = event.target.value;
+                this.leftData(1);
+            }
+        },
+        mounted () {
+            this.leftData(1);
+        }
+    })
+</script>
+</html>

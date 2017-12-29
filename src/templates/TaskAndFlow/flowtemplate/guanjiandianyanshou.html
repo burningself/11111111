@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block ownerhead %}
+<script src="/js/common/guanjiandianyanshou.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.config.biaodan.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/ueditor-1.4.3.3/ueditor.all.min.js"> </script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/biaodan.js" type="text/javascript" charset="utf-8"></script>
+<link href="/css/project/navtab.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block content %}
+<style type="text/css">
+	.header-row {
+	    margin: 0px 0 5px 5px;
+	    padding-left: 5px;
+	    text-align: left;
+	    font-size: 18px;
+	    font-weight: bold;
+	    color: #2e6da4;
+	    
+	}
+</style>
+<div col-md-12 column bb2 style="background:white;margin-top:2px;min-height: 85vh;padding-top: 15px;padding-bottom: 10px;">
+    <div class="header-row">
+       	<i class="fa fa-file-word-o"></i>验收质量关键点
+    </div>
+
+    <div style="margin-top: 10px;text-align: left;">
+    	<div style="width:1024px;margin: auto;">
+	    	<ul class="nav nav-tabs bdname">
+		   		<button class="btn btn-primary" onclick="yanshousaveallform()"  style="float: right;">保存</button>
+		   	</ul>
+	    </div>
+    	<script id="editor" type="text/plain" style="width:1024px;height:500px;margin: auto;"></script>
+    </div>
+
+ </div>
+ 
+ <script type="text/javascript">
+	$(function() {
+		initUE();
+		
+		getForms();
+	});
+</script>
+{% endblock %}
+

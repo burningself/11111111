@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<script src="/js/commonopr.js" type="text/javascript"></script>
+<script src="/js/common/goujian.js" type="text/javascript"></script>
+<link href="/css/project/goujian.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+<style>
+	.groupContent {padding-bottom:10px; min-height:100px; margin-top:10px;}
+	.groupContent h3{margin-bottom: 20px; font-weight:bold; }
+	.groupContent .form-group > label{line-height:34px; margin:0px; padding-right:0px;}
+	.groupContent .form-group > div {padding-left:0px;}
+	
+	#addGroup h3{margin-top:10px;}
+	#addGroup .input-group{height:40px; width:80%; margin:20px auto;}
+	#addGroup .input-group span{height:40px; width:30%; text-align:right;}
+	#addGroup .input-group input{height:40px; display:inline-block;}
+	#addGroup .input-group select{width:100%;height:105%; border:1px solid #ccc;padding-left:7px;}
+	
+	#dataTables-example{margin-top:25px;}
+</style>
+<div class="row groupContent">
+ <div class="col-md-12 col-sm-12">
+ <div class="widget-container fluid-height clearfix">
+ 	<h3><i class="fa fa-list-alt"></i> 设施管理</h3>
+	<div class="widget-content padded">
+	<form class="searchForm" id="tab" action="" method="get"> {% csrf_token %}
+		<div class="form-group col-md-4 col-sm-12 pull-right"> 	
+          	<div class="col-md-12" >
+				<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#addGroup" style="width:150px;font-size:15px; display:block; margin:0 auto; margin-bottom:14px;" ><i class="fa fa-list"></i> 增加 </button>
+            	<button type="submit" class="btn btn-danger" style="width:150px;font-size:15px; "><i class="fa fa-search"></i> 查询 </button>
+          	</div>
+        </div>
+		<div class="form-group col-md-8 col-sm-12" >
+			{{ form.name.errors }}
+            <label class="col-md-3" align="right"><i class="fa fa-barcode"></i> 设施编号：</label>
+            <div class="col-md-3">
+			  <input type="text" name="number" id="pid" class="form-control"  value="{{groupid}}">
+            </div>
+			<label class="col-md-3" align="right"><i class="fa fa-globe"></i> 设施状态：</label>
+            <div class="col-md-3">
+			  <select name="progress" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for each in cm_status_list %}
+						{% ifequal forloop.counter hzstatus %}
+							<option value="{{forloop.counter}}" selected>{{each}}</option>
+						{% else %}
+							<option value="{{forloop.counter}}">{{each}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>	
+        </div>
+		<div class="form-group col-md-8 col-sm-12">
+			
+			<label class="control-label col-md-3" align="right"><i class="fa fa-stack-exchange"></i> 关联类型：</label>
+            <div class="col-md-3">
+					<select name="pbstatus" class="form-control">
+					<option value="0" selected>全部</option>
+					<option value="1" selected>构件</option>
+					<option value="2" selected>任务</option>
+					<option value="3" selected>设备</option>
+				</select>
+            </div>
+            <label class="control-label col-md-3" align="right"><i class="fa fa-qrcode"></i> 设施类型：</label>
+            <div class="col-md-3">
+			  <select name="gtype" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for type in cm_type_list %}
+						{% ifequal type.id gtype %}
+							<option value="{{type.id}}" selected>{{type.name}}</option>
+						{% else %}
+							<option value="{{type.id}}">{{type.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>
+        </div>        
+	</form>
+</div>                    
+</div>  
+</div>  
+</div>  
+
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-bordered table-striped " id="dataTables-example">
+      <thead>
+        <tr>
+          <th id="id">编号<span class="pull-right" id="span_id"><img src="/images/sort_both.png"></span></th>
+		  <th id="descrition">名称<span class="pull-right" id="span_descrition"><img src="/images/sort_both.png"></span></th>
+		  <th id="rate">设施类别<span class="pull-right" id="span_rate"><img src="/images/sort_both.png"></span></th>
+		  <th id="pbstatus">当前状态<span class="pull-right" id="span_pbstatus"><img src="/images/sort_both.png"></span></th>
+		  
+		  <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+		  <tr>
+	         <td colspan="5"><h3>没有相关记录！</h3></td>
+		  </tr>
+	  {% endifequal %}
+	  {% for item in list_items %}
+        <tr>
+          <td>{{item.number}}</td>
+		  <td>{{item.name}}</td>
+		  <td>{{item.cmtype.name}}</td>
+		  <td>{{item.curstatus.statusname}}</td>
+          <td>	
+          	 <a href="javascript:deleteGroup({{item.id}})" title="新增检查" style="cursor: pointer;">[新增检查]</a>	
+			 <a href="javascript:deleteGroup({{item.id}})" title="删除危险源" style="cursor: pointer;">[删除设施]</a>	
+          </td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+    <ul class="pagination pagination-lg">
+    	<li><a onclick="FunChangePage(1)">首页</a></li>
+		{% if list_items.has_previous %}	
+			<li><a onclick="FunChangePage({{ list_items.previous_page_number }})">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+        <li><a> 
+        	<input id="pageJump" style="width:30px;border:0; font-size: 16px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;"/>
+        	</a>
+        	<a id="jumpBTN">
+        	跳转
+        	</a>
+        </li>
+		{% if list_items.has_next %}
+         <li><a onclick="FunChangePage({{ list_items.next_page_number }})">下一页</a></li>
+		{% endif %}
+		<li><a onclick="FunChangePage({{paginator.num_pages}})">尾页</a></li>
+		
+    </ul>
+	
+</div>
+ </div>
+ 	<div class="modal fade" id="addGroup" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4></h4>
+            </div>
+            <div class="modal-body">
+	          <div class="form-group">
+				<h3 >添加设施</h3>
+				<div>
+					<div class="input-group">
+			            <span class="input-group-addon">设施名称:</span>
+			            <input id="new_name" type="text" class="form-control" placeholder="设施名称">
+			        </div>
+			        <div class="input-group">
+			            <span class="input-group-addon">设施编号:</span>
+			            <input id="new_descrition" type="text" class="form-control" placeholder="设施编号">
+			        </div>
+			        <div class="input-group">
+			            <span class="input-group-addon" >设施标记:</span>
+			            <input type="text" style="ime-mode:disabled" onkeydown="if(event.keyCode==13)event.keyCode=9" onkeypress="if ((event.keyCode<48 || event.keyCode>57)) event.returnValue=false" id="new_total_count" class="form-control" placeholder="">
+			        </div>
+			        <div class="input-group">
+			            <span class="input-group-addon">设施类别:</span>
+			            <input  type="text" style="ime-mode:disabled" onkeydown="if(event.keyCode==13)event.keyCode=9" onkeypress="if ((event.keyCode<48 || event.keyCode>57)) event.returnValue=false" id="new_rate" class="form-control" placeholder="">
+			        </div>
+			        <div class="input-group">
+			            <span class="input-group-addon">关联对象:</span>
+			            <select id="new_type" >
+			            	<option value=0>请选择对象</option>
+			            	{% for each in typeList %}
+			            		<option value={{each.id}}>{{each.name}}</option>
+			            	{% endfor %}
+			            </select>
+			        </div>
+				</div>
+			  </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnAddGroup" data-dismiss="modal" aria-hidden="true">确定</button>
+            </div>
+    </div>
+    </div>
+    </div>
+ <script type="text/javascript">
+    $(document).ready(function () {
+	  
+		var id="#span_{{orderby}}";
+		if ({{clickcount}}==0){
+			$(id).html('<img src="/images/sort_desc.png">')
+		}
+		else{
+			$(id).html('<img src="/images/sort_asc.png">')
+		}
+			
+		$("#dataTables-example th").click(function () {
+			var curOrder = $(this).attr("id");
+			if (curOrder!=undefined){
+				if("{{orderby}}"!=curOrder){
+					clickcount = 0;
+				}
+				else{
+					clickcount = ({{clickcount}}+1)%2
+				}
+				
+				window.location.href="?page=1&number={{groupid}}&progress={{progress}}&pbstatus={{pbstatus}}&gtype={{gtype}}&orderby="+curOrder+"&clickcount="+clickcount; 
+			}
+		})
+		
+		$("#btnAddGroup").click(function(){			
+			$.ajax({
+				type:"post",
+				url:"/task/goujian/group/create/",
+				cache:false,
+				dataType:"json",
+				data:{  "name": $("#new_name").val(),
+						"descrition":$("#new_descrition").val(),
+						"total_count":$("#new_total_count").val(),
+						"rate":$("#new_rate").val(),
+						"pbstatus":$("#new_pbstatus").val(),
+						"type":$("#new_type").val()
+				},
+				success: function(data){
+					if(data.status==1)
+					{
+						window.location.reload(true);
+					}
+				}
+			});
+		})
+		
+    });
+	 
+	$('#pageJump').bind('input propertychange', function() { 
+		var tgtPage = $('#pageJump').val();
+		if(tgtPage){
+			$("#jumpBTN").attr("onclick","FunChangePage(" + tgtPage + ")");
+		}
+	});
+		
+	function deleteGroup(id){
+		if(confirm("所有组-构件关联关系都会一并删除，确定吗？")){
+			$.ajax({
+				type:"post",
+				url:"/task/goujian/group/delete/",
+				cache:false,
+				dataType:"json",
+				data:{"groupid": id,},
+				success: function(data){
+					if(data.status==1)
+					{
+						window.location.reload(true);
+					}
+					else{
+						alert(data.error);
+					}
+				}
+			});
+		}
+	}
+		
+	function FunChangePage(page)
+	{
+		var oldpbnumber = $('<div/>').text('{{pbnumber}}').html();
+		var pbnumber=oldpbnumber.replace("#","%23");  
+		var href = "?page="+page+"&number="+pbnumber+"&pbelevation={{pbelevation}}&pbstatus={{pbstatus}}&pbtype={{pbtype}}&orderby={{orderby}}&clickcount={{clickcount}}"; 
+	
+		window.location.href=href;
+	}
+		
+</script>
+ 
+</div>
+
+
+
+{% endblock %}
+

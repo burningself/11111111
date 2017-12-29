@@ -1,0 +1,259 @@
+{% extends "base.html" %} 
+{% block ownerhead %}
+
+{% endblock %}
+ {% block content %}
+	<script language="JavaScript">
+		
+        var fileId= GetQueryString("fileId");//
+        console.log(fileId);
+
+		var ocfurl = '';
+		$.ajax({
+				type: "POST",
+				url: "/task/ziliao/previewfile/",
+				cache: false,
+				dataType: "json",
+				async: false,
+				data: {
+					"fileId": fileId,
+				},
+				success: function(data) {
+					if(data.issuc == "true") {
+						ocfurl = data.url;
+					}else{
+						alert("该图纸无预览文件！");
+					}
+					
+				}
+			});
+
+		var v = 0;
+		function OnFlashLoaded() {		
+		
+		//下面这个传递参数只是参考，本样例代码中为了简化后台并没有使用.后台代码中只实现了transform.do,这个是必须的，另外一个是将图纸转化成pdf，如果不需要就可以不管它。
+        var urlData = "{\"transformPage\":\"\",\"CheckTaskStatus\":\"\"}";
+		thisMovie("WebCAD").setDataUrl("urlData" , urlData);
+		
+		//
+		   if(ocfurl){
+		   		thisMovie("WebCAD").setData(ocfurl,"");	
+		   }
+			
+			v = 1;
+		}
+
+		function GetQueryString(name)
+		{
+		     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		     var r = window.location.search.substr(1).match(reg);
+		     if(r!=null)return  unescape(r[2]); 
+		     return null;
+		}
+		
+		
+		var fullScreen = 0;
+		function OnFullScreen(blSuccess) {
+			if (blSuccess) {
+				fullScreen = 1 - fullScreen;
+			}
+		}
+
+		function thisMovie(movieName) {
+			if (navigator.appName.indexOf("Microsoft") != -1) {
+				return window[movieName];
+			} else {
+			    return document[movieName];
+			}
+		}
+				
+
+</script>
+
+
+	<script language="JavaScript">
+
+    //读取用户浏览器信息 
+	function myBrowser(){
+		
+	    var userAgent = navigator.userAgent; 
+	    var isOpera = userAgent.indexOf("Opera") > -1;
+	    if (isOpera) {
+	        return "Opera"
+	    }; 
+	    if (userAgent.indexOf("Firefox") > -1) {
+	        return "FF";
+	    } 
+	    if (userAgent.indexOf("Chrome") > -1){
+	        return "Chrome";
+	    }
+	    if (userAgent.indexOf("Safari") > -1) {
+	        return "Safari";
+	    } 
+	    if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+	        return "IE";
+	    }; 
+	    
+	}
+	
+	
+var flashVars = "showToolBar=0&runmode=0&OnLoadedEvent=OnFlashLoaded&OnFullScreenEvent=OnFullScreen&fileId=1001&fileName=tuzhi&cacheSize=1024&ocfSizeLimit=70&extData=null&languagePage=/css/webcad/flash/cn.xml&lan=cn";
+
+    
+//生成不同浏览器对应的 html代码  
+var op_ie10='<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="WebCAD" width="100%" height="800" align="middle">'
+			+'<param name="movie" value="/css/webcad/flash/cadViewer.swf" />'
+			+'<param name="quality" value="high" /><param name="bgcolor" value="#ffffff" />'
+			+'<param name="allowFullScreen" value="true">'
+			+'<param name="play" value="true" /><param name="loop" value="true" /><param name="wmode" value="transparent" /><param name="scale" value="showall" />'
+			+'<param name="menu" value="true" /><param name="devicefont" value="false" /><param name="salign" value="" /><param name="allowScriptAccess" value="always" />'
+			+'<param name="FlashVars" value="' + flashVars + '" /></object>';
+			
+var op_other='<embed id="WebCAD" width="100%" height="800" flashvars="' + flashVars + '" allowscriptaccess="always" allowfullscreen="true" bgcolor="#000000" wmode="Opaque" src="/css/webcad/flash/cadViewer.swf" type="application/x-shockwave-flash" style="outline:none;" name="krpanoSWFObject"></embed>';
+
+var op_chrome='<object type="application/x-shockwave-flash"  id="WebCAD" data="/css/webcad/flash/cadViewer.swf" width="100%" height="800" >'
+			+'<param name="movie" value="/css/webcad/flash/cadViewer.swf" />'
+			+'<param name="quality" value="high" /><param name="bgcolor" value="#ffffff" />'
+			+'<param name="allowFullScreen" value="true">'
+			+'<param name="play" value="true" /><param name="loop" value="true" />'
+			+'<param name="wmode" value="Opaque">'
+			+'<param name="scale" value="showall" />'
+			+'<param name="menu" value="true" /><param name="devicefont" value="false" /><param name="salign" value="" />'
+			+'<param name="allowScriptAccess" value="always" />'
+			+'<param name="FlashVars" value="' + flashVars + '" /></object>';
+
+			
+
+//将上面的html代码插入到页面id为flashContent对象里面  
+window.onload=function(){
+	
+     var mb = myBrowser();
+     if ("IE" == mb) {
+	      $("#flashContent").html(op_ie10);
+	  }else if ("FF" == mb) {
+	      $("#flashContent").html(op_other);
+      }else if ("Chrome" == mb) {	  
+	      $("#flashContent").html(op_chrome);   
+      }else if ("Opera" == mb) {
+	      $("#flashContent").html(op_other);
+      }else if ("Safari" == mb) {
+	      $("#flashContent").html(op_chrome);
+      }else{
+	      $("#flashContent").html(op_other);
+      }
+}
+   
+</script>
+<style>
+	.cadtoolbar{
+		width: 100px;
+		position: absolute;
+		z-index: 10;
+		top:95px;
+		left: 5px;
+		background-color: #d8d8d8;
+	    border-radius: 5px;
+	    padding: 10px 0px;
+	}
+	
+	.cadtoolbarbtn{
+		width: 40px;
+		height: 40px;
+		margin:5px 5px;
+		float: left;
+		border: 1px solid #08c;
+    	border-radius: 5px;
+	}
+	
+	.cadtoolbarbtnimg{
+		    margin: 2.5px;
+		    width: 30px;
+	}
+</style>
+	
+	<div id="flashContent"></div>
+	<div class="cadtoolbar" >
+		<!--<div class="cadtoolbarbtn" id="btnprint" title="打印"><img src="/img/cadbtn/print.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnpdf" title="保存pdf"><img src="/img/cadbtn/pdf.png" class="cadtoolbarbtnimg"  /> </div>-->
+		<div class="cadtoolbarbtn" id="btnselect" title="选择"><img src="/img/cadbtn/select.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnshowall" title="显示全图"><img src="/img/cadbtn/showall.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnmove" title="移动"><img src="/img/cadbtn/move.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnzoom" title="框选"><img src="/img/cadbtn/zoom.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnzoomout" title="放大视图"><img src="/img/cadbtn/zoomout.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnzoomin" title="缩小视图"><img src="/img/cadbtn/zoomin.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnswap" title="切换背景颜色"><img src="/img/cadbtn/swap.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnfullscreen" title="全屏"><img src="/img/cadbtn/fullscreen.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnlength" title="测量长度"><img src="/img/cadbtn/length.png" class="cadtoolbarbtnimg"  /> </div>
+		<div class="cadtoolbarbtn" id="btnarea" title="测量面积"><img src="/img/cadbtn/area.png" class="cadtoolbarbtnimg"  /> </div>
+	</div>
+
+
+	<script language="JavaScript">
+		//点击第一个按钮时
+		$(".bigbomb_btn_one").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('');
+			}
+		})
+		//点击第二个按钮时
+		$("#btnshowall").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('ZOOMALL');
+			}
+		})
+		//点击第三个按钮时
+		$("#btnmove").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('DRAG');
+			}
+		})
+		//点击第四个按钮时
+		$("#btnzoom").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('ZOOMWINDOW');
+			}
+		})
+		//点击第五个按钮时
+		$("#btnzoomin").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('ZOOMIN');
+			}
+		})
+		//点击第六个按钮时
+		$("#btnzoomout").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('ZOOMOUT');
+			}
+		})
+		//点击第七个按钮时
+		$("#btnswap").click(function() {
+			if (v == 1) {
+				thisMovie('WebCAD').executeCommand('BKCOLOR');
+			}
+		})
+		//点击第八个按钮时
+		$("#btnfullscreen").click(function() {
+			if (v == 1) {
+				try {
+					thisMovie("WebCAD").executeCommand('FULLSCREEN');
+				} catch (e) {
+					alert(e);
+				}
+			}
+		})
+		//点击第九个按钮时
+		$("#btnlength").click(function() {
+			if (v == 1) {
+				$(this).addClass("bigbomb_btn_nine_checked");
+				thisMovie('WebCAD').executeCommand('DIST');
+			}
+		})
+		//点击第十个按钮时
+		$("#btnarea").click(function() {
+			if (v == 1) {
+				$(this).addClass("bigbomb_btn_ten_checked");
+				thisMovie('WebCAD').executeCommand('AREA');
+			}
+		})
+</script>
+{% endblock %}

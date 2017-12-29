@@ -1,0 +1,141 @@
+
+{% extends "base.html" %}
+
+{% block title %} 梁段基本信息 -- 编辑 {% endblock %}
+
+{% block heading %} <h1> 梁段</h1><h2> 编辑 </h2> {% endblock %}
+{% block content %} 
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container label-container fluid-height center">
+      <div class="heading">
+        <i class="fa fa-tags"></i>编辑梁段-基本信息
+      </div>
+		<fieldset>
+			<form action="" method="post" class="login">
+				{% if form %}
+					{{form.as_ul}}
+				{% endif %}
+				<input name='obj_url' type='hidden' id='obj_url' value="{{obj_url}}" />
+				<div style="display:inline-block;text-align:center; margin-top:20px;">
+					<button type="submit" class="btn btn-primary" ><i class="fa fa-save"></i> 保存</button>
+					<a class="btn btn-success btn" onclick="location.reload();" > 放弃 </a>
+					<a class="btn btn-default btn" onclick="javascript:history.back(1)" > 返回</a>
+				</div>
+			</form>
+		</fieldset>	
+    </div>
+    <div id="predestalStr"></div>
+  </div>
+</div>
+
+<style type="text/css">
+	.heading{
+		text-align:center;
+		font-size:25px !important;
+	}
+	
+	fieldset{
+		font-size:20px;
+		width:100%;
+		margin-top:5px;
+		text-align:center;
+		padding-bottom:20px;
+	}
+	
+	fieldset li{
+		margin-top:18px;
+	}
+	
+	fieldset li label{
+		width:100px;
+		text-align:right;
+		margin-right:10px;
+	}
+	
+	fieldset li input{
+		width:300px;
+		text-align:left;
+	}
+	
+	fieldset li select{
+		width:300px;
+		text-align:left;
+	}
+	
+	#predestalStr{display:none;}
+
+</style>
+<script type="text/javascript">
+		$('#id_number').attr("readonly",true);
+		$('#id_postion').attr("readonly",true);
+		$('#id_task').attr("disabled",true);
+		$('#id_direction').attr("readonly",true);
+		$('#id_edittime').attr("class","form_time","data-date-format","yyyy-mm-dd hh:ii");
+		
+		var optText = $("#id_curpredestal").find("option:selected").text();
+		var optVal = $("#id_curpredestal").find("option:selected").val();
+		var count=$("#id_curpredestal option").length;
+		var predestalStr = "";
+		
+		for(var i=0;i<count;i++)
+        {           
+        	predestalStr += $("#id_curpredestal ").get(0).options[i].value + ":" + $("#id_curpredestal ").get(0).options[i].text + "/" ;
+        }
+        
+		$("#id_status").bind("change", function() { 
+			$("#id_curpredestal").empty();
+			var textList = predestalStr.split("/");
+			
+			console.log( optText );
+			if( $("#id_status").val() in {2:"2",3:"3"} ){  
+				
+				for(var each in textList){
+					valPair = textList[each].split(":");
+					if(valPair[1] && valPair[1][0]=="B"){
+						if(valPair[1] == optText){
+							$("#id_curpredestal").append("<option value=" + valPair[0] + " selected='selected'>" + valPair[1] + "</option>");
+						}
+						else{
+							$("#id_curpredestal").append("<option value=" + valPair[0] + ">" + valPair[1] + "</option>");
+						}
+					}
+				}
+			}
+			
+			else if( $("#id_status").val() in {4:"4",5:"5",6:"6",7:"7"} ){  
+				for(var each in textList){
+					valPair = textList[each].split(":");
+					if(valPair[1] && valPair[1][0]=="Y"){
+						if(valPair[1] == optText){
+							$("#id_curpredestal").append("<option value=" + valPair[0] + " selected='selected'>" + valPair[1] + "</option>");
+						}
+						else{
+							$("#id_curpredestal").append("<option value=" + valPair[0] + ">" + valPair[1] + "</option>");
+						}
+					}
+				}
+			}
+			
+			else if( $("#id_status").val() in {10:"10",11:"11"} ){  
+				for(var each in textList){
+					valPair = textList[each].split(":");
+					if(valPair[1] && valPair[1][0]=="C"){
+						if(valPair[1] == optText){
+							$("#id_curpredestal").append("<option value=" + valPair[0] + " selected='selected'>" + valPair[1] + "</option>");
+						}
+						else{
+							$("#id_curpredestal").append("<option value=" + valPair[0] + ">" + valPair[1] + "</option>");
+						}
+					}
+				}
+			}
+			else{
+				$("#id_curpredestal").append("<option value>---------</option>");
+			}
+			
+			
+		});
+</script>
+
+{% endblock %}

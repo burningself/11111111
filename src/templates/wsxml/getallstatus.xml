@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<getstatusrsp>
+	<result>{{result}}</result>
+	<statussum>{{statussum}}</statussum>
+	{% for item in statuslist %}
+	<statusinfo{{ forloop.counter0 }}>
+		<statusname>{{item.statusname}}</statusname>
+		<factoryarea>{{item.factoryarea.areaname}}</factoryarea>
+	</statusinfo{{ forloop.counter0 }}>
+	{% endfor %}
+</getstatusrsp>

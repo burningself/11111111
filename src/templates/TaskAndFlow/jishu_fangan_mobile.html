@@ -1,0 +1,88 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %} 
+<!--<script src="/js/commonopr.js" type="text/javascript"></script>-->
+<link href="/css/project/common_mobile.css?ver=1111" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/js/json/json2.js"></script>
+<style>
+	.weui_cells {
+		font-size: 1.3rem;
+		margin-top: 0;
+	}
+</style>
+{% endblock %}
+
+{% block content %} 
+	<div class="row-fluid">
+    	<label class="titleLabel"><i class="fa fa-bookmark"></i> 施组方案 </label>
+		<div class="content">
+			<div class="weui_cells weui_cells_access">
+				    <div class="weui_panel_bd">
+			           {% for each in  technicallist %}
+							 <a class="weui_cell " href="/task/jishu/fangan/{{each.id}}">
+			               		 <div class="weui_cell_bd weui_cell_primary">
+			                    		<span>{{each.number}}：<b>{{each.name}}</b></span>
+			               		 </div>
+			               		 <div class="weui_cell_ft">
+			               		 	{% ifequal each.status 1%}
+										<span style="color:#BB17EE">未完成</span>
+									{% endifequal %}
+									{% ifequal each.status 2%}
+										<span style="color:#5017EE">已上报</span>
+									{% endifequal %}
+									{% ifequal each.status 3%}
+										<span style="color:#1749EE">已审批</span>
+									{% endifequal %}
+									{% ifequal each.status 4%}
+										<span style="color:#17B4EE">已交底</span>
+									{% endifequal %}
+			               		 </div>
+			           		</a>
+					        {% endfor %}
+			           </div>
+			       </div>
+		</div>
+	</div>
+
+	<script>
+
+//	$(document).ready(function(){
+//		var page=1;
+//		var status = ['未完成','已上报','已审批','已交底']
+//		$("div.content").scroll(function(){
+//	    　　var scrollTop = $(this).scrollTop();               //滚动条距离顶部的高度
+//	    　　var scrollHeight = $(document).height()*0.835*0.813;           //当前页面的总高度
+//	    　　var windowHeight = $(this).height();               //当前可视的页面高度
+//
+//	    　if(scrollTop + windowHeight >= scrollHeight){        //距离顶部+当前高度 >=文档总高度 即代表滑动到底部
+//	    	page += 1;
+//	    	pdata = {'page':page,'opt':'getmore'}
+//	    	$.ajax({
+//				type: "post",
+//				cache: false,
+//				dataType: "json",
+//				data: pdata,
+//				success: function(data) {
+//					if(data.issuc == "true") {
+//						for(var i in data.more){
+//							var tmp  = "<tr>";
+//								tmp +='<th style="width: 5vw" class="orange"><a href="/task/jishu/fangan/{{each.self.id}}"> <i class="fa fa-gear"></i></a></th>';
+//								tmp +='<th style="width: 40vw" >'+data.more[i].number+'</th>';
+//								tmp +='<th style="width: 40vw;text-align: left;">'+data.more[i].name+'</th>';
+//								tmp +='<th style="width: 15vw">';
+//								tmp += status[data.more[i].status-1];
+//								tmp +='</th>';
+//								tmp +='</tr>';
+//							$("div.content>table").append(tmp);
+//						}
+//					}
+//				}
+//			});
+//	      }
+//	     });
+//	});
+
+
+	</script>
+{% endblock %}
+

@@ -1,0 +1,83 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/issue_readstyle.css" media="all" rel="stylesheet" type="text/css" />
+<style>
+	.spansplit {
+		margin: 0px 5px;
+		color: black;
+	}
+	
+	.container {
+		width: 760px;
+		margin: 5px auto;
+		border: 1px solid #bcbcbc;
+		min-height: 850px;
+		padding: 0 10px;
+	}
+	
+	.header-row {
+		width: 758px;
+		font-size: 20px;
+		font-weight: bold;
+		color: #000810;
+		background-color: #fff;
+		padding: 5px;
+		margin: 0 -10px 10px -10px;
+		text-align: left;
+		border-bottom: 1px solid #bcbcbc;
+	}
+</style>
+{% endblock %} {% block content %}
+<div class="row">
+	<div class="col-md-12" style="min-height: 83vh">
+		<div class="container">
+			<div class="header-row">
+				安全检查记录查看-{{rec.monitoring.qrcode}}
+			</div>
+			{% for item in reclistWithDoc %}
+			<ul class="timeline" style="margin-left: -90%;">
+				<li class="timeline-inverted">
+					<div class="tl-circ"></div>
+					<div class="timeline-panel" style="text-align: left;">
+						<div class="tl-heading">
+							{% if item.rec.isneedcheck %}
+                  	  		  <label style="float: right;color: red;">未检查</label>
+		                  	{% else %}
+		                  	  <label style="float: right;">检查时间：{{item.rec.time|date:"Y-m-d H:i:s"}}</label>
+		                  	{% endif %}
+						</div>
+						<div class="tl-body">
+							<p><label>重置时间：</label>{{item.rec.status_reset_time|date:"Y-m-d H:i"}} </p>
+							<p><label>人员：</label>{{item.rec.actor.truename}}</p>
+							<p><label>表单：</label>
+								{% ifequal item.rec.related_form None %} {% else %}
+								<a href="/assist/biaodanedit/?bdid={{item.rec.related_form_id}}&readonly=true" title="{{item.rec.related_form}}" target="_blank">{{item.rec.related_form}}</a>
+								{% endifequal %}
+							</p>
+							<p><label>备注：</label>{% ifequal item.rec.description None %}{% else %}{{item.rec.description}}{% endifequal %}</p>
+							<ul class="list-group ul_biaodan">
+								{% for doc in item.doclist %}
+								<li class="list-group-item li-magright">
+									<a href="/{{doc.document.filepath}}{{doc.document.name}}">
+									{{doc.document.shortname}}</a> 
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<script>
+						</script>
+					</div>
+				</li>
+
+			</ul>
+
+			{% endfor %}
+			<div align="middle" style="margin-bottom:20px">
+				<button class="btn btn-default-outline" onclick="javascript:window.close()">关闭</a>	  
+			</div>
+	  	</div>
+    </div>
+</div>
+	
+{% endblock %}

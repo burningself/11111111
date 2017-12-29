@@ -1,0 +1,368 @@
+{% extends "base_v2.html" %}
+{% block content %}
+<!--iview-->
+<link href="../../dist_vue/plugin/iview/theme/my-theme/dist/iview.css" rel="stylesheet">
+<script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+<script src="../../dist_vue/plugin/clickEditor/Meditor.js"></script>
+<script src="http://cdn.bootcss.com/xlsx/0.10.4/xlsx.core.min.js"></script>
+<style>
+    *{ padding: 0;margin: 0;letter-spacing: 1px;}
+    .btn-right{  float: right;  margin-right: 5px;  }
+    .cost-table{  margin: 15px;  }
+    .cost-footer{  width: 100%;  }
+    .cost-footer tr td:first-child{  text-align: center;  }
+    .cost-footer tr td + td{  text-align: left;  width: 20%;  padding-left: 20px;  }
+    .c-input{width: 65%;}
+    .c-btn{padding: 0 0;color:#2DB7F5; }
+    .c-btn:hover{color:#2D8CF0}
+    .c-btn-red{padding: 0 0;color:#ED3F14; }
+    .c-btn-red:hover{ color: darkred;}
+    .pointer{  cursor: pointer;  }
+    .margin10{margin-right: 10px;}
+    .my-input{
+        border:none;
+        background-color: #fff;
+        display: none;
+    }
+    .detail{
+        margin-top: 15px;
+        display: none;
+        border:none;
+    }
+    .detail tr td{  text-align: center; }
+</style>
+<div id="app">
+    <div class="header-v2">
+        <div class="header-bg-v2">
+            <span class="title-v2 line_height32">成本管理</span>
+            <i-button class="btn-right" type="primary">历史</i-button>
+            <i-button class="btn-right" type="primary" @click="update">更新</i-button>
+        </div>
+    </div>
+    <i-table class="cost-table" border :columns="costName" :data="costData" size="small">
+        <table class="cost-footer" slot="footer">
+            <tr>
+                <td colspan="2" >合计</td>
+                <td>[[subCost]]</td>
+                <td>[[upCost]]</td>
+                <td>[[currentDoneCost]]</td>
+                <td>[[currentCost]]</td>
+            </tr>
+        </table>
+    </i-table>
+    <Modal
+            width=800
+            v-model="modalShow"
+            title="详细计价表单">
+        <input class="my-input" type="file" id="excel-file">
+        <table class="detail" border="border" >
+           <thead>
+               <tr>
+                   <td rowspan="2">序号</td>
+                   <td rowspan="2">项目名称</td>
+                   <td rowspan="2">单位</td>
+                   <td align="center" colspan="3">合同</td>
+                   <td colspan="3">上期累计完成（元）</td>
+                   <td colspan="3">本期完成（元）</td>
+                   <td colspan="3">至本期累计完成（元）</td>
+               </tr>
+               <tr>
+                   <td>数量</td>
+                   <td>单价（元）</td>
+                   <td>金额（元）</td>
+                   <td>数量</td>
+                   <td>单价（元）</td>
+                   <td>金额（元）</td>
+                   <td>数量</td>
+                   <td>单价（元）</td>
+                   <td>金额（元）</td>
+                   <td>数量</td>
+                   <td>金额（元）</td>
+               </tr>
+           </thead>
+            <tbody id="detail-content"></tbody>
+        </table>
+    </Modal>
+</div>
+<script>
+    Vue.config.devtools = true;
+    Vue.component('clickInput', MEditor);
+    var user = new Vue({
+        el:'#app',
+        delimiters:['[[',']]'],
+        data () {
+            return {
+                costName:[
+                    {
+                        title:'序号',
+                        width: 90,
+                        align:'center',
+                        key:'nub'
+                    },
+                    {
+                        title:'项目名称',
+                        render:(h,param)=>{
+                            return h('Poptip',{
+                                    props: {placement:'right'},
+
+                                },[ h('span',{class:'pointer'
+                                    },param.row.name),
+                                    h('div',{
+                                        attrs: { slot: "content" },
+                                        slot: "content"
+                                    },[
+                                        h('Button',{
+                                            class:'margin10',
+                                            props: {
+                                                type:"primary",
+                                                size:'small'
+                                            },
+                                            on: {
+                                                click: () => {
+                                                  var wrap=document.getElementsByClassName('ivu-poptip-popper');
+                                                  wrap[param.index].style.display="none";
+                                                  this.modalShow = true;
+                                                  $(".detail").css({display:'block'});
+                                                  $(".my-input").css({display:'none'});
+
+                                                }
+                                            }
+                                        },'查看'),
+                                        h('Button',{
+                                            props: {
+                                                type:"primary",
+                                                size:'small'
+                                            },
+                                            on: {
+                                                click: () => {
+                                                    var wrap=document.getElementsByClassName('ivu-poptip-popper');
+                                                    wrap[param.index].style.display="none";
+                                                    this.modalShow = true;
+                                                    $(".detail").css({display:'none'});
+                                                    $(".my-input").css({display:'block'});
+                                                }
+                                            }
+                                        },'添加')
+                                    ])
+                            ])
+                        }
+                    },
+                    {
+                        title:'合同金额（元）',
+                        width: '20%',
+                        key:'subCost'
+                    },
+                    {
+                        title:'上期累计完成金额（元）',
+                        width: '20%',
+                        render: (h , param) => {
+                            return  h('clickInput', {
+                                props: {
+                                    type:"input",
+                                },
+                                model:{
+                                    value:param.row.upCost,
+                                    callback:(t)=>{
+                                        if( param.row.upCost != t ){
+                                            this.costData[param.index].upCost = t;
+                                        }
+                                    }
+                                }
+                            },param.row.upCost)
+                        }
+                    },
+                    {
+                        title:'本期完成金额（元）',
+                        width: '20%',
+                        render: (h , param) => {
+                            return  h('clickInput', {
+                                props: {
+                                    type:"input",
+                                },
+                                model:{
+                                    value:param.row.currentDoneCost,
+                                    callback:(t)=>{
+                                        if( param.row.currentDoneCost != t ){
+                                            this.costData[param.index].currentDoneCost = t;
+                                        }
+                                    }
+                                }
+                            },param.row.currentDoneCost)
+                        }
+                    },
+                    {
+                        title:'本期累计完成金额（元）',
+                        width: '20%',
+                        key:'currentCost'
+                    }
+                ],
+                costData:[
+                    {   nub:'1',
+                        name:'总价格注项目',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.1',
+                        name:'安全文明施工',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.1.1',
+                        name:'环境保护',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.1.2',
+                        name:'文明施工',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.1.3',
+                        name:'临时设施',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.1.4',
+                        name:'安全施工',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.2',
+                        name:'其他措施项目',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.2.1',
+                        name:'夜间施工',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.2.2',
+                        name:'非夜间施工照明',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.2.3',
+                        name:'二次搬运',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    },
+                    {   nub:'1.2.4',
+                        name:'冬雨季施工',
+                        subCost:'8623577.89',
+                        upCost:'1751599.17',
+                        currentDoneCost:'156453.17',
+                        currentCost:'1986952.32'
+                    }
+                ],
+                subCost:0,
+                upCost:0,
+                currentDoneCost:0,
+                currentCost:0,
+                modalShow:false,
+                visible:false,
+                showFlag:false
+            }
+        },
+        methods:{
+            showSubCost (value) {
+                let that = this;
+                that.subCost = 0;
+                that.upCost = 0;
+                that.currentDoneCost = 0;
+                that.currentCost = 0;
+                for(let i = 0;i < value.length;i ++){
+                    that.subCost += Number( value[i].subCost );
+                    that.upCost += Number( value[i].upCost );
+                    that.currentDoneCost += Number( value[i].currentDoneCost );
+                    let temp = Number( value[i].upCost ) + Number( value[i].currentDoneCost );
+                    value[i].currentCost =temp.toFixed(2);
+                    that.currentCost += Number( value[i].currentCost );
+                }
+                that.subCost = that.subCost.toFixed(2);
+                that.upCost = that.upCost.toFixed(2);
+                that.currentDoneCost = that.currentDoneCost.toFixed(2);
+                that.currentCost = that.currentCost.toFixed(2);
+            },
+            update () {
+                for(let i = 0;i < this.costData.length;i ++){
+                    this.costData[i].upCost =  this.costData[i].currentCost;
+                    this.costData[i].currentDoneCost = 0;
+                }
+            }
+        },
+        watch:{
+            costData:{
+                handler: function (val) {
+                    this.showSubCost(val);
+                },
+                deep: true
+            }
+        },
+        mounted () {
+           this.showSubCost(this.costData);
+            $('#excel-file').change(function(e) {
+                var files = e.target.files;
+                var fileReader = new FileReader();
+                fileReader.onload = function(ev) {
+                    try {
+                        var data = ev.target.result,
+                            workbook = XLSX.read(data, {
+                                type: 'binary'
+                            }), // 以二进制流方式读取得到整份excel表格对象
+                            persons = []; // 存储获取到的数据
+                    } catch (e) {
+                        alert('文件类型不正确');
+                        return;
+                    }
+                    for (var sheet in workbook.Sheets) {
+                        var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheet], {header:1});
+                        result = roa;
+                        result = JSON.stringify(result);
+                        result = eval(result);
+//                        console.log(result);
+                        break;
+                    }
+                    let tempA = '';
+                    for(let n = 6; n < result.length; n++){
+                        tempA += "<tr>";
+                        let tempB =  result[n];
+                        for(let m = 0; m < tempB.length; m++){
+                            if(tempB[m] == null){
+                                tempA += "<td></td>";
+                            }else {
+                                tempA += "<td>" + tempB[m] + "</td>";
+                            }
+                        }
+                        tempA += "</tr>";
+                    }
+                    $("#detail-content").html(tempA);
+                    $(".detail").css({display:"block"});
+                };
+                // 以二进制方式打开文件
+                fileReader.readAsBinaryString(files[0]);
+            });
+        }
+    })
+</script>
+{% endblock %}

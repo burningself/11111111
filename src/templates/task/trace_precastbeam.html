@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<div class="row">
+ <div class="col-md-12">
+ <div class="widget-container fluid-height clearfix">
+     <div class="heading">
+        <i class="fa fa-search-plus"></i>梁段[{{pbinfo.number}}][{{pbinfo.postion}}]追踪
+     </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+		  <th>状态</th>
+		  <th>人员</th>
+		  <th>时间</th>
+		  <th>编辑</th>
+        </tr>
+      </thead>
+      <tbody>
+	   {% for status in statuslist %}
+        <tr>
+		  <td>{{status.statusname}}</td>
+		  {% if status.status_record %}
+		  		<td>{{status.status_record.actor.role}}&nbsp&nbsp{{status.status_record.actor.truename}}</td>
+				<td>{{status.status_record.time|date:"Y-m-d H:i:s"}}</td>
+				{% ifnotequal status.id 1 %}
+				   {% ifequal user.role_id 2 %}
+					  <td><a id={{status.status_record.id}} onclick="delStatusRecord(this.id)" title="删除状态记录" style="cursor:pointer;" >[删除<i class="glyphicon glyphicon-remove"></i>]</a></td>
+				   {% endifequal %}
+				   {% ifequal user.role_id 3 %}
+					  <td><a id={{status.status_record.id}} onclick="delStatusRecord(this.id)" title="删除状态记录" style="cursor:pointer;" >[删除<i class="glyphicon glyphicon-remove"></i>]</a></td>
+				   {% endifequal %}
+					{% ifequal user.role_id 6 %}
+					  <td><a id={{status.status_record.id}} onclick="delStatusRecord(this.id)" title="删除状态记录" style="cursor:pointer;" >[删除<i class="glyphicon glyphicon-remove"></i>]</a></td>
+				   {% endifequal %}
+			   {% endifnotequal %}
+		  {% else %}
+				<td colspan='3' style="color:red;">状态未扫描</td>
+		  {% endif %}
+        </tr>
+	   {% endfor %}
+
+      </tbody>
+    </table>
+</div>
+<div class="btn-toolbar" align="right">
+	<button class="btn btn-primary" onclick="javascript:history.back(1)"><i class="fa fa-arrow-left"></i>&nbsp&nbsp返回&nbsp&nbsp</button>
+</div>
+
+</div>
+</div>
+
+<script type="text/javascript">
+	function delStatusRecord(id){
+		var delID=id;
+		if(confirm("确认删除状态记录吗？")){
+        	$.ajax({ 
+        	type:"POST",
+            url: "pbstatusrecord/delete/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":delID},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("删除成功!");
+            		location.reload();
+                }
+                else{
+                	alert("删除不了,服务器问题！");
+                }
+                
+                
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+	    }
+        
+    };
+</script>
+
+{% endblock %}

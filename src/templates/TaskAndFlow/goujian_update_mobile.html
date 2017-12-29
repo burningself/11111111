@@ -1,0 +1,893 @@
+{% extends "base_mobile.html" %}
+{% block content %}
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<link href="/css/project/goujian_update_mobile.css?ver=111" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/swipercss/swiper.min.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/js/swiperjs/swiper.min.js" type="text/javascript"></script>
+
+
+<script type="text/javascript" src="/js/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="/js/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+
+<script src="js/jquery/jquery.form-3.51.0.js"></script>
+<script src="/js/loading/jq_mydialog.js"></script>
+<link href="/js/loading/my_dialog.css" type="text/css" rel="stylesheet" />
+<script src="/js/common/guanlianyuansu_mobile.js?ver=(20171109)" type="text/javascript" charset="utf-8"></script>
+
+
+<div class="btn-group topBtn">
+  <button type="button" class="btn btn-primary active" onclick="loadTab(this,0)">{{title}}</button>
+  <button type="button" class="btn btn-primary" onclick="loadTab(this,1)">补充验收信息</button>
+</div>
+
+<div id="recordUpdateBg" style="display:none; z-index:1001; background:RGBA(1,1,1,.778); position:absolute; width:100%; height:100%; text-align:center;">
+	<a class="btn btn-primary " id="stopUpdateRecord" style="border-radius: 15px; background: url(/images/bgs/voice.gif); background-size:contain; height:60px; padding:0; left:calc(50% - 120px); font-size: 40px; width:240px; line-height:60px; position:absolute; bottom:200px;"> 结束录音</a>
+</div>
+
+<div id="recordZhijianBg" style="display:none; z-index:1001; background:RGBA(1,1,1,.778); position:absolute; width:100%; height:100%; text-align:center;">
+	<a class="btn btn-primary " id="stopZhijianRecord" style="border-radius: 15px; background: url(/images/bgs/voice.gif); background-size:contain; height:60px; padding:0; left:calc(50% - 120px); font-size: 40px; width:240px; line-height:60px; position:absolute; bottom:200px;"> 结束录音</a>
+</div>
+
+<div class="swiper-container swiper-container-updatepb" style="min-height:calc(100vh - 160px);background-color: white;">
+	<div class="swiper-wrapper">
+			<div class="swiper-slide tab-pane fade in active" id="statusTab" >
+			<form method="post" action="" name="updateForm" id="goujianUpdateForm">
+				{% csrf_token %}
+				<div class="row-fluid" >
+					<div class="input-group" >
+					         <span class="input-group-addon">
+					         <i class="fa fa-barcode" ></i>元素编号：
+					         </span>
+					         <input type="hidden" class="form-control" id="goujian" name="goujian" value="{{form.cleaned_data.goujian}}">
+					         <input type="text" class="form-control" id="relateYuanSu" name="relateYuanSu" value="{{form.cleaned_data.goujian}}">
+					         <span class="input-group-addon" id="saoma_goujian">扫二维码
+					         </span>
+					</div>
+					{{form.goujian.errors}}
+					 <div class="input-group" style="margin-top:2px;">
+					  <button type="button"  style="background-color: #069CD8;border-color: #069CD8;width: 100%;" onclick="FunGuanLianYuanSu('goujian','relateYuanSu',true);"><span class="input-group-addon">点击选择验收元素</span></button>
+					 </div>
+					 
+					<div class="input-group" >
+						<span class="input-group-addon">
+				      <i class="fa fa-list"></i>选择状态：</span>
+				      <select class="form-control" name="status" id="status">
+				        	 <option value selected>请选择状态</option>
+					         {% for opt in statuslist %} 
+				         			<option value="{{opt.id}}">{{opt.statusname}}</option>
+			             {% endfor %}
+				        </select>
+				    </div>
+				    {{form.status.errors}}
+					
+					<div class="input-group" id="addZhijian" >
+			       <input id="update_photoNum" name="zhijian" type="text" class="form-control" placeholder="选取照片"  readonly="readonly"> 
+			        <a id='clearUpdatephoto' style='margin:-5px -26px auto; position:relative; z-index:2; right:30px; font-size:25px;'>
+			         	<i class='fa fa-close'></i></a>
+			       <span class="input-group-addon" id="update_chooseImage"><i class="fa fa-camera" ></i>拍照</span>
+					</div>
+					
+          <div colspan="2" class="input-group" id="addBeizhu" >
+			         <span colspan="2" class="input-group-addon" >
+			         <i class="fa fa-edit" ></i> 验收备注：</span>
+			         <input colspan="2" type="text" name="beizhu" class="form-control" placeholder="选填" id="beizhu" >
+			         <a id='startUpdateRecord' style='margin:-5px -26px auto; position:relative; z-index:2; right:25px; font-size:25px;'>
+			         	<i class='fa fa-microphone'></i></a>
+					</div>
+					
+					<div class="input-group">
+				         <span class="input-group-addon">
+				         <i class="fa fa-hdd-o"></i>场地仓位：</span>
+				         <select class="form-control" name="duichang" id="duichang" >
+				        	 <option value selected>请选择堆场</option>
+				        	 {% for opt in duichanglist %} 
+				         			<option value="{{opt.id}}">{{opt.number}}</option>
+			             {% endfor %}
+				         </select>
+				         <span class="input-group-addon" id="saoma_duichang">扫二维码
+				         </span>
+					</div>
+					{{form.duichang.errors}}
+					
+
+					
+					<input id="update_latitude" name="latitude" type="text" style="display:none"/>
+					<input id="update_longitude" name="longitude" type="text" style="display:none"/>
+					<input id="update_speed" name="speed" type="text" style="display:none">
+					<input id="update_accuracy" name="accuracy" type="text" style="display:none"/>
+					
+				  <!--<a class="add" onclick="showZhijian()">添加验收信息？</a>-->
+					<div class="input-group">
+							<p style="text-align: center;" id="res_updatestatus"></p>
+							<button class="btn btn-primary uploadBtn" type="button" id="uploadStatus" ><i class="fa fa-upload" ></i> 点击提交</button>
+					</div>
+				</div>		      
+			</form>
+		</div>
+		<div class="swiper-slide tab-pane fade in" id="zhijianTab">
+			<form method="post" action="" name="zhijianForm">
+				{% csrf_token %}
+				<div class="row-fluid" >
+					<div class="input-group">
+				         <span class="input-group-addon">
+				         <i class="fa fa-barcode" ></i>  元素编号：
+				         </span>
+				         <input type="hidden" class="form-control" id="zhijian_goujian" placeholder="输入二维码">
+				          <input type="text" class="form-control" id="relateYuanSuZhijian" name="relateYuanSuZhijian" value="{{form.cleaned_data.goujian}}">
+				         <span class="input-group-addon" id="zhijian_saoma" >扫二维码
+				         </span>
+					</div>
+					<div class="input-group" style="margin-top:2px;">
+					  <button type="button"  style="background-color: #069CD8;border-color: #069CD8;width: 100%;" onclick="FunGuanLianYuanSu('zhijian_goujian','relateYuanSuZhijian',true);"><span class="input-group-addon">点击选择验收元素</span></button>
+					 </div>
+					 
+					<div class="input-group">
+		         <input id="photoNum" type="text" class="form-control" placeholder="选取照片" readonly="readonly"> 
+		         <a id='clearZhijianphoto' style='margin:-5px -26px auto; position:relative; z-index:2; right:30px; font-size:25px;'><i class='fa fa-close'></i></a>
+		         <span class="input-group-addon" id="chooseImage">
+		         	<i class="fa fa-camera" ></i>拍照
+		         </span>
+					</div>
+					
+					<div colspan="2" class="input-group">
+					         <span colspan="2" class="input-group-addon" >
+					         <i class="fa fa-edit" ></i> 验收备注：</span>
+					         <input colspan="2" type="text" class="form-control" placeholder="选填" id="zhijian_beizhu">
+					         <a id='startZhijianRecord' style='margin:-5px -26px auto; position:relative; z-index:2; right:25px; font-size:25px;'>
+			         			<i class='fa fa-microphone'></i></a>
+					</div>
+					
+					<div class="input-group">
+							<span class="input-group-addon">
+				      <i class="fa fa-list"></i>选择状态：</span>
+				        <select class="form-control" name="zhijian_status" id="zhijian_status">
+				        	 <option selected>请选择状态</option>
+					         {% for opt in statuslist_zhijian %} 
+				         			<option value="{{opt.id}}">{{opt.statusname}}</option>
+			             {% endfor %}
+								</select>
+				    </div>
+					
+					<div class="input-group" >
+						<p style="text-align: center;" id="res_uploadPhoto"></p>
+						<span class="btn btn-primary uploadBtn" id="uploadPhoto" ><i class="fa fa-upload" ></i>点击提交<span>
+					</div>
+				</div>
+				<!--<script>
+					{% if rePath %}
+						if(!confirm("是否继续上传状态？")){
+							window.location.href="{{rePath}}";
+						}
+					{% endif %}
+				</script>-->
+			</form>
+		</div>
+
+
+	</div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">
+               		提交中，请稍等！
+            </h4>
+         </div>
+      </div>
+   </div>
+</div>
+
+<style>
+
+
+.DivTrees
+{
+    float:left;
+    width: 48%;
+    margin-left: 1%;
+}
+
+#jstree_pbgrp,#jstree_anquanwenmingsheshi,#jstree_goujian,#jstree_renwu{
+	width: 100%;
+	border: 1px solid darkgrey;
+	overflow:auto;
+	height: 400px;
+	text-align: left;
+}
+
+	/*套在Select外层，用于隐藏Select框*/
+.DivSelect
+{
+    float:left;
+    width: 48%;
+    margin-left: 1%;
+    height: 400px;
+    border: 1px #A29D9D solid;
+    font-size: 1.3em;
+}
+
+/*设置Select样式*/
+.SelectList
+{
+    width: 100%;
+    margin-top: 2px;
+}
+
+/*.SelectList option{
+	padding: 3px 3px;
+}*/
+
+</style>
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true" style="text-align: center;">
+	<div class="modal-dialog">
+		<div class="modal-content" style="min-height: calc(100vh - 180px);min-width: calc(100vw - 20px);font-size: 10px;">
+			<div class="modal-header" style="padding: 5px;">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<div style="text-align: left;font-size: 1.5em;padding: 5px;">
+				<span style="color:#337ab7;">选择关联元素</span>
+				<select id="guanlianyuansumajor" style="float: right;margin-right: 10px;" >
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				 </select>	
+				</div>
+
+			</div>
+			<div class="modal-body" style="padding: 0px;min-height: calc(100vh - 180px);margin-bottom: 2px;">
+			<div class="tabbable" id="tabs-615644" >
+				<ul class="nav nav-tabs chooseGLYS" style="margin-bottom: 2px;">
+						<li class="active">
+							 <a href="#goujianTab" data-toggle="tab">构件</a>
+						</li>
+						{% if havesheshi %}
+						<li>
+							 <a href="#anquanwenmingsheshiTab" data-toggle="tab">安全设施</a>
+						</li>
+						{% endif%}
+						
+						{% if havejixie %}
+						<li >
+							 <a href="#shigongjixieTab" data-toggle="tab">施工机械</a>
+						</li>
+						{% endif%}
+						
+						{% if haverenwu %}
+						<li>
+							 <a href="#renwuTab" data-toggle="tab">任务</a>
+						</li>
+						{% endif%}
+				</ul>
+				<div class="tab-content" style="height:400px">					
+						<div class="tab-pane active" id="goujianTab">
+								<div class="DivTrees" >
+								<div id="jstree_goujian" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect">
+									<select class="choosegoujian SelectList"  name="choosegoujian" id="choosegoujian"  multiple>
+									</select>
+								</div>
+	
+						</div>
+						{% if havesheshi %}	
+					<div class="tab-pane" id="anquanwenmingsheshiTab">
+							<div class="DivTrees">
+								<div id="jstree_anquanwenmingsheshi" class="DivJsTree">
+					
+								</div>
+							</div>
+							<div class="DivSelect">
+								<select class="choosesheshi SelectList" name="choosesheshi" id="choosesheshi" multiple >
+					
+								</select>
+							</div>
+						</div>
+							{% endif%}
+							
+						{% if havejixie %}
+						<div class="tab-pane" id="shigongjixieTab">
+								<div class="DivSelect" style="margin-left:1%;width: 98%;">
+									<select class="chooseshigongjixie SelectList"  name="chooseshigongjixie" id="chooseshigongjixie" multiple >
+									</select>
+								</div>
+						</div>
+							{% endif%}
+						
+						{% if haverenwu %}
+						<div class="tab-pane" id="renwuTab">
+							<div class="DivTrees">
+								<div id="jstree_renwu" class="DivJsTree">
+					
+								</div>
+							</div>
+								<div class="DivSelect">
+									<select class="chooserenwu SelectList"  name="chooserenwu" id="chooserenwu" multiple >
+									</select>
+								</div>
+						</div>
+					{% endif%}
+
+				</div>
+			</div>
+		</div>
+			<div class="modal-footer">
+				<a class="btn btn-default btn" role="button" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定选择</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+//	$("#duichang").bind("change", function() { 
+
+//	});
+
+
+	wx.config({
+    debug: false, 
+    appId: '{{config.appid}}', 
+    timestamp: {{config.timestamp}}, 
+    nonceStr: '{{config.nonceStr}}', 
+    signature: '{{config.signature}}',
+    jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'hideMenuItems',
+        'showMenuItems',
+        'hideAllNonBaseMenuItem',
+        'showAllNonBaseMenuItem',
+        'translateVoice',
+        'startRecord',
+        'stopRecord',
+        'onRecordEnd',
+        'playVoice',
+        'pauseVoice',
+        'stopVoice',
+        'uploadVoice',
+        'downloadVoice',
+        'chooseImage',
+        'previewImage',
+        'uploadImage',
+        'downloadImage',
+        'getNetworkType',
+        'openLocation',
+        'getLocation',
+        'hideOptionMenu',
+        'showOptionMenu',
+        'closeWindow',
+        'scanQRCode',
+        'chooseWXPay',
+        'openProductSpecificView',
+        'addCard',
+        'chooseCard',
+        'openCard'
+      ]
+	});
+	
+		$("#goujian").bind("change", function() { 
+			var chooseStatus = $("#status").val();
+						
+								$.ajax({
+											  type:"post",
+											  url:"/task/getelestatuslist/",
+											  cache:false,
+											  dataType:"json",
+											  data:{"elelist": $("#goujian").val()},
+											  success: function(data){
+											  	if(data.issuc=="true"){
+											  		var optHtml="";
+											  		
+											  		for(i in data.statuslist){
+											  			optHtml+="<option value=" + data.statuslist[i].id.toString()+ ">" + data.statuslist[i].statusname + "</option>";
+											  		}
+											  		
+											  		$("#status").html(optHtml);
+														$("#status").val(data.defaultstatus);
+
+											  	}
+											  	else{
+											  		alert(data.error);
+											  	}
+											  },
+											  error:function(data){
+											  	alert("服务器错误");
+										      	return false;
+										      },
+											});
+			
+	});
+
+	$("#zhijian_goujian").bind("change", function() { 		        
+      										$.ajax({
+											  type:"post",
+											  url:"/task/getelestatuslisthis/",
+											  cache:false,
+											  dataType:"json",
+											  data:{"elelist": $("#zhijian_goujian").val()},
+											  success: function(data){
+											  	if(data.issuc=="true"){
+											  		var optHtml="";
+											  		
+											  		for(i in data.statuslist){
+											  			optHtml+="<option value=" + data.statuslist[i].id.toString()+ ">" + data.statuslist[i].statusname + "</option>";
+											  		}
+											  		
+											  		$("#zhijian_status").html(optHtml);
+
+											  	}
+											  	else{
+											  		alert("无效构件编码！");
+											  	}
+											  },
+											  error:function(data){
+											  	alert("服务器错误");
+										      	return false;
+										      },
+											});
+	});
+
+	
+	var images = {
+	    localId: [],
+	    serverId: []
+	  	};
+	
+	var voice = {
+	    localId: '',
+	    serverId: ''
+	};
+	
+	wx.ready(function(){
+		document.querySelector('#startZhijianRecord').onclick = function () {
+		    wx.startRecord({
+		      success: function (res) {
+		      	$("#recordZhijianBg").css("display","block");
+		      },
+		      cancel: function () {
+		        alert('用户拒绝授权录音');
+		      }
+		    });
+		};
+		
+		document.querySelector('#stopZhijianRecord').onclick = function () {
+		    wx.stopRecord({
+		      success: function (res) {
+		        voice.localId = res.localId;
+		        wx.translateVoice({
+			      	localId: voice.localId,
+			      	complete: function (res) {
+			        	if (res.hasOwnProperty('translateResult')) {
+			          		$("#zhijian_beizhu").val($("#zhijian_beizhu").val()+res.translateResult);
+			        	}                                                                                                                                                                                                                                                                                                                                                                                                                                           
+			        	$("#recordZhijianBg").css("display","none");
+			      	}
+			    });
+		      },
+		      fail: function (res) {
+		        alert(JSON.stringify(res));
+		      }
+		    });
+		};
+		
+		document.querySelector('#startUpdateRecord').onclick = function () {
+		    wx.startRecord({
+		      success: function (res) {
+		      	$("#recordUpdateBg").css("display","block");
+		      },
+		      cancel: function () {
+		        alert('用户拒绝授权录音');
+		      }
+		    });
+		};
+		
+		document.querySelector('#stopUpdateRecord').onclick = function () {
+		    wx.stopRecord({
+		      success: function (res) {
+		        voice.localId = res.localId;
+		        wx.translateVoice({
+			      	localId: voice.localId,
+			      	complete: function (res) {
+			        	if (res.hasOwnProperty('translateResult')) {
+			          		$("#beizhu").val($("#beizhu").val()+res.translateResult);
+			        	}                                                                                                                                                                                                                                                                                                                                                                                                                                           
+			        	$("#recordUpdateBg").css("display","none");
+			      	}
+			    });
+		      },
+		      fail: function (res) {
+		        alert(JSON.stringify(res));
+		      }
+		    });
+		};
+
+		
+		setInterval(function(){
+			wx.getLocation({
+			    success: function (res) {
+			        var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+			        var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+			        var speed = res.speed; // 速度，以米/每秒计
+			        var accuracy = res.accuracy; // 位置精度
+			        $("#update_latitude").val(latitude);
+			        $("#update_longitude").val(longitude);
+			        $("#update_speed").val(speed);
+			        $("#update_accuracy").val(accuracy);
+			    },
+			    cancel: function (res) {
+			        alert('用户拒绝授权获取地理位置');
+			    },
+//			    fail:function(){
+//			    	alert('请授权 微信 获取 "地理位置"！');
+//			    }
+			});
+		},5000);
+			
+		document.querySelector('#saoma_duichang').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        var keyword=res["resultStr"];
+		        $("#duichang").val(keyword);
+		      }
+		    });
+		};
+		
+		document.querySelector('#saoma_goujian').onclick = function () {
+			
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        var keyword_saoma_pb = res["resultStr"];
+		        var chooseStatus = $("#status").val();
+						
+						$.ajax({
+							  type:"get",
+							  url:"/task/getelebyqrcode/",
+							  cache:false,
+							  dataType:"json",
+							  data:{"qrcode": keyword_saoma_pb},
+							  success: function(data){
+							  	if(data.issuc=="true"){
+							  		$("#relateYuanSu").val(data.elementinfo);
+										$("#goujian").val(JSON.stringify(data.element));
+										
+										
+										$.ajax({
+											  type:"post",
+											  url:"/task/getelestatuslist/",
+											  cache:false,
+											  dataType:"json",
+											  data:{"elelist": $("#goujian").val()},
+											  success: function(data){
+											  	if(data.issuc=="true"){
+											  		var optHtml="";
+											  		
+											  		for(i in data.statuslist){
+											  			optHtml+="<option value=" + data.statuslist[i].id.toString()+ ">" + data.statuslist[i].statusname + "</option>";
+											  		}
+											  		
+											  		$("#status").html(optHtml);
+														$("#status").val(data.defaultstatus);
+
+											  	}
+											  	else{
+											  		alert(data.error);
+											  	}
+											  },
+											  error:function(data){
+											  	alert("服务器错误");
+										      	return false;
+										      },
+											});
+										
+							  	}
+							  	else{
+							  		alert("无效的二维码！");
+							  	}
+							  },
+							  error:function(data){
+							  	  //alert("服务器错误");
+						      	return false;
+						      },
+							});
+						
+
+		      }
+		    });
+		};
+		
+		document.querySelector('#zhijian_saoma').onclick = function () {
+		    wx.scanQRCode({
+		      needResult: 1,
+		      desc: 'scanQRCode desc',
+		      success: function (res) {
+		        var keyword_zhijian_pb=res["resultStr"];
+		        
+						$.ajax({
+							  type:"get",
+							  url:"/task/getelebyqrcode/",
+							  cache:false,
+							  dataType:"json",
+							  data:{"qrcode": keyword_zhijian_pb},
+							  success: function(data){
+							  	if(data.issuc=="true"){
+							  		$("#relateYuanSuZhijian").val(data.elementinfo);
+										$("#zhijian_goujian").val(JSON.stringify(data.element));
+										
+										
+										$.ajax({
+											  type:"post",
+											  url:"/task/getelestatuslisthis/",
+											  cache:false,
+											  dataType:"json",
+											  data:{"elelist": $("#zhijian_goujian").val()},
+											  success: function(data){
+											  	if(data.issuc=="true"){
+											  		var optHtml="";
+											  		
+											  		for(i in data.statuslist){
+											  			optHtml+="<option value=" + data.statuslist[i].id.toString()+ ">" + data.statuslist[i].statusname + "</option>";
+											  		}
+											  		
+											  		$("#zhijian_status").html(optHtml);
+
+											  	}
+											  	else{
+											  		alert(data.error);
+											  	}
+											  },
+											  error:function(data){
+											  	alert("服务器错误");
+										      	return false;
+										      },
+											});
+										
+							  	}
+							  	else{
+							  		alert("无效的二维码！");
+							  	}
+							  },
+							  error:function(data){
+							  	  //alert("服务器错误");
+						      	return false;
+						      },
+							});
+		      }
+		    });
+		};
+		
+			document.querySelector('#update_chooseImage').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+		    wx.chooseImage({
+		      success: function (res) {
+		        images.localId = res.localIds;
+		        var length = images.localId.length;
+
+		        var i = 0, length = images.localId.length;
+		        function upload() {
+			      wx.uploadImage({
+			        localId: images.localId[i],
+			        isShowProgressTips: 1,
+			        success: function (res) {
+			          i++;
+			          images.serverId.push(res.serverId);
+			          if (i < length) {
+			            upload();
+			          }
+			          $("#update_photoNum").val("已选取"+ length.toString() + "图片:" + images.serverId.join(";"));
+			        },
+			        fail: function (res) {
+			          alert(JSON.stringify(res));
+			        }
+			      });
+			    }
+			    upload();
+		        
+		      }
+	        });
+	  	};
+	  	
+	  	document.querySelector('#clearUpdatephoto').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+			  $("#update_photoNum").val("");
+	  	};
+		
+			 document.querySelector('#clearZhijianphoto').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+	  		$("#photoNum").val("");
+	  	};
+		
+	  	document.querySelector('#chooseImage').onclick = function () {
+	  		images.localId=[];
+	  		images.serverId=[];
+		    wx.chooseImage({
+		      success: function (res) {
+		        images.localId = res.localIds;
+		        var length = images.localId.length;
+		        $("#photoNum").val("已选取"+ length.toString() + "图片！");
+		        
+		        var i = 0, length = images.localId.length;
+		        function upload() {
+			      wx.uploadImage({
+			        localId: images.localId[i],
+			        isShowProgressTips: 1,
+			        success: function (res) {
+			          i++;
+			          images.serverId.push(res.serverId);
+			          $("#name").val($("#goujian").val() + "_Info");
+			          if (i < length) {
+			            upload();
+			          }
+			        },
+			        fail: function (res) {
+			          alert(JSON.stringify(res));
+			        }
+			      });
+			    }
+			    upload();
+		        
+		      }
+	        });
+	  	};
+	  	
+	  	
+		
+  	});
+	
+	wx.error(function(res){
+		alert("授权失败！");
+	});
+	
+	document.querySelector('#uploadPhoto').onclick = function () {
+		
+  		var pbid = $("#zhijian_goujian").val();
+  		var pbStatus = $("#zhijian_status").val();
+  		
+  		var beizhu = $("#zhijian_beizhu").val();
+		  var i = 0, length = images.localId.length;
+  		if(pbid && pbStatus ){
+  					  	 $.myloading({
+		title: "正在提交，请稍后……"
+	});
+	  		$.ajax({ 
+	        	type:"POST",
+            url: "/task/goujian/update/zhijian/", 
+            cache:false,   
+            dataType: "json",
+            data: {'zhijianList': images.serverId.join(";"), "pbid": pbid, "beizhu": beizhu, 
+            			"pbstatus": pbStatus, "latitude":$("#update_latitude").val(), "longitude":$("#update_longitude").val(), 
+            			"speed":$("#update_speed").val(),"accuracy":$("#update_accuracy").val(),
+            },
+            success: function(data) { 
+            	$.myloading("hide");
+            	$("#res_uploadPhoto").text(data.msg);
+                if (data.status=="Succeed") {
+//	                	if(confirm("上传成功,是否继续上传？")){\n
+									var optHtml="";
+                	for(i in data.statusSet_zhijian){
+						  			optHtml+="<option value=" + data.statusSet[i].id.toString()+ ">" + data.statusSet[i].statusname + "</option>";
+						  		}
+						  		
+						  		$("#zhijian_status").html(optHtml);
+						  		
+						  		
+                }
+                else{
+                	alert(data.msg);
+                }
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		  } 
+	        });
+	    }
+			else{
+				alert("提交信息不全！");
+			} 
+	};
+	
+	var mySwiperUpdatepb = new Swiper ('.swiper-container-updatepb', {
+//	    direction: 'vertical',
+//	    loop: true,
+	    initialSlide: 0,
+//	    // 如果需要分页器
+//	    pagination: '.swiper-pagination',
+//	    
+//	    // 如果需要前进后退按钮
+//	    nextButton: '.swiper-button-next',
+//	    prevButton: '.swiper-button-prev',
+//	    
+//	    // 如果需要滚动条
+//	    scrollbar: '.swiper-scrollbar',
+		onSlideChangeEnd: function(swiper){
+				$(".topBtn .active").removeClass("active");
+		        $($(".topBtn button")[swiper.activeIndex]).addClass("active");
+		    }
+	  })        
+	
+	function loadTab(obj,id){
+		$(".topBtn .active").removeClass("active");
+		$(obj).addClass("active");
+		mySwiperUpdatepb.slideTo(id, 1000, false);
+	}
+	
+
+document.querySelector('#uploadStatus').onclick = function () {
+  	 $.myloading({
+		title: "正在提交，请稍后……"
+	});
+	
+	    	var options ={   
+	        url:'',   
+	        type:'post',                    
+	        data:null,
+	        success:function(data){
+	        	 $.myloading("hide");
+	        	$("#res_updatestatus").css("color",data.color_code);
+	        	$("#res_updatestatus").text(data.result_string);
+			      if(data.color_code!="red")
+						{
+							if(data.isqualify=="true")
+							{
+								if(confirm("验收不合格是否发起整改单？"))
+								{
+										var gojian = data.goujian;
+										var describe = data.describe;
+										var relatedflowtemplate = data.relatedflowtemplate;
+										
+										window.location.href='/task/projectevent/create/?gojian='+gojian+'&describe='+describe+'&relatedflowtemplate='+relatedflowtemplate;
+								}
+							}
+						}  
+	    		}
+	       
+	    	};
+	        
+	    	$("#goujianUpdateForm").ajaxSubmit(options); 
+
+	};
+	
+	$(document).ready(function(){
+		{% if duichangId or statusId %}
+			$("#duichang").val( '{{duichangId}}' );
+			$("#status").val( '{{statusId}}' );
+		{% endif %}
+		
+
+		{% if isqualify %}
+			alert("不合格状态");
+		{% endif %}
+		
+	
+		init_tree({{curMajorId}},"");
+		
+
+	
+	  
+	});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+		<link href="/css/project/filemanager.css" media="all" rel="stylesheet" type="text/css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+		<link rel="stylesheet" type="text/css" href="/js/jquery-ui-1.11.4/jquery-ui.css">
+		<script src="/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+
+		<!-- elFinder CSS (REQUIRED) -->
+		<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/css/elfinder.full.css">
+		<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/theme.css">
+
+		<!-- elFinder JS (REQUIRED) -->
+		<script src="/js/elFinder-2.1.12/elfinder.full.js"></script>
+
+		<!-- GoogleDocs Quicklook plugin for GoogleDrive Volume (OPTIONAL) -->
+		<!--<script src="js/extras/quicklook.googledocs.js"></script>-->
+
+		<!-- elFinder translation (OPTIONAL) -->
+		<script src="js/elFinder-2.1.12/i18n/elfinder.zh_CN.js"></script>
+
+		<link rel="stylesheet" href="/js/select2/select2.min.css">
+		<script src="/js/select2/select2.min.js"></script>
+		<script src="/js/select2/i18n/zh-CN.js"></script>
+		
+		<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+		<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+		
+	
+		<!-- elFinder initialization (REQUIRED) -->
+		<script type="text/javascript" charset="utf-8">
+			// Documentation for client options:
+			// https://github.com/Studio-42/elFinder/wiki/Client-configuration-options
+			
+	$(function () {
+	wgetFit();
+	
+	var height = $(window).height() -180;
+	
+	 elFinder.prototype.i18.en.messages['cmdcustom'] = '发起问题';          
+				elFinder.prototype._options.commands.push('custom');
+				elFinder.prototype.commands.custom = function() {
+					var self  = this,
+					fm    = self.fm;
+					this.exec = function(hashes) {
+						 
+						for(i=0;i<hashes.length;i++)
+						{
+							docId=hashes[i].split("_")[0]; 
+							IssueRelateFileDocIds.push(docId);
+						}
+	
+						 FunFaqiwentiDlg();
+					}
+					this.getstate = function() {
+						//return 0 to enable, -1 to disable icon access
+						 var sel = this.files(sel);
+						cnt = sel.length;
+						if (cnt < 1) {
+							return -1;
+						}
+						
+						for(i=0;i<cnt;i++)
+						{
+							if(sel[i].dirs==1)
+								return -1;
+						}
+
+						// Rule 1 and 2 exclude itself. By this I mean that rule nr 2
+						// takes precedence over rule nr 1, so you just need to check
+						// if the selected hash is a root folder.
+						result=0;
+
+						return result;
+					}
+				}
+			
+		 elFinder.prototype.i18.en.messages['cmduploadcustom'] = '上传文件';          
+				elFinder.prototype._options.commands.push('uploadcustom');
+				elFinder.prototype.commands.uploadcustom = function() {
+					var self  = this,
+					fm    = self.fm;
+					this.exec = function(hashes) {
+						var dirId = $('#elfinder')[0].elfinder.cwd().hash.split("_")[0];
+						window.location.href="/task/ziliao/uploadview/?uploaddir="+dirId;
+					}
+					this.getstate = function() {
+						//return 0 to enable, -1 to disable icon access
+						var sel = this.files(sel);
+						// Rule 1 and 2 exclude itself. By this I mean that rule nr 2
+						// takes precedence over rule nr 1, so you just need to check
+						// if the selected hash is a root folder.
+						result=0;
+
+						return result;
+					}
+				}
+	
+	var elfinder_instance = $('#elfinder').elfinder({
+					url : '/task/ziliao/connector/',  // connector URL (REQUIRED)
+					lang: 'zh_CN',                    // language (OPTIONAL)
+					urlUpload:'/task/ziliao/connector_upload/',
+					height:height,
+					rememberLastDir:false,
+					startPathHash : '28_dir',
+			    uiOptions: {
+					// toolbar configuration
+							toolbar : [
+							['back', 'forward'],
+							['home','reload'],
+							['mkdir', 'uploadcustom'],
+							['open', 'download', 'getfile'],
+							['info', 'quicklook'],
+							['copy', 'cut', 'paste'],
+							['rm'],
+							['duplicate', 'rename'],
+							['view', 'sort'],
+							['search'],
+							// extra options
+							{
+								// auto hide on initial open
+								autoHideUA: ['Mobile']
+							}
+						],
+					cwd : {
+								// display parent folder with ".." name :)
+								oldSchool : false,
+								
+								// fm.UA types array to show item select checkboxes e.g. ['All'] or ['Mobile'] etc. default: ['Touch']
+								showSelectCheckboxUA : ['Touch'],
+								
+								// file info columns displayed
+								listView : {
+									// name is always displayed, cols are ordered
+									// e.g. ['perm', 'date', 'size', 'kind', 'owner', 'group', 'mode']
+									// mode: 'mode'(by `fileModeStyle` setting), 'modestr'(rwxr-xr-x) , 'modeoct'(755), 'modeboth'(rwxr-xr-x (755))
+									// 'owner', 'group' and 'mode', It's necessary set volume driver option "statOwner" to `true`
+									columns : ['date', 'size', 'kind', ],
+									// override this if you want custom columns name
+									// example
+									// columnsCustomName : {
+									//		date : 'Last modification',
+									// 		kind : 'Mime type'
+									// }
+									columnsCustomName : {
+										
+								  },
+									// fixed list header colmun
+									fixedHeader : true
+								}
+							},	
+						},
+						commands : [
+							'custom','open', 'opendir', 'reload', 'home', 'up', 'back', 'forward', 'getfile', 'quicklook', 
+							'download', 'rm', 'duplicate', 'rename', 'mkdir', 'mkfile', 'uploadcustom', 'copy', 
+							'cut', 'paste', 'edit', 'extract', 'archive', 'search', 'info', 'view', 'help',
+							'resize', 'sort', 'places', 'chmod'
+						],
+					contextmenu : {
+							// navbarfolder menu
+							navbar : ['open', 'download', '|', 'uploadcustom', '|', 'copy', 'cut', 'paste', '|', 'rm', '|', 'rename', '|', 'archive', '|', 'places', 'info', 'chmod', 'netunmount'],
+							// current directory menu
+							cwd    : ['reload', 'back', '|', 'uploadcustom', 'mkdir', 'mkfile', 'paste', '|', 'sort', '|', 'info'],
+							// current directory file menu
+							files  : ['getfile', '|' ,'custom','open', 'download', 'opendir', 'quicklook', '|', 'uploadcustom', 'mkdir', '|', 'copy', 'cut', 'paste', '|', 'rm', '|', 'edit', 'rename', '|',  'info', 'chmod']
+						},
+
+				});
+				
+
+		});
+		
+		function wgetFit(){
+				var minheight = $(window).height() -170;
+				$(".row").css('min-height',minheight);
+			}
+		</script>
+
+{% endblock %}
+
+{% block content %} 
+		
+<div class="row">
+    	<div class="header-row">
+	        <i class="fa fa-file-pdf-o"></i>安全检查
+	    </div>
+	<div class="row content-row" >
+		<!-- Element where elFinder will be created (REQUIRED) -->
+		<div  id="elfinder"></div>
+ 	</div>
+  </div>   	
+  
+   	<div class="modal fade" id="faqiwentidlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4 align="left">发起问题</h4>
+            </div>
+            <div class="modal-body">
+	          <div class="widget-content padded">
+				<form action="#" class="form-horizontal"  id="faqiwentiForm" align="left">
+				  <div class="form-group">
+					<label class="control-label col-md-3">问题类型</label>
+					<div class="col-md-7">
+					  <select class="form-control" name="issuetype" id="issuetype">
+						{% for issuetype in issuetypeList %}
+								<option value="{{issuetype.name}}">{{issuetype.name}}</option>
+						{% endfor %}
+					</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">问题编号</label>
+					<div class="col-md-7">
+						<input class="form-control" placeholder="输入问题编号"  name="qnumber" id="qnumber" type="text">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">问题描述</label>
+					<div class="col-md-7">
+					<textarea class="form-control"  placeholder="输入问题描述" name="qdescribe" id="qdescribe" rows="3"></textarea>
+				</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">关联元素</label>
+					<div class="col-md-7">
+					<label class="radio-inline"><input onchange="RelateTypeChange()" name="optionsRadiosRelateType" type="radio" value="构件" checked><span>构件</span></label>
+					<label class="radio-inline"><input onchange="RelateTypeChange()" name="optionsRadiosRelateType" type="radio" value="任务"><span>任务</span></label>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="col-md-3"></div>
+					<div class="col-md-7">
+						<select class="form-control select2able" style="width: 100%;" name="RelateElement" id="RelateElement">
+						</select>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label col-md-3">负责分包</label>
+					<div class="col-md-7">
+					  <select class="form-control" name="dealTemplateMajor" id="dealTemplateMajor">
+					  <option value="0" selected>全部</option>
+						{% for major in majorList %}
+								<option value="{{major.id}}">{{major.name}}</option>
+						{% endfor %}
+					</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">处理流程</label>
+					<div class="col-md-7">
+					  <select class="form-control" name="dealTemplate" id="dealTemplate">
+						{% for temp in FlowTemplateList %}
+							<option value="{{temp.id}}">{{temp.name}}</option>
+						{% endfor %}
+					  </select>
+					</div>
+				</div>
+		         <div class="form-group">
+					<label class="control-label col-md-3">优先级</label>
+					<div class="col-md-7">
+					  <select class="form-control" name="issuePriority" id="issuePriority">
+						  <option value="1">普通</option>
+						  <option value="5">重要问题</option>
+						  <option value="10">重大问题</option>
+					  </select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">截至时间</label>
+					<div class="col-md-7">
+						<input class="form-control" type="text"  value="{{deadline|date:"Y-m-d"}}" name="deadline" id="deadline" data-date-format="yyyy-mm-dd">
+					</div>
+				</div>
+				<input type="hidden" id="RelateFileList" name="RelateFileList" value='' />
+				</form>
+			  </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnFaqiWenTiCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="Funfaqiwenti()" id="btnFaqiWenTi" >发起</button>
+            </div>
+    </div>
+    </div>
+    </div>
+  
+  
+  <script type="text/javascript">
+  
+  $('#dealTemplateMajor').change(function(){ 
+			var major = $("#dealTemplateMajor").val();
+			var issuetype = $("#issuetype").val();
+			$.ajax({
+			  type:"get",
+			  url:"/task/issue/getmajortemplate/",
+			  cache:false,
+			  dataType:"json",
+			  data:{"major":major,"issuetype":issuetype,},
+			  success: function(data){
+				if(data.issuc=="true")
+				{
+					$("#dealTemplate").empty();
+					for(var each in data.TemplateList){
+						$("#dealTemplate").append("<option value=" + data.TemplateList[each].id + ">" + data.TemplateList[each].name+ "</option>");
+					}
+				}
+				else
+				{
+					alert(data.error);
+				}
+            
+			  }
+			});
+		});
+		
+$('#issuetype').change(function(){ 
+			var issuetype = $("#issuetype").val();
+			$.ajax({
+			  type:"get",
+			  url:"/task/issue/getissuetypetemplate/",
+			  cache:false,
+			  dataType:"json",
+			  data:{"issuetype":issuetype,},
+			  success: function(data){
+				if(data.issuc=="true")
+				{
+					$("#dealTemplate").empty();
+					for(var each in data.TemplateList){
+						$("#dealTemplate").append("<option value=" + data.TemplateList[each].id + ">" + data.TemplateList[each].name+ "</option>");
+					}
+				}
+				else
+				{
+					alert(data.error);
+				}
+            
+			  }
+			});
+		});
+		
+  </script>
+  
+{% endblock %}
+

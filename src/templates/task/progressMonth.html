@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+	<script type="text/javascript">
+	    function hideNum(){
+    			document.getElementById("yuzhi").innerHTML     = "";
+            	document.getElementById("chuch").innerHTML    = "";
+            	document.getElementById("buhege").innerHTML = "";
+   		 } 
+	</script>
+    <style>
+    @media (min-width: 767px) {
+	    .materialTab{
+	    	width:30%;
+	    	//border:solid 2px #DDDDDD;
+	    	display:inline-block;
+	    	vertical-align:top;
+	    	margin-left:-4px;
+	    }
+	    
+	    #gangjinTable{
+	    	margin-left:5%;
+	    }
+	    
+	    #pandianDate{
+	    	font-size:14px;
+	    	margin-left:1%;
+	    }
+	    
+	    #pandianRow{
+	    	width:98.5%;
+	    	margin-left:0;
+	    }
+	    
+	    th{
+	    	text-align:center;
+	    }
+	    
+	    td{
+	    	text-align:center;
+	    }
+		.container-fluid{
+			margin-left:2%;
+		}
+		.hero-donut{
+			font:12px;
+		}
+			
+		h5{
+			font-size:20px;
+			width:100%;
+			text-align: center;
+		}
+	
+		.col-md-8{
+			display: inline-block;
+			height:202px;
+			padding:0;
+		}
+		
+		.col-liangduan{
+			margin-left:2%;
+			margin-top:1%;
+			width:40%;
+			border-radius: 20px;
+			background-color: inherit;
+			background-color:white;
+			display:inline-block;
+			vertical-align:top;
+			color:black;
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.row-fluid{
+			background-color:white;
+			margin-left:2%; 
+			margin-top:1%;
+			display:inline-block; 
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.widget-container{
+			background-color: inherit;
+		}
+		
+		.number{
+			font-size:40px !important;
+		}
+		
+		h3{
+			text-align:center;
+			color: #007aff;
+		}
+		
+		bingTu{
+			height:250px;
+			width:40%;
+		}
+		
+		#hero-donut-total, #hero-donut-pass {
+			height: 260px; 
+			width:100%; 
+		}
+		
+		#month-draw{ width: 56%;}
+		#day-draw{ width: 56%;}
+		#circle-draw{width: 40%;}
+		
+		#toTop{
+    		display:none;
+    		
+    	}
+	}
+	
+    @media (max-width: 767px) {
+    	#month-draw,#day-draw,#circle-draw{ width: 100%; margin-bottom:10px;}
+    	
+    	#exportReport, #dateConfig{
+    		display:none;
+    	}
+    	
+    	#toTop{
+    		margin-top:10px;
+    		margin-bottom:32px;
+    		width:100%;
+    	}
+    	
+    	#hero-donut-total, #hero-donut-pass {
+			width:100%; 
+			height:20%;
+			min-height:180px;
+		}
+    	
+	    .materialTab{
+	    	width:100%;
+	    	display:inline-block;
+	    	vertical-align:top;
+	    }
+	    
+	    #pandianRow{
+	    	width:100%;
+	    }
+	    
+	    #pandianDate{
+	    	font-size:12px;
+	    }
+	    
+	    th{
+	    	text-align:center;
+	    }
+	    
+	    td{
+	    	text-align:center;
+	    }
+		.container-fluid{
+			margin-left:0%;
+		}
+		.hero-donut{
+			font:12px;
+		}
+			
+		h5{
+			font-size:20px;
+			width:100%;
+			text-align: center;
+		}
+	
+		.col-md-8{
+			display: inline-block;
+			height:202px;
+			padding:0;
+			width:100%;
+			margin-bottom:10px;
+		}
+		
+		.col-liangduan{
+			margin-top:1%;
+			width:100%;
+			margin-bottom:10px;
+			border-radius: 20px;
+			background-color: inherit;
+			background-color:white;
+			display:inline-block;
+			vertical-align:top;
+			color:black;
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.row-fluid{
+			background-color:white;
+			margin-top:1%;
+			display:inline-block; 
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		#circle-draw{
+			height:10%;
+		}
+		
+		.widget-container{
+			background-color: inherit;
+		}
+		
+		.number{
+			font-size:40px !important;
+		}
+		
+		h3{
+			text-align:center;
+			color: #007aff;
+			font-size:15px;
+		}
+		
+		bingTu{
+			height:250px;
+			width:40%;
+		}
+	}
+	
+	</style>
+	
+    <div>
+        <div class="photo">
+            <div id="pad-wrapper">
+                <div class="row-fluid" id="month-draw" style="vertical-align: top; margin-left:0;" align="left" >
+                	<h3><i class="fa fa-tasks">&nbsp</i>月生产图  
+						<a href="#" id="exportReport" class="btn btn-success btn pull-right" data-toggle="modal" data-target="#exportworddlg"><i class="fa fa-download"></i>导出生产报表</a>
+					</h3>
+            	    <a id="dateConfig" class="chooseDate pull-right" style="margin-right:5%; cursor:pointer">
+						<span class="add-on" ><i class="fa fa-clock-o"></i>选择时间点</span>
+                	</a>
+                    <div class="span12" align="center" style="width:100%;">
+                        <div style="display:inline-block; width:25%; font-size: 11px;align:ceter;">
+                        	<a  style="border: #67BDF8 solid 2px; width:15%; display: inline-block; margin-bottom:1%;">
+                        	</a> 
+                        	<a style="color: black;">	
+                        		预制梁段
+                        	</a>
+                        	<a id="yuzhi" style="color: black;">
+                        	</a>
+                        </div>
+                        <div style="display:inline-block; width:25%; font-size: 11px;align:ceter;">
+                        	<a style="border: #ACDF9D solid 2px; width:15%; display: inline-block; margin-bottom:1%;">
+                        	</a> 
+                        	<a style="color: black;">	
+                        		出厂梁段
+                        	</a>
+                        	<a id="chuch" style="color: black;">
+                        	</a>
+                        </div>
+                        <div style="display:inline-block; width:25%; font-size: 11px;align:ceter;">
+                        	<a style="border: #D9534F solid 2px; width:15%; display: inline-block; margin-bottom:1%;">
+                        	</a>
+                        	<a style="color: black;">	 
+                        	不合格梁段
+                        	</a>
+                        	<a id="buhege" style="color: black;">
+                        	</a>
+                        </div>
+                    </div>
+                    <div style="height: 245px; width:100%;" align="center">
+						<div id="hero-area" style="height: 240px; width:96%;">
+						</div>
+					</div>
+				</div>
+				
+			 	<!-- morris bar & donut charts -->
+	            <div class="row-fluid" id="day-draw" style="margin-left:0; margin-bottom:35px; ">
+	                <h3><i class="fa fa-th-list" style="margin-left:20%;">&nbsp</i>当月生产进度
+	                	<a class="chooseDate pull-right" style="margin-right:5%; font-size:14px; font-weight:bold;">
+							<span class="add-on">计划生产量： {{tgt}}</span>
+                		</a>
+                	</h3>
+	                <div id="cunliang-bar" style="height: 270px; width:100%;"></div>
+	            </div>   
+		       
+            </div>
+        </div>
+    </div>
+						
+    <!-- build the charts -->
+    <script src="/js/jquery.flot.js"></script>
+    <script src="/js/jquery.flot.stack.js"></script>
+    <script src="/js/jquery.flot.resize.js"></script>
+	<script src="/js/exportword.js"></script>
+    <script type="text/javascript" >		        
+        // Morris Area Chart
+        $(document).ready(function() {
+         	
+         	var max = ( Math.ceil({{yuzhi}}/4) )*8;
+         	
+            if ($('#hero-area').length) {
+		        Morris.Line({
+		        	element: "hero-area",
+		        	data: [
+						{% for item in countlist %}
+							{month: '{{item.countdate}}', 已预制梁段: {{item.yuzhi}}, 出厂梁段: {{item.chuchang}}, 不合格梁段: {{item.buhege}}},
+						{% endfor %}
+		            ],
+		            xkey: 'month',
+		            ykeys: ['已预制梁段', '出厂梁段', '不合格梁段'],
+		            labels: ['已预制梁段', '出厂梁段', '不合格梁段'],
+		          hideHover: "auto",
+				  gridTextColor: "black",	
+		          lineWidth: 2,
+		          pointSize: 4,
+		          lineColors: ["#67BDF8", "#ACDF9D", "red"],
+		          fillOpacity: 0.5,
+		          smooth: true,
+				  ymax:'auto ' + max.toString(),
+				  ymin:'auto 20',
+		        });
+	        }
+
+	        var cur = new Date(); 
+	        
+	        if ($('#cunliang-bar').length) {
+		        Morris.Line({
+		        	element: "cunliang-bar",
+		        	data: [
+						{% for item in daycountList %}
+							{% if item.cur %}
+								{day: '{{item.day}}', 预制梁段比例: {{item.count}}},
+							{% else %}
+								{day: '{{item.day}}'},
+							{% endif %}
+						{% endfor %}
+		            ],
+		            xkey: 'day',
+		            ykeys: ['预制梁段比例'],
+		            labels: ['预制梁段比例'],
+		          hideHover: "auto",
+				  gridTextColor:"black",	
+		          lineWidth: 2,
+		          pointSize: 4,
+		          lineColors: ["#ACDF9D"],
+		          fillOpacity: 0.5,
+		          smooth: true,
+		          units:'%',
+		          ymax:'auto 100'
+		        });
+	        } 	
+	      });
+	
+    </script>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<link rel="stylesheet" href="/css/style.min.css" />
+ <script src="/js/jquery.js"></script>
+ <script src="/js/jstree.min.js"></script>
+  <script src="/js/datastruct.js"></script>
+    <script src="/js/taskselect.js"></script>
+<script type="text/javascript">
+
+$(function () {
+    // 6 create an instance when the DOM is ready
+	$('#jstree').jstree({
+		"core" : {'data' : {
+		      'url' : '/task/projecttask/tasktree/',
+		      'data' : function (node) {
+					return { 'id' : node.id,'taskid' : $('#taskid').val() };
+			}
+		  }
+		},
+		"plugins" : [ "themes", "html_data" ,"checkbox","search" ] 
+		});
+});
+
+  
+$(document).ready(function(){
+
+	$("#btnReleatePbs").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbAddSignRow(pbs);
+	});
+	
+	$("#btnCancle").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbDeleteUnSelect(pbs);
+	});
+});
+
+
+</script>
+{% endblock %}
+
+
+{% block content %} 
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container label-container fluid-height">
+      <div class="heading">
+        <i class="fa fa-tags"></i>编辑任务-基本信息
+      </div>
+<fieldset style="width:100%; height:5%;padding:2%;padding-left:0; padding-top:1%;">
+		{% if task %}
+			<style type="text/css">
+				.taskInfo {
+					font-size:14px;
+					width:150px;
+					margin-left:0px;
+					text-align:right;
+					display:inline-block;
+					color:#999999;
+					
+				}
+				.taskVal{
+					margin-left:10px;
+					width:140px;
+					font-size:14px;
+					display:inline-block;
+				}
+				.taskValdate{
+					margin-left:10px;
+					width:140px;
+					font-size:14px;
+					display:inline-block;
+				}
+			
+			</style>
+			<div class=taskInfo>生产批次：</div><span class="taskVal" style="text-decoration:none;">{{task.id}} </span>
+			<div class=taskInfo  align="right">任务负责人：</div><span class="taskVal">{{task.material.name}}（{{task.material.role}}）</span>
+			<div class=taskInfo  align="right">任务下达人：</div><span class="taskVal">{{task.creator}}（{{task.creator.role}}）</span>
+			<br></br>
+			{% if task.actualstart %}
+				<div class=taskInfo  nowrap align="right">启动时间：</div><span class="taskValdate">{{task.actualstart|date:"Y-m-d"}}</span>
+			{%else%}	
+				<div class=taskInfo nowrap align="right">任务创建时间：</div><span class="taskValdate">{{task.planstart|date:"Y-m-d"}}</span>
+			{%endif%}	
+			{% if task.actualfinish %}
+				<div class=taskInfo  nowrap align="right">出厂时间：</div ><span class="taskValdate">{{task.actualfinish|date:"Y-m-d"}}</span>
+			{%else%}	
+				<div class=taskInfo  nowrap align="right">任务结束时间：</div><span class="taskValdate">{{task.planfinish|date:"Y-m-d"}}</span>
+			{%endif%}	
+
+		{% endif %}
+</fieldset>		
+</div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container label-container fluid-height">
+      <div class="heading">
+        <i class="fa fa-pencil-square-o"></i>编辑任务-录入材料
+      </div>
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane active in" id="home">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+	<input name='taskid' type='hidden' id='taskid' value="{{task.id}}" />
+    <form id="tab" action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+		<table border="0" cellpadding="0" cellspacing="0" style="width:100%">
+		<TR>
+			<TD width="100%">
+				<fieldset style="height:100%;">
+					  <table border="0" cellpadding="2" cellspacing="1" style="width:100%">
+					  <tr>
+					    <td align="right" width="10%">水泥批次：</td>
+							<td width="40%">
+							{{ form.shuini.errors }}
+							<input type="text" class="form-control" name="shuini" value="{{shuini}}">
+							</td>
+						<td nowrap align="right">砂石批次：</td>
+					    <td>
+							{{ form.shashi.errors }}
+							<input type="text" class="form-control" name="shashi" value="{{shashi}}">
+						</td>
+					   </tr>
+						  <tr>
+					    <td align="right" width="10%">碎石批次：</td>
+							<td width="40%">
+							{{ form.suishi.errors }}
+							<input type="text" class="form-control" name="suishi" value="{{suishi}}">
+							</td>
+						<td nowrap align="right">粉煤灰批次：</td>
+					    <td>
+							{{ form.fenmeihui.errors }}
+							<input type="text" class="form-control" name="fenmeihui" value="{{fenmeihui}}">
+						</td>
+					   </tr>
+					   
+					   	<tr>
+					    <td align="right" width="10%">矿粉批次：</td>
+							<td width="40%">
+							{{ form.kuangfen.errors }}
+							<input type="text" class="form-control" name="kuangfen" value="{{kuangfen}}">
+							</td>
+						<td nowrap align="right">其他：</td>
+					    <td>
+							{{ form.other.errors }}
+							<input type="text" class="form-control" name="other" value="{{other}}">
+						</td>
+					   </tr>
+					   
+					   	<tr>
+						<td nowrap align="right">混泥土强度报告：</td>
+					    <td>
+							{{ form.filebaogao.errors }}
+							{{ form.filebaogao }}
+						</td>
+					   </tr>
+					   
+					   <tr>
+					    <td nowrap> 
+							<a href="#" class="btn btn-success btn" data-toggle="modal" data-target="#update"><i class="fa fa-plus"></i>添加更多梁段</a>
+						</td>
+						<td colspan="3">
+							<table class="table" id="RelatePbItem">
+									<tr >
+									  <td colspan="2" style="height:20px;" ><h3 style="text-align:center; margin:0;">选择梁段</h3></td>
+									</tr>
+									<tr id="tr1" >
+									   <td >编号 </td>	  
+									   <td align='center' >编辑
+									   <input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value="2" />
+									   </td>		
+									</tr>
+							</table>
+							<input name='PbSelected' type='hidden' id='PbSelected' value="" />
+						</td>
+					    </tr>
+					  </table>
+				</fieldset>		
+				</TD>
+		</TR>
+		
+		</TABLE>
+		
+  
+      </div>
+  </div>
+	
+<div class="btn-toolbar" align="right">
+    <button type="submit" class="btn btn-primary" ><i class="fa fa-save"></i> 保存</button>
+    <a class="btn btn-default btn" onclick="javascript:history.back(1)" > 返回</a>
+  <div class="btn-group">
+  </div>
+</div>
+</div>
+
+</form>
+		
+		
+
+	<div class="modal fade" id="update" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <a>选择梁段</a>
+            </div>
+            <div class="modal-body">
+				  <div id="jstree">
+					<!-- the tree is populated from inline HTML -->
+				  </div>
+            </div>
+            <div class="modal-footer">
+				<input type="text" value="" id="search_pb" onkeyup="searchFunction()" placeholder="搜索" />
+                <a class="btn" role="button" id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn" id="btnReleatePbs" data-dismiss="modal" aria-hidden="true">确定</button>
+            </div>
+    </div>
+    </div>
+    </div>
+		
+				
+        </div>
+    </div>
+{% endblock %}

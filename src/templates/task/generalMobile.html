@@ -1,0 +1,855 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+	<script type="text/javascript">
+		function refreshEditModal(typeName){
+			var html = "";
+			var dataList = {};
+			var i = 0;
+			className = typeName.substring(0,typeName.indexOf(" "));
+			$("#" + className + "Table tbody tr").each(function(){
+				html += "<tr>";
+				if(this.children[0].innerHTML=="") return false;
+				html += "<td>" + this.children[0].innerHTML + "</td>";
+				var name = this.children[0].innerHTML;
+				html += '<td><input type="number" name="points" min="1" placeholder=" ' + this.children[1].innerHTML + '"</td>';
+				var num = this.children[1].innerHTML;
+				html += "<td>" + this.children[2].innerHTML + "</td>";
+				html += "</tr>";
+
+				dataList[name]=num;
+				i++;
+			});
+
+			$("#MaterialModalBody").html(html);
+			
+			datePeriod = $("." + className + "Picker").val();
+			
+			$("#updateData").unbind('click').click(function(){
+				var dataDic = {};
+				className = typeName.substring(0,typeName.indexOf(" "));
+				$("#MaterialModalBody tr").each(function(){
+					if($(this).children("td")[0]){
+						var a = $(this).children("td")[0].childNodes[0].data;
+						var b = $(this).children("td")[1].firstElementChild.value;
+						if(b){ 
+							dataDic[a]=b;
+						}
+					}
+				});
+				
+				if(! dataDic) {
+					alert("没有数据录入！");
+					return;
+				}
+				
+				var userName = '{{user}}';
+				$.ajax({
+				  type:"post",
+				  url:"update_pandian/",
+				  cache:false,
+				  dataType:"json",
+				  data:{"datePeriod": datePeriod, "dataList":JSON.stringify(dataDic), "typeName":className, "userName":userName},
+				  success: function(data){
+				  	if(data.status=="Succeed"){
+				  		$('#EditData').modal('hide');
+						alert("更新成功！");
+				  		$("#" + className + "Table tbody tr").each(function(){
+							if(this.children[0].innerHTML=="") return false;
+							var a = this.children[0].innerHTML;
+
+							if(a in dataDic){
+								this.children[1].innerHTML = dataDic[a] ;
+							}
+						});
+				  		
+				  	}
+				  	else{
+				  		alert("服务器错误，请重试！");
+				  	}
+				  },
+				  error:function(data){
+				  	alert("服务器错误");
+			      	return false;
+			      },
+				});
+			
+			});
+        
+        }
+		
+	    function hideNum(){
+    			document.getElementById("yuzhi").innerHTML     = "";
+            	document.getElementById("chuch").innerHTML    = "";
+            	document.getElementById("buhege").innerHTML = "";
+   		 } 
+   		 
+   		function updateInfo(value, name){
+   			var datePeriod = value;
+   			var material_type = name;
+			$.ajax({
+			  type:"post",
+			  url:"query_pandian/",
+			  cache:false,
+			  dataType:"json",
+			  data:{"datePeriod": datePeriod, "material_type":material_type},
+			  success: function(data){
+			  	if(data.status=="Succeed"){
+			  		var htmlStr = "";
+			  		for(var each in data.queryList){
+			  			htmlStr += "<tr><td>" + data.queryList[each].name + "</td><td>" + data.queryList[each].quantity + "</td><td>" + data.queryList[each].unit + "</td></tr>";
+			  		}
+			  		
+			  		htmlStr += "<tr><td></td><td></td><td></td></tr>";
+			  		listName = material_type.replace(/Picker/g,"Table");
+			  		$("#"+listName + " > table > tbody").html(htmlStr);
+			  	}
+			  }
+			});
+		}
+	</script>
+    <style>
+    @media (min-width: 767px) {
+	    .materialTab{
+	    	width:30%;
+	    	//border:solid 2px #DDDDDD;
+	    	display:inline-block;
+	    	vertical-align:top;
+	    	margin-left:-4px;
+	    }
+	    
+	    #gangjinTable{
+	    	margin-left:5%;
+	    }
+	    
+	    #pandianDate{
+	    	font-size:14px;
+	    	margin-left:1%;
+	    }
+	    
+	    #pandianRow{
+	    	width:98.5%;
+	    	margin-left:0;
+	    }
+	    
+	    th{
+	    	text-align:center;
+	    }
+	    
+	    td{
+	    	text-align:center;
+	    }
+		.container-fluid{
+			margin-left:2%;
+		}
+		.hero-donut{
+			font:12px;
+		}
+			
+		h5{
+			font-size:20px;
+			width:100%;
+			text-align: center;
+		}
+	
+		.col-md-8{
+			display: inline-block;
+			height:202px;
+			padding:0;
+		}
+		
+		.col-liangduan{
+			margin-left:2%;
+			margin-top:1%;
+			width:40%;
+			border-radius: 20px;
+			background-color: inherit;
+			background-color:white;
+			display:inline-block;
+			vertical-align:top;
+			color:black;
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.row-fluid{
+			background-color:white;
+			margin-left:2%; 
+			margin-top:1%;
+			display:inline-block; 
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.widget-container{
+			background-color: inherit;
+		}
+		
+		.weather{
+			background: #5BC0DE;
+			border: 5px solid #5BC0DE;
+			border-radius: 20px;
+			padding:0;
+		}
+		
+		.notice{
+			margin-left:1%;
+			width:30%;
+			display:inline-block;
+			height:202px;
+			border: 5px solid white;
+			border-radius: 20px;
+			background-color:white;
+		}
+		
+		#carousel-example-generic{
+			height:202px;
+			width:100%;
+			margin:0;
+		}
+		
+		.carousel-inner{
+			height:150px;
+			width:100%;
+		}
+		
+		.carousel-indicators{
+			bottom:0px;
+		}	
+		
+		.carousel-indicators li{
+			background-color:white;
+			border: #5BC0DE solid 1px;
+			margin-top:100px;
+		}
+		
+		.carousel-indicators .active{
+			background-color: #5BC0DE;
+		}
+		
+		.carousel-control{
+			margin-top:2%;
+			height: 180px;
+			background-color:white !important;
+		}
+		
+		.carousel-control .glyphicon{
+			margin-left:-25%;
+			background-color:inherite;
+			color:#5BC0DE;
+			font-size:20px;
+		}
+		
+		.number{
+			font-size:40px !important;
+		}
+		
+		h3{
+			text-align:center;
+			color: #007aff;
+		}
+		
+		bingTu{
+			height:250px;
+			width:40%;
+		}
+		
+		#hero-donut-total, #hero-donut-pass {
+			height: 260px; 
+			width:100%; 
+		}
+		
+		#month-draw{ width: 56%;}
+		#day-draw{ width: 56%;}
+		#circle-draw{width: 40%;}
+		
+		#toTop{
+    		display:none;
+    		
+    	}
+	}
+	
+    @media (max-width: 767px) {
+    	#month-draw,#day-draw,#circle-draw{ width: 100%; margin-bottom:10px;}
+    	
+    	#exportReport, #dateConfig{
+    		display:none;
+    	}
+    	
+    	#toTop{
+    		margin-top:10px;
+    		margin-bottom:32px;
+    		width:100%;
+    	}
+    	
+    	#hero-donut-total, #hero-donut-pass , #bangzaArea, #yuzhiArea, #yanghuArea, #cunliangArea{
+			width:100%; 
+			height:20%;
+			min-height:180px;
+		}
+    	
+	    .materialTab{
+	    	width:100%;
+	    	display:inline-block;
+	    	vertical-align:top;
+	    }
+	    
+	    #pandianRow{
+	    	width:100%;
+	    }
+	    
+	    #pandianDate{
+	    	font-size:12px;
+	    }
+	    
+	    th{
+	    	text-align:center;
+	    }
+	    
+	    td{
+	    	text-align:center;
+	    }
+		.container-fluid{
+			margin-left:0%;
+		}
+		.hero-donut{
+			font:12px;
+		}
+			
+		h5{
+			font-size:20px;
+			width:100%;
+			text-align: center;
+		}
+	
+		.col-md-8{
+			display: inline-block;
+			height:202px;
+			padding:0;
+			width:100%;
+			margin-bottom:10px;
+		}
+		
+		.col-liangduan{
+			margin-top:1%;
+			width:100%;
+			margin-bottom:10px;
+			border-radius: 20px;
+			background-color: inherit;
+			background-color:white;
+			display:inline-block;
+			vertical-align:top;
+			color:black;
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		.row-fluid{
+			background-color:white;
+			margin-top:1%;
+			display:inline-block; 
+			border: 5px solid white;
+			border-radius: 20px;
+		}
+		
+		#circle-draw{
+			height:10%;
+		}
+		
+		.widget-container{
+			background-color: inherit;
+		}
+		
+		.weather{
+			background: #5BC0DE;
+			border: 5px solid #5BC0DE;
+			border-radius: 20px;
+			padding:0;
+		}
+		
+		.notice{
+			width:100%;
+			display:inline-block;
+			height:202px;
+			border: 5px solid white;
+			border-radius: 20px;
+			background-color:white;
+			margin-bottom:10px;
+		}
+		
+		#carousel-example-generic{
+			height:202px;
+			width:100%;
+			margin:0;
+		}
+		
+		.carousel-inner{
+			height:150px;
+			width:100%;
+		}
+		
+		.carousel-indicators{
+			bottom:0px;
+		}	
+		
+		.carousel-indicators li{
+			background-color:white;
+			border: #5BC0DE solid 1px;
+			margin-top:100px;
+		}
+		
+		.carousel-indicators .active{
+			background-color: #5BC0DE;
+		}
+		
+		.carousel-control{
+			margin-top:2%;
+			height: 180px;
+			background-color:white !important;
+		}
+		
+		.carousel-control .glyphicon{
+			margin-left:-25%;
+			background-color:inherite;
+			color:#5BC0DE;
+			font-size:20px;
+		}
+		
+		.number{
+			font-size:40px !important;
+		}
+		
+		h3{
+			text-align:center;
+			color: #007aff;
+			font-size:15px;
+		}
+		
+		bingTu{
+			height:250px;
+			width:40%;
+		}
+	}
+	
+	</style>
+	
+	<div class="notice">
+		<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+		  <h3 align="center"><i class="fa fa-signal">&nbsp</i>通告栏
+		  </h3>
+	      <!-- Indicators -->
+	      <ol class="carousel-indicators">
+	      	{% for each in noticeList %}
+	      		{% ifequal forloop.counter0 0%}
+		        	<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+		        {% else %}	
+		        	<li data-target="#carousel-example-generic" data-slide-to="{{ forloop.counter0 }}"></li>
+		       	{% endifequal %}
+		    {% endfor %}
+	      </ol>
+	    
+	      <!-- Wrapper for slides -->
+	      <div class="carousel-inner" style="text-align:center">
+	        {% for each in noticeList %}
+	        	{% ifequal forloop.counter 1%}
+		        	<div class="item active" align="center">
+		        {% else %}
+		        	<div class="item" align="center">
+		        {% endifequal %}
+			          	<p style="width:70%;text-align:left;">{{each}}</p>
+		        </div>
+		    {% endfor %}
+	      </div>
+	    
+	      <!-- Controls -->
+	      <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+	        <span class="glyphicon glyphicon-chevron-left"></span>
+	      </a>
+	      <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+	        <span class="glyphicon glyphicon-chevron-right"></span>
+	      </a>
+	    </div>
+	</div>
+    <div>
+        <div class="photo">
+            <div id="pad-wrapper">
+            	<div class="row-fluid" id="circle-draw" style="display: inline-block; " align="center">
+					<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+						<h3><i class="fa fa-th-large">&nbsp</i>已预制梁段比例</h3>
+						<div id="hero-donut-total"></div>  
+					</div>
+					<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+						<h3><i class="fa fa-th-large">&nbsp</i>生产合格率</h3>
+                        <div id="hero-donut-pass"></div>    
+	               	</div>
+			    </div>
+            
+                <div class="row-fluid" id="circle-draw" style="display: inline-block; " align="center">
+				<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+					<h3><i class="fa fa-th-large">&nbsp</i>绑扎区空间占用率</h3>
+					<div id="bangzaArea"></div>  
+					</div>
+					<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+						<h3><i class="fa fa-th-large">&nbsp</i>预制台座区占用率</h3>
+		                <div id="yuzhiArea"></div>    
+		           	</div>
+			    </div>
+				<div class="row-fluid" id="circle-draw" style="display: inline-block; " align="center">
+					<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+						<h3><i class="fa fa-th-large">&nbsp</i>养护区占用率</h3>
+						<div id="yanghuArea"></div>  
+					</div>
+					<div class="span5 chart" style="display: inline-block; width: 49%; margin-left:0;" >
+						<h3><i class="fa fa-th-large">&nbsp</i>存梁区占用率</h3>
+		                <div id="cunliangArea"></div>    
+		           	</div>
+			    </div>
+		          
+		          <div class="row-fluid"  id="pandianRow">
+	                <h3 style="margin-left:6%;"><i class="fa fa-th-list" >&nbsp</i>材料当期盘点  <span style="text-align:right;font-size:14px; font-weight:bold ">(最新盘点：{{materialDate}})<span>
+                	</h3>
+                	<div class="materialTab" id="gangjinTable" style="text-align:center" >
+                		<table class="table table-filters">
+                			<thead>
+                				<tr>
+                					<th colspan='3'>钢筋材料盘点 
+	                					<a class="chooseGangjin pull-right" id="pandianDate" title="选择盘点时间">
+											<select  class="gangjinPicker" onchange="updateInfo(this.value, this.className)">
+												{% for each in gangjinDate %}
+													
+													{% if forloop.counter = 1 %}
+														<option value="{{each}}" selected="true" >{{each}}</option>
+													{%else%}
+														<option value="{{each}}">{{each}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
+				                		</a>
+				                		<a data-target='#EditData' class="gangjin pull-right" data-toggle='modal' style="cursor:pointer;" title="更正当期数据" onClick="refreshEditModal(this.className)">
+											<i class="fa fa-gear"></i>
+										</a>
+				                		
+                					</th>
+                				</tr>
+							    <tr>
+							    	<th>钢筋</th>
+							    	<th>验收数量</th>
+							    	<th>单位</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in gangjinCount %}
+						    		<tr>
+						    		<td>{{item.name}}</td>
+						    		<td>{{item.quantity}}</td>
+						    		<td>{{item.unit}}</td>
+						    		</tr>
+							    {% endfor %}
+							    <tr><td></td><td></td><td></td></tr>
+							</tbody>
+                		</table>
+                	</div>
+                	<div class="materialTab" id="maobanTable">
+                		<table class="table table-filters" inputautocomplete='off'>
+                			<thead>
+                				<tr>
+                					<th colspan='3'>工作锚板盘点
+                						<a class="chooseMaoban pull-right" id="pandianDate" title="选择盘点时间" >
+											<select class="maobanPicker" onchange="updateInfo(this.value, this.className)" >
+												{% for each in maobanDate %}
+													{% if forloop.counter = 1 %}
+														<option value="{{each}}" selected >{{each}}</option>
+													{%else%}
+														<option value="{{each}}">{{each}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
+				                		</a>
+				                		<a data-target='#EditData' class="maoban pull-right" data-toggle='modal' style="cursor:pointer;" title="更正当期数据" onClick="refreshEditModal(this.className)">
+											<i class="fa fa-gear"></i>
+										</a>
+                					</th>
+                				</tr>
+							    <tr>
+							    	<th>专用材料</th>
+							    	<th>验收数量</th>
+							    	<th>单位</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in maobanCount %}
+						    		<tr>
+						    		<td>{{item.name}}</td>
+						    		<td>{{item.quantity}}</td>
+						    		<td>{{item.unit}}</td>
+						    		</tr>
+							    {% endfor %}
+							    <tr><td></td><td></td><td></td></tr>
+							</tbody>
+                		</table>
+                	</div>
+                	<div class="materialTab" id="qitaTable">
+                		<table class="table table-filters">
+                			<thead>
+                				<tr>
+                					<th colspan='3'>其他材料盘点
+                						<a class="chooseQita pull-right" id="pandianDate" title="选择盘点时间">
+											<select class="qitaPicker" onchange="updateInfo(this.value, this.className)">
+												{% for each in qitaDate %}
+													{% if forloop.counter = 1 %}
+														<option value="{{each}}" selected="selected">{{each}}</option>
+													{%else%}
+														<option value="{{each}}">{{each}}</option>
+													{% endif %}
+												{% endfor %}
+											</select>
+				                		</a>
+				                		<a data-target='#EditData' class="qita pull-right" data-toggle='modal' style="cursor:pointer;" title="更正当期数据" onClick="refreshEditModal(this.className)">
+											<i class="fa fa-gear"></i>
+										</a>
+                					</th>
+                				</tr>
+							    <tr>
+							    	<th>专用材料</th>
+							    	<th>验收数量</th>
+							    	<th>单位</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in qitaCount %}
+									<tr>
+						    		<td>{{item.name}}</td>
+						    		<td>{{item.quantity}}</td>
+						    		<td>{{item.unit}}</td>
+						    		</tr>
+							    {% endfor %}
+							    <tr><td></td><td></td><td></td></tr>
+							</tbody>
+                		</table>
+                	</div>
+                	
+                  </div>
+		          <button type="button" class="btn btn-primary" id="toTop" onclick="javascript:scroll(0,0);">返回顶部</button>
+            </div>
+        </div>
+    </div>
+						
+    <!-- build the charts -->
+    <script type="text/javascript" >		        
+		// Morris Donut Chart
+		
+		if({{total}} !=0){
+	        var rate_weiyuzhi = (parseFloat( {{weiyuzhi}} / {{total}} ).toFixed(4)) ;
+	        var rate_yuzhi = (parseFloat(1 - rate_weiyuzhi).toFixed(4) ) ;
+	    }
+	    else{
+	    	var rate_weiyuzhi = 1.0;
+	    	var rate_yuzhi = 0.0;
+	    }
+	    
+		rate_weiyuzhi = (rate_weiyuzhi*100).toFixed(2);
+		rate_yuzhi = (rate_yuzhi*100).toFixed(2);
+	    
+		Morris.Donut({
+            element: 'hero-donut-total',
+            data: [
+                {label: '未预制梁段比例', value: rate_weiyuzhi },
+                {label: '已预制梁段比例', value: rate_yuzhi },
+            ],
+            colors: ["#9D6C7D","#008000"],
+            formatter: function (y) { return y + "%" }
+        });
+
+        // Morris Donut Chart
+        if( ({{total_fail}} + {{total_pass}} ) !=0){
+	        var rate_fail = parseFloat( {{total_fail}} / ( {{total_fail}} + {{total_pass}} ) ).toFixed(4);
+	        var rate_pass = parseFloat(1 - rate_fail).toFixed(4);
+	    }
+	    else{
+	    	var rate_fail = 0.0;
+	    	var rate_pass = 1.0;
+	    }
+	    
+	    rate_fail = (rate_fail*100).toFixed(2);
+	    rate_pass = (rate_pass*100).toFixed(2);
+	    
+        Morris.Donut({
+            element: 'hero-donut-pass',
+            data: [
+                {label: '合格梁段比例', value: rate_pass},
+                {label: '不合格梁段比例', value: rate_fail},
+            ],
+            colors: ["#89C589","#D9534F"],
+            formatter: function (y) { return y + "%" }
+        });
+        
+        // Morris Area Chart
+        $(document).ready(function() {
+         	
+         	var max = ( Math.ceil({{yuzhi}}/4) )*8;
+	        var cur = new Date(); 
+	        
+	        if ($('#cailiao-bar').length) {
+		        Morris.Line({
+		        	element: "cailiao-bar",
+		        	data: [
+						{% for item in cailiaoList %}
+							{month: '{{item.countdate}}', 螺纹钢: {{item.luowenguan}}, 波纹板: {{item.bowenguan}}, 锚板: {{item.maoban}}},
+						{% endfor %}
+		            ],
+		            xkey: 'month',
+		            ykeys: ['螺纹钢', '波纹板', '锚板'],
+		            labels: ['螺纹钢', '波纹板', '锚板'],
+		          hideHover: "auto",
+				  gridTextColor:"black",	
+		          lineWidth: 2,
+		          pointSize: 4,
+		          lineColors: ["#67BDF8", "#ACDF9D", "orange"],
+		          fillOpacity: 0.5,
+		          smooth: true,
+		          units:'米(件)',
+		          ymax:'auto'
+		        });
+	        }
+
+	      });
+	
+	var Week = ['日','一','二','三','四','五','六'];
+	var myDate = new Date();
+	
+	var paddNum = function(num){
+          num += "";
+          return num.replace(/^(\d)$/,"0$1");
+        }
+    
+    var ifInList = function(ins, insArray){
+    	for( var each in insArray){
+    		if(ins==each){return true;}
+    	}
+    	return false;
+    }
+	
+	for(var i=0; i<5; i++){
+		var preTitle="信息更新于：";
+		var tgtDate = new Date;
+		var tgtDateMins = myDate.getTime() + i * 24000*3600;
+		tgtDate.setTime(tgtDateMins);
+		
+		tgtXingqi = tgtDate.getDay();
+		tgtXq = " 星期" + Week[tgtXingqi.toString()];
+		tgtDay = paddNum(tgtDate.getDate().toString());
+		tgtMonth= paddNum((tgtDate.getMonth()+1).toString());
+		tgtYear = tgtDate.getFullYear().toString();
+		
+		msg = tgtYear+"-" +tgtMonth + "-" + tgtDay;
+		
+		if(i==0){
+			msg = preTitle + msg + tgtXq; 
+	    }
+	    
+	    $("#day"+i.toString()).html(msg);
+	    skycons = $("#day"+i.toString()).parent().find("canvas");
+	    tempDiv = $("#day"+i.toString()).parent().find("div");
+	    
+	    skyDate = tgtYear+"-" +tgtMonth + "-" + tgtDay;
+		{% for each in weatherList %}
+			if(skyDate == "{{each.date}}" ){
+				skycons.attr("data-skycons","{{each.weather}}");
+				tempDiv.html("{{each.temp}}" + "<small>&deg;</small>" );
+			}
+			
+		{% endfor %}
+	}
+    
+    // Load Weather
+    $('.skycons-element').each(function() {
+      var canvasId, skycons, weatherSetting;
+      skycons = new Skycons({
+        color: "white"
+      });
+      canvasId = $(this).attr('id');
+      weatherSetting = $(this).data('skycons');
+      skycons.add(canvasId, Skycons[weatherSetting]);
+      return skycons.play();
+    });
+	
+	//Morris Area 
+    Morris.Donut({
+            element: 'bangzaArea',
+            data: [
+                {label: '已使用', value: {{gangjingjiagongqu_rate}}},
+                {label: '未使用', value: 100-{{gangjingjiagongqu_rate}}},
+            ],
+            colors: ["#89C589","#A2B5CD"],
+            formatter: function (y) { return y + "%" }
+        });
+	
+	Morris.Donut({
+            element: 'yuzhiArea',
+            data: [
+                {label: '已使用', value: {{yuzhitaizuoqu_rate}}},
+                {label: '未使用', value: 100-{{yuzhitaizuoqu_rate}}},
+            ],
+            colors: ["#89C589","#A2B5CD"],
+            formatter: function (y) { return y + "%" }
+        });
+        
+    Morris.Donut({
+            element: 'yanghuArea',
+            data: [
+                {label: '已使用', value: {{xiuzhengqu_rate}}},
+                {label: '未使用', value: 100-{{xiuzhengqu_rate}}},
+            ],
+            colors: ["#89C589","#A2B5CD"],
+            formatter: function (y) { return y + "%" }
+        });
+    
+    Morris.Donut({
+            element: 'cunliangArea',
+            data: [
+                {label: '已使用', value: {{cunliangqu_rate}}},
+                {label: '未使用', value: 100- {{cunliangqu_rate}}},
+            ],
+            colors: ["#89C589","#A2B5CD"],
+            formatter: function (y) { return y + "%" }
+        });
+	
+    </script>
+    
+    <div style="margin-top:10%;" class="modal fade" id="EditData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    	<div class="modal-dialog">
+	      <div class="modal-content">
+	         <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	                  &times;
+	            </button>
+	            <h4 class="modal-title" id="myModalLabel" style="font-weight:bold;text-align:center;margin-left:5%;">
+	            	更新盘点数据
+	            </h4>
+	         </div>
+	         <div class="modal-body" align="center">
+	         	<table class="table table-filters">
+        			<thead>
+					    <tr>
+					    	<th>名称</th>
+					    	<th>验收数量</th>
+					    	<th>单位</th>
+						</tr>
+					</thead>
+					<tbody id="MaterialModalBody">
+						
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+	            	返回
+	            </button>
+	            <button type="button" class="btn btn-primary" id="updateData">更新</button>
+			</div>
+	      </div>
+   		</div>
+   	</div>
+
+{% endblock %}

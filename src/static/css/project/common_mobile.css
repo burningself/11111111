@@ -1,0 +1,14 @@
+
+.titleLabel {
+    width: 100%;
+    font-size: 1.5em;
+    margin-bottom: 0px;
+    color: white;
+    background-color: #077AC7;
+    text-align: center;
+}	
+
+.row-fluid{
+	height:calc(100vh - 90px);
+	overflow: scroll;
+}

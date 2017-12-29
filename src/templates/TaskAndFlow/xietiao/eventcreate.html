@@ -1,0 +1,260 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<script src="/js/json/json2.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/js/common/guanlianyuansu.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/css/project/guanlianyuansu.css" />
+
+<link rel="stylesheet" type="text/css" href="/css/project/issuecreate.css" />
+<link href="/js/jQuery.filer-1.3.0/css/jquery.filer.css" rel="stylesheet">
+<script src="/js/jQuery.filer-1.3.0/js/jquery.filer.js" type="text/javascript"></script>
+<script src="/js/common/eventcreate.js" type="text/javascript"></script>
+{% endblock %} {% block content %}
+<style type="text/css">
+	.jFiler-input.jFiler-input{
+		width:100%;
+	}
+</style>
+
+<div class="qiehuan">
+	<div class="widget-content padded" style="text-align: center;width: 100%;min-height: 80vh;padding-top: 5px;">
+		<div class="createcontent">
+			<form class="form-horizontal" id="faqiwentiForm" align="left">
+				<div class="createtitle">
+					新增{{issuetype}}
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">编号</label>
+					<div class="col-md-9">
+						<input class="form-control" name="qnumber" id="qnumber" value='{{bianhao}}' type="text" readonly="true">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">标题</label>
+					<div class="col-md-9">
+						<input class="form-control" placeholder="输入标题" name="qtitle" id="qtitle"  type="text" >
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">描述</label>
+					<div class="col-md-9">
+						<textarea class="form-control" placeholder="输入描述" name="qdescribe" id="qdescribe" rows="3"
+						maxlength="120"></textarea>
+					</div>
+				</div>
+				{% if categoryList %}
+				<div class="form-group">
+					<label class="control-label col-md-2">专业类别</label>
+					<div class="col-md-9">
+						<select class="form-control" name="category" id="category" >
+							{% for each in categoryList %}
+							<option value="{{each}}">{{each}}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				{% endif %}
+				<div class="form-group">
+					<label class="control-label col-md-2">添加附件</label>
+					<div for="IssueRelateFile" class="col-md-9">
+						<input type="file" name="files" id="uploadfile" multiple="multiple" style="max-width: 300px;margin: 10px;">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">处理流程</label>
+					<div class="col-md-9">
+						<select class="form-control" name="dealTemplate" id="dealTemplate" >
+							{% for temp in FlowTemplateList %}
+							<option value="{{temp.id}}">{{temp.name}}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">优先级</label>
+					<div class="col-md-9">
+						<select class="form-control" name="issuePriority" id="issuePriority">
+							<option value="1">轻微</option>
+							<option value="5">一般</option>
+							<option value="10">严重</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">截止时间</label>
+					<div class="col-md-9">
+						<input class="form-control" type="text" value="{{deadline|date:" Y-m-d "}}" name="deadline" id="deadline" data-date-format="yyyy-mm-dd">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-2">关联元素</label>
+					<div class="col-md-9">
+						<button id="addyuansu" onclick="FunGuanLianYuanSu()" style="text-align: left;" class="btn btn-default form-control" role="button" type="button"><i class="fa fa-plus"></i>增加关联元素</button>
+						<h6 id="yixuanyuansu" style="color: blue;text-align: left;"></h6>
+					</div>
+
+				</div>
+
+				<div class="modal-footer" style="width: 50;">
+					<a class="btn btn-default btn but" role="button" id="btnFaqiWenTiCancle" data-dismiss="modal"  onclick="window.close()">取消</a>
+					<button class="btn btn-danger" onclick="Funfaqiwenti()" id="btnFaqiWenTi">新增</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="guanlianyuansu" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 align="left">选择关联元素</h4>
+			</div>
+			<div class="modal-body" style="padding: 2px;">
+				<select class="pull-right" name="guanlianyuansumajor" id="guanlianyuansumajor">
+						{% for major in majorList %}
+							{% ifequal major.id curMajorId %}
+								<option value="{{major.id}}" selected>{{major.name}}</option>
+							{% else %}
+								<option value="{{major.id}}">{{major.name}}</option>
+							{% endifequal %}
+								
+						{% endfor %}
+				</select>
+				<ul class="nav nav-tabs" >
+					<li class="active">
+						<a href="#kongjianjiegou" data-toggle="tab">空间结构</a>
+					</li>
+					
+					<li >
+						<a href="#goujian" data-toggle="tab">构件</a>
+					</li>
+
+					<li>
+						<a href="#renwu" data-toggle="tab">任务</a>
+					</li>
+					<li >
+						<a href="#weixianyuan" data-toggle="tab">危险源</a>
+					</li>
+					<li>
+						<a href="#anquanwenmingsheshi" data-toggle="tab">安全设施</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+
+					<div class="tab-pane fade in active guanlianyuansuTab" id="kongjianjiegou">
+						<div class="left_panel" >
+							<div id="jstree_kongjian" class="onlytree"></div>
+						</div>
+						<div class="middle_panel">
+						</div>
+						<div class="right_panel">
+							<select class="choosekongjian"  multiple name="right" id="right" size="20">
+
+							</select>
+						</div>
+					</div>
+										
+					<div class="tab-pane fade guanlianyuansuTab" id="goujian">
+						<div class="left_panel">
+							<div class="toptree" id="jstree_goujian">
+							</div>
+							<select class="goujianselect bottomlist"  multiple name="left" id="left" size="7" style="" ondblclick="moveright('gj')">
+							</select>
+						</div>
+						<div class="middle_panel">
+							<a href="#" onclick="moveleft('gj')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('gj')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="right_panel">
+							<select class="choosegoujian"  multiple name="right" id="right" size="20" ondblclick="moveleft('gj')">
+							</select>
+						</div>
+					</div>
+
+					<div class="tab-pane fade guanlianyuansuTab" id="renwu">
+						<div class="left_panel">
+							<div class="toptree" id="jstree_renwu">
+							</div>
+							<select class="renwuselect bottomlist"  multiple name="left" id="left" size="7" ondblclick="moveright('rw')">
+							</select>
+						</div>
+						<div class="middle_panel">
+							<a href="#" onclick="moveleft('rw')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('rw')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="right_panel">
+							<select class="chooserenwu"  multiple name="right" id="right" size="20" ondblclick="moveleft('rw')">
+								</select>
+						</div>
+
+					</div>
+					
+
+					<div class="tab-pane fade guanlianyuansuTab" id="weixianyuan">
+						<div class="left_panel">
+							<div id="jstree_weixianyuan" class="onlytree">
+							</div>
+						</div>
+						<div class="middle_panel">
+
+						</div>
+						<div class="right_panel">
+							<select id="weixianyuan_right" multiple name="right" size="20">
+								</select>
+						</div>
+
+					</div>
+					<div class="tab-pane fade guanlianyuansuTab" id="anquanwenmingsheshi">
+						<div class="left_panel">
+							<div id="jstree_anquanwenmingsheshi" class="toptree">
+
+							</div>
+							<select class="bottomlist" id="sheshi_left" multiple name="left" id="left" size="7" ondblclick="moveright('ss')">
+
+							</select>
+						</div>
+						<div class="middle_panel">
+							<a href="#" onclick="moveleft('ss')"><i class="fa  fa-arrow-circle-left"></i></a>
+							<a href="#" onclick="moveright('ss')"><i class="fa  fa-arrow-circle-right"></i></a>
+						</div>
+						<div class="right_panel">
+							<select id="sheshi_right" multiple name="right" id="right" size="20" ondblclick="moveleft('ss')">
+
+								</select>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button class="btn btn-primary" onclick="chooseGLYS()">确定</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<link rel="stylesheet" href="/css/style.min.css" />
+<link href="/css/project/morris.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/goujian.css" media="all" rel="stylesheet" type="text/css" />
+ <script src="/js/jstree.min.js"></script>
+  <script src="/js/datastruct.js"></script>
+  <script src="/js/taskselect.js"></script>
+  <script src="/js/morris.js-0.5.1/raphael-min.js"></script>
+  <script src="/js/morris.js-0.5.1/morris.min.js" type="text/javascript">
+  
+<script type="text/javascript">
+
+
+</script>
+{% endblock %}
+
+
+{% block content %} 
+<style>
+body{background-size:cover;}
+.btn-toolbar {width:100%;padding:20px 50px 0px 30px; border-top:solid 1px #ddd;} 
+.btn-toolbar .btn{float:right;}
+td{vertical-align:top; color:black;font-size:16px;}
+#stateDraw{width:80%;margin:0 auto; margin-top:20px; display:block; overflow:visible; max-height:200px;}
+
+</style>
+<div class="row">
+	<div class="col-lg-12">
+	    <div class="widget-container fluid-height clearfix">
+	      	<div class="heading">
+	       		<h3><i class="fa fa-tags"></i> 编辑分组-基本信息</h3>
+	      	</div>
+			<fieldset style="width:100%; height:5%;padding:2%;padding-left:0; padding-top:1%;">
+			{% if group_instance %}
+				<style type="text/css">
+					.taskVal{text-align:left;width:9%; display:inline-block;}
+					.taskInfo{text-align:right;width:10%; display:inline-block; min-width:100px;}
+					.taskVal, .taskInfo{display:inline-block;  vertical-align:top; color:#585555;  font-size:18px; text-align:right;line-height:30px;}
+					.taskVal{text-decoration:underline; text-align:left;padding-left:10px; max-width:300px;}
+					.taskVal a{color:#585555;}
+				</style>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 分组编号: </div>
+				<span class="taskVal" >{{group_instance.id}} </span>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 分组名称: </div>
+				<span class="taskVal" style="width:25%;">{{group_instance.name}}</span>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 关联状态: </div>
+				<span class="taskVal" style="width:25%;">{{group_instance.pbstatus.statusname}}</span><br>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 抽检要求: </div>
+				<span class="taskVal" >{{group_instance.total_count}} / {{list_items_total}}</span></span>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 比例要求: </div>
+				<span class="taskVal" style="width:25%;">={{group_instance.rate}}%</span>
+				<div class="taskInfo"><i class="fa fa-dot-circle-o"></i> 关联分组: </div>
+				<span class="taskVal" style="width:25%;"><a href="/task/goujian/group/edit/{{relateGroup.id}}">{{relateGroup.name}}</a></span>
+			{% endif %}
+			</fieldset>	
+		</div>
+	</div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container fluid-height clearfix" style="padding-bottom:20px;">
+      <div class="heading">
+        <h3><i class="fa fa-plus-square"></i> 编辑分组-关联构件</h3>
+      </div>
+	  <div class="widget-content padded">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+    <form id="tab" action="" method="POST"> {% csrf_token %}
+		<table border="0" cellpadding="2" cellspacing="1" style="width:100%;min-height:250px;">
+		<tr>
+			<td style="width:15%" align="right" valign="top">
+				<a href="#" class="btn btn-success btn" data-toggle="modal" data-target="#update"><i class="fa fa-plus"></i>添加构件</a>
+				<div id="stateDraw"> </div>
+			</td>
+			<td align="left" style="width:60%">
+				<table class="table" id="RelatePbItem">
+						<tr >
+						<td colspan="3" style="height:20px;" ><h3 style="text-align:center; margin:0;">关联构件清单</h3></td>
+						</tr>
+						<tr id="tr1" >
+							<td >编号 </td>	 					
+							<td align='left' >状态</td>	
+							<td align='left' >编辑</td>		
+						</tr>
+						{% if list_items %}
+							{% for item in list_items %}
+							<tr>
+							  <td><a href="/task/goujian/trace/?pbid={{item.id}}" >{{item.drawnumber}}</a></td>
+							  <td>{{item.curstatus}}</td><td><a id={{item.id}} type="button" onclick="delProjectPB({{group_instance.id}},{{item.id}})" title="删除关联构件" style="cursor:pointer;" >[删除关联<i class="glyphicon glyphicon-remove"></i>]</a></td>
+							</tr>
+							{% if forloop.last %} 
+								<input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value={{pbcount}} />
+							{% endif %}
+						   {% endfor %}
+						{% else %}
+							<input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value="1" />
+					   {% endif %}
+					   <tr><td></td><td></td><td></td></tr>
+				</table>
+		</td>
+		</tr>
+		<input name='PbSelected' type='hidden' id='PbSelected' value="" />
+	</table>
+	</div>
+		<div class="btn-toolbar" align="right">
+		    <button type="submit" class="btn btn-primary" ><i class="fa fa-save"></i> 保存修改 </button>
+	    	<a class="btn btn-default btn" href="/task/goujian/group/" > 返回</a>
+		</div>
+	</div>
+
+</div>
+  </form>
+		
+		
+
+	<div class="modal fade" id="update" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <a>选择构件</a>
+            </div>
+            <div class="modal-body" style="overflow:scroll;min-height:300px;max-height:600px;">
+				  <div id="jstree"  style="text-align:left;">
+					
+				  </div>
+            </div>
+            <div class="modal-footer">
+				<input type="text" value="" id="search_pb" onkeyup="searchFunction()" placeholder="搜索" />
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnReleatePbs" data-dismiss="modal" aria-hidden="true">确定</button>
+            </div>
+    </div>
+    </div>
+    </div>
+		
+				
+        </div>
+    </div>
+	
+<script type="text/javascript">
+	$(document).ready(function(){
+		var pbs = new UserList();
+		
+		$('#jstree').jstree({
+			"core" : {'data' : {
+				      'url' : '/task/goujian/tree/',
+				      'data' : function (node) {
+							return { 'id' : node.id, 'gid': {{group_instance.id}} };
+						}
+			  		}
+			},
+			"plugins" : [ "themes", "html_data" ,"checkbox","search" ] 
+		});
+	
+		$("#btnReleatePbs").click(function(){
+			ref = $('#jstree').jstree(true);
+			pbs = ref.get_selected();
+			PbAddSignRow(pbs);
+		});
+		
+		$("#btnCancle").click(function(){
+			ref = $('#jstree').jstree(true);
+			pbs= ref.get_selected();
+			PbDeleteUnSelect(pbs);
+		});
+	});
+	
+	
+	function delProjectPB(gid, pid){
+		if(confirm("确认删除关联构件吗？")){
+        	$.ajax({ 
+        	type:"POST",
+            url: "/task/goujian/group/pbdelete/", 
+            cache:false,    
+            dataType: "json",
+            data: {"gid":gid, "pid":pid},
+            success: function(data) { 
+                if (data.status==1) {
+            		location.href=location.href;
+                }
+                else{
+                	alert("删除不了,服务器问题！");
+                }
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+        	});
+	    }
+        
+    };
+    
+    if({{list_items_total}}- {{relate_group_instance.current_count}} - {{group_instance.current_count}} >= 0 ){
+    	var donutData=[  
+            {label: "通过", value: {{group_instance.current_count}} },  
+            {label: "未通过", value: {{relate_group_instance.current_count}} },
+            {label: "未检", value: {{list_items_total}}- {{relate_group_instance.current_count}} - {{group_instance.current_count}} }, 
+        ];
+    }
+    else{
+    	var donutData=[  
+            {label: "通过", value: {{group_instance.current_count}} },  
+            {label: "未通过", value: 0 },  
+            {label: "未检", value: {{list_items_total}} - {{group_instance.current_count}} }, 
+        ];
+    }
+    
+    Morris.Donut({
+	        element: 'stateDraw',
+	        resize: true,  
+	        data: donutData,
+	        colors: ["#5cb85c","red","grey"],
+	        formatter: function (y) { return y.toString() },
+	        resize: true
+	    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %} 
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js" type="text/javascript"></script>
+<link href="/css/project/common_mobile.css?ver=1111" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/jishu_mobile.css?ver=1111" media="all" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/js/json/json2.js"></script>
+<style>
+	.weui_cells {
+      margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %} 
+	<div class="row-fluid">
+		<label class="titleLabel"><i class="fa fa-edit"></i> 方案操作 </label>
+		<div class="weui-form-preview">
+            <div class="weui-form-preview-hd">
+                <label class="weui-form-preview-label">方案编号</label>
+                <em class="weui-form-preview-value">{{technical.number}}</em>
+            </div>
+            <div class="weui-form-preview-bd">
+                <p>
+                    <label class="weui-form-preview-label">名称</label>
+                    <span class="weui-form-preview-value">{{technical.name}}</span>
+                </p>
+                <p>
+                    <label class="weui-form-preview-label">状态</label>
+					 	 {% ifequal technical.status 1%}
+							  <span class="weui-form-preview-value">未完成</span>
+						{% endifequal %}
+						{% ifequal technical.status 2%}
+							  <span class="weui-form-preview-value">已上报</span>
+						{% endifequal %}
+						{% ifequal technical.status 3%}
+							  <span class="weui-form-preview-value">已审批</span>
+						{% endifequal %}
+						{% ifequal technical.status 4%}
+							  <span class="weui-form-preview-value">已交底</span>
+						{% endifequal %}
+                </p>
+
+                <!--<p>
+                    <label class="weui-form-preview-label">编制日期</label>
+                    <span class="weui-form-preview-value">{% if technical.create_date %}{{technical.create_date|date:"Y-m-d"}}{% else %}--{% endif %}</span>
+                </p>
+                <p>
+                    <label class="weui-form-preview-label">上报日期</label>
+                    <span class="weui-form-preview-value">{% if technical.submit_date %}{{technical.submit_date|date:"Y-m-d"}}{% else %}--{% endif %}</span>
+                </p>
+                <p>
+                    <label class="weui-form-preview-label">审批通过日期</label>
+                    <span class="weui-form-preview-value">{% if technical.approve_date %}{{technical.approve_date|date:"Y-m-d"}}{% else %}--{% endif %}</span>
+                </p>
+                 <p>
+                    <label class="weui-form-preview-label">交底日期</label>
+                    <span class="weui-form-preview-value">{% if technical.disclosure_date %}{{technical.disclosure_date|date:"Y-m-d"}}{% else %}--{% endif %}</span>
+                </p>-->
+            </div>
+        </div>
+        
+         <div class="weui_cells weui_cells_access">
+         	{% for doc in docs %}
+			<a class="weui_cell " href="/{{doc.filepath}}{{doc.name}}">
+                <div class="weui_cell_bd weui_cell_primary">
+                    {{doc.shortname}}
+                </div>
+                <div class="weui_cell_ft"></div>
+            </a>
+			{% endfor %}
+
+        </div>
+        
+		<div class="input-group">
+		        <span class="input-group-addon">
+				 <label for="id_describe">方案记录:</label>
+				</span>
+		        <textarea cols="40" id="id_describe" name="describe" rows="3" class="form-control"></textarea><span class="input-group-addon" id="startRecord" style="margin:-5px -26px auto;"><i class="fa fa-microphone"></i></span> 
+		        
+		      </div>
+		<div class="input-group" >
+	        <span class="input-group-addon"><i class="fa fa-photo" ></i> 添加附件：</span>
+		    <input id="update_photoNum" name="zhijian" type="text" class="form-control" placeholder="选取照片" readonly="readonly"> 
+		    <span class="input-group-addon" id="update_chooseImage"><i class="fa fa-camera" ></i>拍照</span>
+		</div>
+		<div  class="input-group" style="text-align: center;">
+			<a href="#" id="genzong" class="btn weui_btn bg-blue" onclick="caozuo(this)" title="" style="margin: 5px">跟踪</a>
+			<a href="#" id="xiugai" class=" btn weui_btn bg-orange" onclick="caozuo(this)" title="" style="margin: 5px">修改</a>
+			{% ifequal technical.status 1%}
+				<a href="#" id="shangchuan" class=" btn btn-success" onclick="caozuo(this)" title="" style="margin: 5px">上传</a>
+			{% endifequal %}
+			{% ifequal technical.status 2%}
+				<a href="#" id="shenpi" class=" btn btn-success" onclick="caozuo(this)" title="" style="margin: 5px">审批</a>
+			{% endifequal %}
+			{% ifequal technical.status 3%}
+				<a href="#" id="jiaodi" class=" btn btn-success" onclick="caozuo(this)" title="" style="margin: 5px">交底</a>
+			{% endifequal %}
+		</div>
+	</div>
+
+<script type="text/javascript">
+	var docs = [];
+	wx.config({
+	    debug: false, 
+	    appId: '{{config.appid}}', 
+	    timestamp: {{config.timestamp}}, 
+	    nonceStr: '{{config.nonceStr}}', 
+	    signature: '{{config.signature}}',
+	    jsApiList: [
+	        'checkJsApi',
+	        'onMenuShareTimeline',
+	        'onMenuShareAppMessage',
+	        'onMenuShareQQ',
+	        'onMenuShareWeibo',
+	        'hideMenuItems',
+	        'showMenuItems',
+	        'hideAllNonBaseMenuItem',
+	        'showAllNonBaseMenuItem',
+	        'translateVoice',
+	        'startRecord',
+	        'stopRecord',
+	        'onRecordEnd',
+	        'playVoice',
+	        'pauseVoice',
+	        'stopVoice',
+	        'uploadVoice',
+	        'downloadVoice',
+	        'chooseImage',
+	        'previewImage',
+	        'uploadImage',
+	        'downloadImage',
+	        'getNetworkType',
+	        'openLocation',
+	        'getLocation',
+	        'hideOptionMenu',
+	        'showOptionMenu',
+	        'closeWindow',
+	        'scanQRCode',
+	        'chooseWXPay',
+	        'openProductSpecificView',
+	        'addCard',
+	        'chooseCard',
+	        'openCard'
+	      ]
+	    });
+	    var images = {
+	        localId: [],
+	        serverId: []
+	    };
+    document.querySelector('#update_chooseImage').onclick = function () {
+            images.localId=[];
+            images.serverId=[];
+            wx.chooseImage({
+              success: function (res) {
+                images.localId = res.localIds;
+                var length = images.localId.length;
+
+                var i = 0, length = images.localId.length;
+                function uploadcomplete(){
+                	//上传到微信成功后,记录id
+                	docs = images.localId=[];
+
+                }
+
+                function upload() {
+                  wx.uploadImage({
+                    localId: images.localId[i],
+                    isShowProgressTips: 1,
+                    success: function (res) {
+                      i++;
+                      images.serverId.push(res.serverId);
+                      if (i < length) {
+                        upload();
+                      }else{
+                        uploadcomplete()
+                      }
+                      $("#update_photoNum").val("已选取"+ length.toString() + "图片:" + images.serverId.join(";"));
+
+                    },
+                    fail: function (res) {
+                      alert(JSON.stringify(res));
+                    }
+                  });
+                }
+                upload();
+
+              }
+            });
+        };
+    function caozuo(obj){
+        var sdata={
+        	'opt':obj.getAttribute('id'),
+            'imageserverids':docs,
+        }
+        $.ajax({
+            type:"POST",
+//          url:"",
+            cache:"false",
+            dataType: "json",
+            data:sdata,
+            success: function(data){
+				window.location.href = document.referrer;//返回上一页并刷新 
+            }
+
+        })
+	}
+</script>
+{% endblock %}
+

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        #container {
+            position: relative;
+            width: 100%;
+            min-width: 980px;
+            padding: 0;
+        }
+        
+        #content-main {
+            position: relative;
+        }
+        
+        #content-main h1 {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        
+        #content {
+            padding: 20px 40px;
+        }
+        
+        .ivu-page {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .ivu-table-cell .ivu-icon-ios-close {
+            color: red;
+            font-size: 18px;
+        }
+        
+        .ivu-table-cell .ivu-icon-ios-checkmark {
+            color: #70bf2b;
+            font-size: 18px;
+        }
+        
+        #content-main>.ivu-input-wrapper.ivu-input-type {
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: right;
+            padding-right: 120px;
+            padding-left: 150px;
+        }
+        
+        #content-main>.ivu-input-wrapper input {
+            width: 300px;
+        }
+        
+        #content-main>.ivu-btn-info {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        
+        .ivu-modal-body {
+            padding: 16px 40px 16px 16px;
+        }
+        
+        .ivu-tooltip {
+            width: 100%;
+        }
+        
+        .ivu-spin-fix {
+            top: 32px;
+        }
+        
+        .ivu-table-cell>div>.ivu-input-type,
+        .ivu-table-cell .ivu-select {
+            float: left;
+            width: 60%;
+            max-width: 190px;
+        }
+        
+        .perserveData {
+            width: 40%;
+            padding-left: 10px;
+            float: left;
+            height: 32px;
+            line-height: 32px;
+        }
+        
+        .perserveData>div {
+            width: 17.5px;
+            height: 100%;
+            float: left;
+        }
+        
+        .perserveData .ivu-btn {
+            padding: 0;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-checkmark-round {
+            color: #2DB7F5;
+        }
+        
+        .perserveData .ivu-btn .ivu-icon-close-round {
+            color: #ED3F14;
+        }
+        
+        .perserveData>div:nth-child(1):hover .ivu-icon-checkmark-round {
+            color: #2D8CF0
+        }
+        
+        .perserveData>div:nth-child(2):hover .ivu-icon-close-round {
+            color: #8b0706;
+        }
+        
+        .ivu-modal-footer .ivu-col {
+            text-align: center;
+            height: 100%;
+        }
+        
+        .ivu-modal-footer .ivu-btn-long {
+            width: 80%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <!--content-->
+        <div id="content" class="flex">
+            <div id="content-main">
+                <h1>构件类型管理</h1>
+                <i-input v-model.trim="valueData" placeholder="筛选条件" @on-change="filter_data"></i-input>
+                <i-button type="info" @click="updata_value(true)">添加构件类型</i-button>
+                <i-table border :columns="columns" :data="data" @on-sort-change="sort_value"></i-table>
+                <Spin size="large" fix v-if="spinShow"></Spin>
+                <Page :total="count" @on-change="changeData" show-elevator show-total :page-size="page_one_count" :current.sync="current"></Page>
+                <!--弹窗-->
+                <Modal v-model="modal" @updata:modal="val=>modal=val" width="450">
+                    <p slot="header" style="text-align:left">
+                        <span>添加构件类型</span>
+                    </p>
+                    <div style="text-align:left">
+                        <i-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
+                            <Form-item label="名称" prop="name">
+                                <i-input v-model.trim="formValidate.name" placeholder="请输入名称"></i-input>
+                            </Form-item>
+                            <Form-item label="标识" prop="sign">
+                                <i-input v-model.trim="formValidate.sign" placeholder="请输入标识"></i-input>
+                            </Form-item>
+                            <Form-item label="分类编码" prop="classficationCode">
+                                <i-input v-model.trim="formValidate.classficationCode" placeholder="请输入分类编码"></i-input>
+                            </Form-item>
+                            <Form-item label="是否预制" prop="isprebuilt">
+                                <Checkbox-group v-model="formValidate.isprebuilt">
+                                    <Checkbox label="预制"></Checkbox>
+                                </Checkbox-group>
+                            </Form-item>
+                            <Form-item label="专业" prop="major">
+                                <i-select v-model="formValidate.major" placeholder="请输入专业">
+                                    <i-option v-for="item,index in majorList" :key="index" :value="item.value">{{ item.label }}</i-option>
+                                </i-select>
+                            </Form-item>
+                        </i-form>
+                    </div>
+                    <div slot="footer">
+                        <!--<i-button type="primary" size="large" long @click="add_component" :loading="modal_loading">添加构件</i-button>-->
+                        <Row>
+                            <i-col span="12">
+                                <i-button type="success" size="large" long @click="add_still" :loading="modal_loading">保存并持续添加</i-button>
+                            </i-col>
+                            <i-col span="12">
+                                <i-button type="primary" size="large" long @click="add_component" :loading="modal_loading">保存</i-button>
+                            </i-col>
+                        </Row>
+                    </div>
+                </Modal>
+                <!--弹窗end-->
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var cookieValue = null,
+            loca = window.location.origin;
+        (function() {
+            var name = 'csrftoken';
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = $.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+        })()
+
+        /**
+         * @module 编辑修改数据ajax
+         * @params id 数据的id
+         * @params data 提交的数据参数
+         * @params callback 提交成功的回调函数
+         */
+        Vue.prototype.$ajax = function(id, data, callback) {
+            $.ajax({
+                url: '/task/pbtypes/' + id + '/',
+                type: 'put',
+                headers: {
+                    'X-CSRFTOKEN': cookieValue,
+                },
+                data: data,
+                success: function() {
+                    callback();
+                }
+            })
+        }
+
+        /**
+         * @module 获取验收类型提交时候对应的id链接
+         * @params array 集合数组
+         * @params value 当前选择的值
+         * @params obj 赋值给上传数据的对象
+         * @params type 下拉标识
+         */
+
+        Vue.prototype.$majorType = function(array, value, obj, type) {
+
+            if (type == "major") {
+                array.forEach((val, index) => {
+                    if (val.value == value) {
+                        obj.majorname = value;
+                        obj.major = loca + '/user/majors/' + val.id + '/';
+                    }
+                })
+            }
+            array.forEach((val, index) => {
+                if (val.value == value) {
+                    obj.isprebuilt = value == "否" ? false : true;
+                }
+            })
+
+        }
+
+        //输入框组件
+        var inputText = {
+            template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="edit=true" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-input  v-model="currentValue" />
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div> 
+                </div>
+            `,
+            data() {
+                return {
+                    edit: false,
+                    currentValue: '',
+                }
+            },
+            props: ['name', 'value', 'dataAll'],
+            methods: {
+                perserve() {
+                    var obj = this.dataAll,
+                        that = this,
+                        val = this.currentValue;
+
+                    obj[this.name] = val;
+
+                    this.$ajax(this.dataAll.id, obj, function() {
+                        that.edit = false;
+                        that.$Message.success('修改成功');
+                        that.$nextTick(() => {
+                            that.$emit('input', obj);
+                            that.$slots.default[0].elm.innerText = val;
+                        })
+                    })
+
+                },
+                cancel() {
+                    this.currentValue = this.value;
+                    this.edit = false;
+                }
+            },
+            mounted() {
+                this.currentValue = this.value;
+            }
+        }
+
+        var sele = {
+            template: `
+                <Tooltip content="单击编辑" v-if="!edit" @click.native="edit=true" placement="top">
+                    <span class="m-span"><slot></slot></span>
+                </Tooltip>
+                <div v-else-if="true">
+                    <i-select v-model="value" @updata:value="val=>value=val">
+                        <i-option v-for="item,index in list" :key="index" :value="item.value">{{ item.value }}</i-option>
+                    </i-select>
+                    <div class="perserveData">
+                        <div @click="perserve">
+                            <Button type="text" icon="checkmark-round"></Button>
+                        </div>
+                        <div @click="cancel">
+                            <Button type="text" icon="close-round"></Button>
+                        </div> 
+                    </div>
+                </div>
+            `,
+            data() {
+                return {
+                    edit: false,
+                    value: ''
+                }
+            },
+            props: {
+                list: {
+                    type: Array,
+                    default: function() {
+                        return []
+                    }
+                },
+                data: {},
+                valueAll: {
+                    type: Object,
+                    default: function() {
+                        return {};
+                    }
+                },
+                type: {
+                    type: String,
+                }
+            },
+            methods: {
+                perserve() {
+                    var obj = this.valueAll,
+                        value = this.value,
+                        that = this,
+                        type = this.type;
+
+                    this.$majorType(this.list, value, obj, type);
+
+                    this.$ajax(obj.id, obj, function() {
+                        that.edit = false;
+                        that.$Message.success('修改成功');
+                        that.$nextTick(() => {
+                            that.$emit('input', obj);
+                            that.$slots.default[0].elm.innerText = value;
+                        })
+                    })
+                },
+                cancel() {
+                    this.value = this.data;
+                    this.edit = false;
+                }
+            },
+            created() {
+                this.value = this.data;
+            }
+        }
+
+        //删除组件
+        var operation = {
+            template: `
+                <div>
+                    <Poptip confirm title="您确认删除这条内容吗？" @on-ok="ok" placement="left-start" :transfer="true">
+                        <Button type="error">删除</Button>
+                    </Poptip>
+                </div>
+            `,
+            methods: {
+                ok() {
+                    this.$emit('del');
+                },
+            }
+        }
+
+        var app = new Vue({
+            el: '#container',
+            data: {
+                columns: [{
+                    title: '名称',
+                    key: 'name',
+                    sortable: 'custom',
+                    render(h, params) {
+                        var result = app.data[params.index].value,
+                            name = result.name;
+                        return h(inputText, {
+                            props: {
+                                value: name,
+                                dataAll: result,
+                                name: 'name',
+                            },
+                            on: {
+                                input(value) {
+                                    result.name = value.name;
+                                }
+                            }
+                        }, [
+                            h('p', name)
+                        ])
+                    },
+                }, {
+                    title: '专业',
+                    key: 'major',
+                    sortable: 'custom',
+                    render(h, params) {
+                        var allData = app.data[params.index].value,
+                            result = allData.majorname;
+                        return h(sele, {
+                            props: {
+                                list: app.majorList,
+                                data: result,
+                                valueAll: allData,
+                                type: 'major'
+                            },
+                            on: {
+                                input(value) {
+                                    allData.major = value.major;
+                                    allData.majorname = value.majorname;
+                                }
+                            }
+                        }, [
+                            h('p', result)
+                        ])
+                    }
+                }, {
+                    title: '标识',
+                    key: 'sign',
+                    render(h, params) {
+                        var result = app.data[params.index].value,
+                            sign = result.sign;
+                        return h(inputText, {
+                            props: {
+                                value: sign,
+                                dataAll: result,
+                                name: 'sign'
+                            },
+                            on: {
+                                input(value) {
+                                    result.sign = value.sign;
+                                }
+                            }
+                        }, [
+                            h('p', sign)
+                        ])
+
+                    },
+                }, {
+                    title: '分类编码',
+                    key: 'classfication_code',
+                    render(h, params) {
+                        var result = app.data[params.index].value,
+                            classfication_code = result.classfication_code;
+                        return h(inputText, {
+                            props: {
+                                value: classfication_code,
+                                dataAll: result,
+                                name: 'classfication_code'
+                            },
+                            on: {
+                                input(value) {
+                                    result.classfication_code = value.classfication_code;
+                                }
+                            }
+                        }, [
+                            h('p', classfication_code)
+                        ])
+
+                    },
+                }, {
+                    title: '是否预制',
+                    key: 'isprebuilt',
+                    sortable: 'custom',
+                    render(h, params) {
+                        var allData = app.data[params.index].value,
+                            result = allData.isprebuilt;
+                        return h(sele, {
+                            props: {
+                                list: [{
+                                    value: '是'
+                                }, {
+                                    value: '否'
+                                }],
+                                data: result == false ? '否' : '是',
+                                valueAll: allData,
+                            },
+                            on: {
+                                input(value) {
+                                    allData.major = value.major;
+                                    allData.majorname = value.majorname;
+                                }
+                            }
+                        }, [
+                            h('i', {
+                                'class': {
+                                    'ivu-icon': true,
+                                    'ivu-icon-ios-checkmark': result,
+                                    'ivu-icon-ios-close': !result,
+                                }
+                            })
+                        ])
+                    }
+                }, {
+                    title: '操作',
+                    key: 'action',
+                    width: 100,
+                    align: 'center',
+                    render(h, params) {
+                        return h(operation, {
+                            on: {
+                                del: function(index) {
+                                    app.del(params.index);
+                                }
+                            }
+                        })
+
+                    }
+                }], //表头
+                data: [], //数据
+                sort_status: 'normal', //当前排序状态
+                page_one_count: 15, //单页数据数量
+                count: 0, //数据总数量
+                spinShow: true, //是否显示加载动画
+                page: 1, //第几页
+                valueData: '', //筛选内容
+                modal: false,
+                current: 1, //当前页码
+                majorList: [], //专业下拉数组
+                modal_loading: false, //添加构件按钮的动画显示是否
+                formValidate: {
+                    name: '', //添加构件名称
+                    sign: '', //添加构件标识
+                    classficationCode: '', //添加构件分类编码
+                    isprebuilt: [], //添加构件是否预制
+                    major: '' //添加构件专业
+                },
+                ruleValidate: {
+                    name: [{
+                        required: true,
+                        message: '名称不能为空',
+                        trigger: 'blur'
+                    }],
+                    sign: [{
+                        required: true,
+                        message: '标识不能为空',
+                        trigger: 'blur'
+                    }, ],
+                    major: [{
+                        required: true,
+                        message: '专业不能为空',
+                        trigger: 'change'
+                    }]
+                }
+            },
+            methods: {
+                del(index) {
+                    var id = this.data[index].value.id,
+                        that = this;
+
+                    $.ajax({
+                        url: '/task/pbtypes/' + id + '/',
+                        type: 'delete',
+                        headers: {
+                            'X-CSRFTOKEN': cookieValue,
+                        },
+                        success: function(res) {
+                            that.count--;
+                            that.data.splice(index, 1);
+                            that.$Message.success('删除成功');
+                        }
+                    })
+                },
+                //关闭弹窗之后重置构件表单数据
+                updata_value(val) {
+                    this.modal = val;
+                    this.$refs.formValidate.resetFields();
+                },
+                //排序
+                sort_value(a) {
+                    var result = a.key;
+                    if (a.order == "desc") { //降序
+                        result = '-' + result;
+                        this.sort_value_one(result);
+                    } else if (a.order == "normal") {
+                        this.sort_value_one('normal');
+                    } else { //升序
+                        this.sort_value_one(result);
+                    }
+                },
+                add(status) {
+                    var that = this;
+                    this.$refs['formValidate'].validate((valid) => {
+                        if (valid) {
+                            this.modal_loading = true;
+                            var formValidate = that.formValidate,
+                                major;
+                            if (that.majorList.length != 0) {
+                                that.majorList.forEach(value => {
+                                    if (value.value == formValidate.major) {
+                                        major = window.location.origin + '/user/majors/' + value.id + '/'
+                                    }
+                                })
+                            }
+                            $.ajax({
+                                type: 'post',
+                                url: '/task/pbtypes/',
+                                data: {
+                                    name: formValidate.name,
+                                    sign: formValidate.sign,
+                                    isprebuilt: formValidate.isprebuilt[0] ? true : false,
+                                    major,
+                                    classfication_code: formValidate.classficationCode,
+                                },
+                                headers: {
+                                    'X-CSRFTOKEN': cookieValue,
+                                },
+                                success: function(res) {
+                                    that.modal_loading = false;
+                                    that.$Message.success('添加成功');
+                                    that.modal = status;
+                                    that.$refs['formValidate'].resetFields();
+                                    if (!that.modal) {
+                                        that.getPageData();
+                                    } else {
+                                        that.data.push({
+                                            value: res
+                                        });
+                                        that.count++;
+                                    }
+                                },
+
+                            })
+                        }
+                    })
+                },
+                add_still() {
+                    this.add(true);
+                },
+                //添加构件
+                add_component(name) {
+
+                    this.add(false);
+
+
+                },
+                //排序,
+                //排序总是回到第一页，
+                sort_value_one(value) {
+                    this.sort_status = value;
+                    this.current = 1;
+                    this.getPageData();
+                },
+                //翻页并携带排序状态
+                changeData(page) {
+                    this.page = page;
+                    this.getPageData(page);
+                },
+                //过滤内容
+                filter_data() {
+                    this.current = 1;
+                    this.getPageData();
+
+                },
+
+                //@param  page 页数
+
+                getPageData(page) {
+                    this.spinShow = true;
+                    var that = this,
+                        page = page || 1;
+                    $.ajax({
+                        url: "/task/pbtypes/?ordering=" + this.sort_status + "&page=" + page + "&search=" + this.valueData,
+                        type: 'get',
+                        headers: {
+                            'X-CSRFTOKEN': cookieValue,
+                        },
+                        success: function(res) {
+                            var result = res.results,
+                                len = result.length;
+                            that.count = res.count;
+                            that.data = [];
+                            if (len != 0) {
+                                result.forEach(value => {
+                                    that.data.push({
+                                        value
+                                    })
+                                })
+                            };
+                            that.spinShow = false;
+                        }
+                    })
+                }
+            },
+            mounted() {
+                var that = this;
+                this.getPageData();
+
+                $.ajax({
+                    url: '/user/majors/?isAll=true&perPage=1000',
+                    type: 'get',
+                    success: function(result) {
+                        var res = result.results;
+                        if (res.length != 0) {
+                            res.forEach((val, index) => {
+                                that.majorList.push({
+                                    value: val.name,
+                                    label: val.name,
+                                    id: val.id,
+                                })
+                            })
+                        }
+
+                    }
+                })
+            }
+        })
+    </script>
+</body>
+
+</html>

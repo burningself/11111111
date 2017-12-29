@@ -1,0 +1,161 @@
+	 /**********************************yxh*********************/
+   /*********************** 项目概况页面css开始****
+    * 添加快捷功能模块*
+    * ******************************/
+		 
+		 div,
+		 span,
+		 ul,
+		 li,
+		 dl,
+		 dd,
+		 dt,
+		 h3 {
+		 	margin: 0px;
+		 	padding: 0px;
+		 	list-style: none;
+		 }
+		 
+		 .changyong ul {
+		 	float: left;
+		 }
+		 
+		 .changyong ul li {
+		 	float: left;
+		 }
+		 
+		 .changyong {
+		 	list-style: none;
+		 	overflow: hidden;
+		 	margin-top: 20px;
+		 }
+		 
+		 .name {
+		 	font-size: 3vh;
+		 	margin-bottom: 20px;
+		 	text-align: initial;
+		 	font-weight: 1.5em;
+		 }
+		 
+		 .box1 {
+		 	float: left;
+		 	width: 100px;
+		 	height: 125px;
+		 	border: 1px solid #DDDDDD;
+		 	margin-right: 10px;
+		 	position: relative;
+		 	border-radius: 13px;
+		 }
+		 
+		 .photos {
+		 	height: 100%;
+		 }
+		 
+		 .title {
+		 	font-size: 50px;
+		 	color: #fff;
+		 }
+		 
+		 .title_text {
+		 	height: 40px;
+		 	line-height: 40px;
+		 	position: absolute;
+		 	bottom: 0px;
+		 	width: 100%;
+		 	opacity: .5;
+		 	font-size: 1.2em;
+		 	color: #fff;
+		 	text-align: center;
+		 	top: 72px;
+		 }
+		 
+		 a {
+		 	text-decoration: none;
+		 	color: #000;
+		 	line-height: 2em;
+		 }
+		 
+		 ul {
+		 	list-style: none;
+		 	padding: 0 0 0 20px;
+		 }
+		 
+		 .affix {
+		 	float: left;
+		 	width: 170px;
+		 	position: inherit;
+		 }
+		 
+		 .affix ul li {
+		 	height: 50px;
+		 	line-height: 50px;
+		 	font-size: 1.1em;
+		 }
+		 
+		 .affix .active a {
+		 	color: #e4393c;
+		 	font-weight: bold;
+		 }
+		 
+		 .containers {
+		 	float: right;
+		 	width: 770px;
+		 	min-height: 400px;
+		 }
+		 
+		 .containers .box {
+		 	display: none;
+		 }
+		 
+		 .containers .box.active {
+		 	display: block;
+		 }
+		 
+		 .total_kinds {
+		 	font-size: 25px;
+		 	margin-right: 10%;
+		 	color: #2E82B3;
+		 }
+		 
+		 .scroll {
+		 	background-color: #00FFFF;
+		 	overflow-y: auto;
+		 }
+		 
+		 .iconColor .fa:before{
+		 	margin-right: 10px;
+		 	color: #45a5ce;
+		 }
+		 
+		 .btn button {
+		 	margin-right: 10px;
+		 }
+		 
+		 .bgpic {
+		 	background: url("../../static/images/check.png") no-repeat 72px 0;
+		 	display: block;
+		 	height: 23px;
+		 	position: relative;
+		 	right: -3px;
+		 	top: -5px;
+		 }
+		 
+		 .bgpics {
+		 	height: 23px;
+		 	width: 100%;
+		 	position: relative;
+		 	right: -3px;
+		 	top: -5px;
+		 }
+		 
+		 .notice .shortcuts a {
+		 	float: left;
+		 }
+		 
+		 .notice .shortcuts {
+		 	padding: 0px 5px 0px 5px;
+		 }
+ /**********************************yxh*********************/
+   /*********************** 项目概况页面css结束****
+    * 添加快捷功能模块*
+    * ******************************/

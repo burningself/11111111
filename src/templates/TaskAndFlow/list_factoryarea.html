@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+
+{% block content %} 
+<link href="/css/project/factory.css" media="all" rel="stylesheet" type="text/css" />
+<link type="text/css" href="/css/project/morris.css" media="all" rel="stylesheet" />
+<script src="/js/morris.js-0.5.1/raphael-min.js"></script>
+<script src="/js/morris.js-0.5.1/morris.min.js" type="text/javascript"></script>
+<script src="/js/common/factory.js"></script>
+
+<div class="content-row">
+  <div class="col-md-12 col-sm-12">
+		<div class="area-row">
+			<ul id="factoryTab" class="nav nav-tabs">
+					<li style="font-weight:bold;color:cornflowerblue;">
+			         	<i class="fa fa-bars" > </i> 场地管理：
+			   	</li>
+					<li class="active">
+							<a href="#donutTab" data-toggle="tab"> 堆场概览</a>
+						</li>
+			   	{% for each in list_items_area%}
+			   		{% if forloop.counter = 1 %}
+			   			<li >
+			   		{% else %}
+				   		<li>
+				   	{% endif %}
+				      	<a href="#{{each.number}}" data-toggle="tab"> {{each.description}}
+					      </a>
+							</li>
+		      {% endfor %}
+
+		      <div class="pull-right search">
+		      	<input id="searchPb" placeholder="搜索构件/编号"></input> <i class="fa fa-search"> </i>
+		      </div>
+			</ul>
+		</div>
+	</div>
+	<div class="area-content tab-content col-md-6 col-sm-6" id="factoryTabContent">
+		<div class="areaTab tab-pane fade in col-md-12 col-sm-12 active" id="donutTab">
+			<div class="donutTab col-md-12">
+				<h2><i class="fa fa-star"> </i> 堆场概览</h2>
+				{% for each in list_items_area %}
+					<div class="areaDonut col-md-4 col-lg-4" id="{{each.id}}_donut"> </div>
+				{% endfor %}
+				
+				<label class="sysMsg col-md-12">
+					<br>
+					<span>系统建议：</span>
+					
+					<span id="sysAdvice">建议挪动构件 达到场区负载均衡！</span>
+				</label>
+			</div>
+		</div>
+		{% for each in list_items_area %}
+				{% if forloop.counter = 1 %}
+				  <div class="areaTab tab-pane fade in col-md-12 col-sm-12  " id="{{each.number}}">
+				{% else %}
+					<div class="areaTab tab-pane fade in col-md-12 col-sm-12" id="{{each.number}}">
+				{% endif %}
+				<div class="positionList col-md-12 col-lg-12">
+					<h2><i class="fa fa-hdd-o"> </i> 堆场列表</h2>
+					{% for eachPosition in each.positions %}
+					<div class="areaPosition col-md-4 col-lg-4" title="获取构件列表?" id="{{eachPosition.id}}" onclick="javascript: fetchPB({{eachPosition.id}});">
+						{% if eachPosition.count > 10 %}
+							<div class="positionCount btn full">{{eachPosition.count}}
+						{% elif eachPosition.count > 0 %}
+							<div class="positionCount btn normal">{{eachPosition.count}}
+						{% else %}
+							<div class="positionCount btn unuse">{{eachPosition.count}}
+						{% endif %}
+						</div>
+						<div class="positionNum">{{eachPosition.number}}
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+	<div class="sumContent col-md-6 col-lg-6">
+		<div class="pbTab col-md-12">
+			<h2><i class="fa fa-bars"> </i> 构件堆放列表</h2>
+			<div class="pbList">
+				<table class="table" id="pbTable">
+					<tbody>
+						<th style="border:none;">
+							<p style="font-size:30px; margin:50px; text-decoration: underline;">点击堆场获取堆场构件列表！</p> 
+						</th>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+{% for each in list_items_area %}
+	Morris.Donut({
+	    element: '{{each.id}}_donut',
+	    data: [
+	        {label: '{{each.description}}已启用', value: {{each.used_rate}}},
+	        {label: '{{each.description}}未启用', value: 100-{{each.used_rate}}},
+	    ],
+	    colors: ["cadetblue","gainsboro"],
+	    formatter: function (y) { return y + "%" },
+	    resize: true
+	});
+{% endfor %}
+
+</script>
+{% endblock %}

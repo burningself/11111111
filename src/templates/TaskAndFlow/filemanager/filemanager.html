@@ -1,0 +1,169 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %} 
+		<!--<link href="/css/project/filemanager.css" media="all" rel="stylesheet" type="text/css" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+		<link rel="stylesheet" type="text/css" href="/js/jquery-ui-1.11.4/jquery-ui.css">
+		<script src="/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+		<!-- elFinder CSS (REQUIRED) -->
+		<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/css/elfinder.full.css">
+		<link rel="stylesheet" type="text/css" href="/js/elFinder-2.1.12/theme.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="/js/elFinder-2.1.12/themes/Material/css/theme-gray.css">
+		<!--<link rel="stylesheet" type="text/css" media="screen" href="/js/elFinder-2.1.12/themes/windows-10/css/theme.css">-->
+		<!-- elFinder JS (REQUIRED) -->
+		<script src="/js/elFinder-2.1.12/elfinder.full.js"></script>
+		<!-- GoogleDocs Quicklook plugin for GoogleDrive Volume (OPTIONAL) -->
+		<!--<script src="js/extras/quicklook.googledocs.js"></script>-->
+		<!-- elFinder translation (OPTIONAL) -->
+		<script src="js/elFinder-2.1.12/i18n/elfinder.zh_CN.js"></script>
+		<script src="/js/common/filemanager.js" type="text/javascript"></script>
+		<!-- 弹出框 -->
+		<link rel="stylesheet" type="text/css" href="/js/zeroModal/css/zeroModal.css">
+		<script src="/js/zeroModal/zeroModal.min.js" type="text/javascript"></script>
+		<!-- elFinder initialization (REQUIRED) -->
+		<script src="/js/common/guanlianyuansufile.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			$(document).ready(function() {
+						 Date.prototype.toLocaleString = function() {//时间
+		                      return this.getFullYear() + "/" + (this.getMonth() + 1) + "/" + this.getDate() + "/ " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
+		                };
+		                function UpTime(date){//定义返回时间
+		                    var upTime = new Date( date*1000 );
+		                    upTime = upTime.toLocaleString();
+		                    return upTime;
+		                };
+		                function UpSize( date ){//计算文件大小
+		                    var upSize = parseInt( date / 1024);
+		                            if( date == 0){
+		                                upSize = date + "KB";
+		                            }else if( date < 1024 ){
+		                                upSize = date + "b";
+		                            }
+		                            else if( upSize >= 1024 ){
+		                                upSize = parseInt(upSize/1024) + "MB";
+		                            }else{
+		                                upSize = upSize + "KB";
+		                            }
+		                            return upSize;
+		                };
+		                function  sortMethod(a, b) {//文件名排序大于1等于0小于-1
+		                    var aa;
+		                    if (window.Intl && window.Intl.Collator) {
+		                        aa = new Intl.Collator("zh-CN", {numeric: true}).compare;
+		                    } else {
+		                        aa = function(a, b) {
+		                            return a.localeCompare(b, "zh-CN", {numeric: true});
+		                        };
+		                    }
+		                    return  aa(a,b);
+		                };
+		                 function disArr( arrDisorder ){//冒泡排序从小到大（文件名）
+		                    for(var z = 0;z < arrDisorder.length - 1;z++){
+		                        for(var x = z+1;x < arrDisorder.length;x++){
+		                            var disTemp;
+		                           if(sortMethod(arrDisorder[z],arrDisorder[x]) == 1 ){
+		                                disTemp = arrDisorder[z];
+		                                arrDisorder[z] = arrDisorder[x];
+		                                arrDisorder[x] = disTemp;
+		                           } 
+		                        }
+		                    }
+		                    return(arrDisorder); 
+		                };
+		                 function size( data,subpage){//文件排序
+		                    var tempS = [];
+		                     for(var w = 0;w < data.length; w++){
+		                            for(var q=0; q < subpage.length; q++){
+		                               if(data[w] == subpage[q].name){
+		                                        tempS.push( subpage[q] );
+		                                        break;
+		                                    }
+		                            }
+		                        }
+		                    return tempS;
+		                };
+					function getData(data){
+                        var subpage = eval(data.files);//获取数组
+                        var tempa = " ";
+                        if(subpage.length == 0){
+                        	tempa = "<p class='gray'>无匹配结果</p>";
+                            return tempa;
+                        }else{
+                            var arrSort = [];arrFile = [];//wenjian数组
+                            //对文件名进行排序
+                            for( var a = 0;a < subpage.length; a++){
+                                if( subpage[a].hasOwnProperty("phash") ){
+                                    if( subpage[a].url ){
+                                        arrSort.push(subpage[a].name);
+                                    }else{
+                                        arrFile.push(subpage[a].name);
+                                    }
+                                }
+                            }
+                            //文件sort()
+                            disArr(arrSort);
+                            disArr(arrFile);
+                            tempa +="<table class='wenjian-li'>";
+                            tempa +="<tr><th style='text-align:center;'>名称</th><th></th><th>大小</th><th style='text-align:right;padding-right:109px;'>修改于</th></tr>";
+                            for(var n=0; n < size(arrSort,subpage).length;n++){
+                                     var url = size(arrSort,subpage)[n].mime.split("/");//截取文件类型
+                                        tempa  += "<tr><td style='width:70px'><div class='elfinder-cwd-icon elfinder-cwd-icon-"+ url[0]+" elfinder-cwd-icon-"+url[1] +" ui-corner-all'></div></td><td> <a href='"+size(arrSort,subpage)[n].url+"' target='_blank' id='"+size(arrSort,subpage)[n].hash +"' class='wenjian-li'><h4 class='f-left'>"+ size(arrSort,subpage)[n].name +"</h4></a></td><td style='line-height:20px'>"+UpSize(subpage[n].size)+"</td><td><p class='f-right'>"+ UpTime( size(arrSort,subpage)[n].ts ) +"</p></td></tr>";
+                            }
+                            tempa +="</table>"
+                            return tempa;
+                        }
+                    };
+					$(".close-newfile").click(function(){
+					 			$("#newfile-page").hide();
+					});
+					$("#click-v2").click(function(){
+					 		var content = $("#search-content").val();
+							$.ajax({
+									url:"/task/ziliao/connector/",
+	                                dataType:"json",
+	                                type:"get",
+	                                data:{cmd:"search",q:content,target:'all'},
+									timeout:15000, //超时时间
+			                        beforeSend:function(XMLHttpRequest){ 
+			                        		 loadunique = zeroModal.loading(2);
+			                        }, 
+			                        success:function(datas){
+			                        	zeroModal.close(loadunique);
+			                        	$("#search-content").val("");
+			                         	var con = getData( datas );
+			                         	zeroModal.show({
+									            title: '查询结果：',
+									            content: con,
+									            width:'55%',
+									            height:'60%'
+									        });
+			                         },
+			                        error:function(){
+			                        	zeroModal.close(loadunique);
+			                            console.log('读取失败');
+			                        }
+							});
+					});
+
+			});
+		</script>
+		<style>
+			.search-v2{position: absolute; top:5px; right: 15px; }
+			.search-v2 input{color:#3B4047;padding-left: 10px;border:1px solid #ccc;}
+			#click-v2{position: absolute; top: 6px; right: 5px; color: #dddddd; cursor: pointer;}
+			.wenjian-li{width: 100%}
+			.f-left{line-height: 48px;font-size: 15px;color: #3B4047;min-width: 195px;overflow: hidden;text-overflow:ellipsis;height: 48px;}
+			.f-right{line-height: 60px;color: #3B4047;height: 48px;text-align: right;margin-right: 30px;}
+		</style>
+{% endblock %}
+{% block content %}
+	<!-- Element where elFinder will be created (REQUIRED) -->
+	<div  id="elfinder"></div>
+	<!-- 新加模块 search -->
+	<div class="search-v2">
+		<input id="search-content" type="text" placeholder="查找文件">
+		<span id="click-v2" class="glyphicon glyphicon-search" title="查找文件"></span>
+	</div>
+ 	<a download="" href=""  id="downhref" target="_blank"></a>  
+ 	<input type="hidden" id="startPathHash" value="{{startPathHash}}" />
+{% endblock %}
+

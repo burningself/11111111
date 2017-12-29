@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh_CN" style="overflow: hidden;">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Set render engine for 360 browser -->
+    <meta name="renderer" content="webkit">
+    <meta charset="utf-8">
+    <title>
+        智慧建造信息平台
+    </title>
+    <meta name="description" content="This is page-header (.page-header > h1)">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/admin/css/admin-theme.css" rel="stylesheet">
+
+    <link href="/css/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/admin/css/xadmin-index.css">
+    <link href="/admin/css/xadmin-default.css" rel="stylesheet">
+    <style>
+        @CHARSET "UTF-8";
+        .input-order {
+            width: 30px;
+        }
+        
+        .wrap {
+            padding: 20px 20px 70px;
+        }
+        
+        .table td {
+            font-size: 12px;
+        }
+        
+        .navbar .nav_shortcuts .btn {
+            margin-top: 5px;
+        }
+        
+        .macro-component-tabitem {
+            width: 101px;
+        }
+        /*-----------------导航hack--------------------*/
+        
+        .nav-list>li.open {
+            position: relative;
+        }
+        
+        .nav-list>li.open .back {
+            display: none;
+        }
+        
+        .nav-list>li.open .normal {
+            display: inline-block !important;
+        }
+        
+        .nav-list>li.open a {
+            padding-left: 7px;
+        }
+        
+        .nav-list>li .submenu>li>a {
+            background: #fff;
+        }
+        
+        .nav-list>li .submenu>li a>[class*="fa-"]:first-child {
+            left: 20px;
+        }
+        
+        .nav-list>li ul.submenu ul.submenu>li a>[class*="fa-"]:first-child {
+            left: 30px;
+        }
+        /*----------------导航hack--------------------*/
+    </style>
+
+</head>
+
+<body style="min-width:900px;" screen_capture_injected="true">
+    <div id="loading" style="display: none;"><i class="loadingicon"></i><span>正在加载...</span></div>
+    <div id="right_tools_wrapper">
+        <!--<span id="right_tools_clearcache" title="清除缓存" onclick="javascript:openapp('/admin/setting/clearcache.html','right_tool_clearcache','清除缓存');"><i class="fa fa-trash-o right_tool_icon"></i></span>--><span id="refresh_wrapper" title="REFRESH_CURRENT_PAGE"><i class="fa fa-refresh right_tool_icon"></i></span> </div>
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container-fluid">
+                <a class="brand" href="/index"> <small style="font-family: 微软雅黑;font-size: 120%;"> 智慧平台后台管理中心              </small> </a>
+
+                <ul class="nav simplewind-nav pull-right">
+                    <li class="light-blue">
+                        <a data-toggle="dropdown" href="#" class="dropdown-toggle"> <span class="user-info"> 欢迎, {{user.truename}}   </span> <i class="fa fa-caret-down"></i> </a>
+                        <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-closer">
+                            <li>
+                                <a href="/logout/">退出系统</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="main-container container-fluid">
+        <div class="sidebar" id="sidebar">
+            <!-- <div class="sidebar-shortcuts" id="sidebar-shortcuts"> </div> -->
+            <div id="nav_wraper" style="height: 929px; overflow: auto;">
+                <ul class="nav nav-list">
+                    <li>
+                        <a href="#" class="dropdown-toggle"> <i class="fa fa-cogs normal"></i> <span class="menu-text normal">
+                                    系统设置                              </span> <b class="arrow fa fa-angle-right normal"></b> <i class="fa fa-reply back"></i> <span class="menu-text back">返回</span> </a>
+                        <ul class="submenu">
+                            <li>
+                                <a href="javascript:openapp('/xadmin/adminmanagerpicture/','115Admin','图片设置',true);"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    图片设置                                </span> </a>
+                            </li>
+                            <li>
+                                <!--<a href="javascript:openapp('/xadmin/Navigation_editor/','114Admin','菜单设置',true);"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    菜单设置                                </span> </a>
+								</li>-->
+
+
+                                <li>
+                                    <a href="#" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    菜单设置                                </span><b class="arrow fa fa-angle-right"></b> </a>
+                                    <ul class="submenu">
+
+                                        <li> <a href="javascript:openapp('/xadmin/Navigation_editor/','1141Admin','PC菜单设置',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                PC菜单设置                         </span> </a> </li>
+
+
+                                        <li> <a href="javascript:openapp('/xadmin/navigation_editor_mobile/','1142Admin','微信菜单设置',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                微信菜单设置                            </span> </a> </li>
+
+                                        <li> <a href="javascript:openapp('/xadmin/navigat/function_editor/','1143Admin','功能磁贴',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                功能磁贴                         </span> </a> </li>
+
+                                    </ul>
+                                </li>
+
+
+                                <li>
+                                    <a href="#" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    类型设置                                </span><b class="arrow fa fa-angle-right"></b> </a>
+                                    <ul class="submenu">
+
+                                        <li>
+                                            <a href="javascript:openapp('/xadmin/usermanager_vue/componentType/','1121Admin','构件类型',true);">
+                                                <!--/admin/TaskAndFlow/pbtype/-->
+                                                &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                构件类型                         </span> </a>
+                                        </li>
+
+
+                                        <li> <a href="javascript:openapp('/task/typemanager/','1122Admin','验收类型',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                验收类型                            </span> </a> </li>
+
+                                        <li> <a href="javascript:openapp('/xadmin/usermanager_vue/typeMeeting/','1123Admin','会议类型',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                会议类型                         </span> </a> </li>
+                                    </ul>
+                                </li>
+
+
+                                <li>
+                                    <a href="#" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    提醒设置                                </span><b class="arrow fa fa-angle-right"></b> </a>
+                                    <ul class="submenu">
+
+                                        <li> <a href="javascript:openapp('/xadmin/usermanager_vue/procedureAccept/','1221Admin','工序验收提醒',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                工序验收提醒                         </span> </a> </li>
+
+
+                                        <li> <a href="javascript:openapp('/xadmin/usermanager_vue/qualityAccept/','1222Admin','质量验收提醒',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                质量验收提醒                            </span> </a> </li>
+
+                                    </ul>
+                                </li>
+
+
+                                <li>
+                                    <a href="javascript:openapp('/task/goujian/statusmanager/','118Admin','状态设置',true);"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    状态设置                                </span> </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:openapp('/task/flowtemplate/list/','119Admin','流程设置',true);"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    流程设置                                </span> </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:openapp('/assist/biaodanmanerger/','1110Admin','表单设置',true);"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    表单设置                                </span> </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    文件夹设置                                </span><b class="arrow fa fa-angle-right"></b> </a>
+                                    <ul class="submenu">
+
+                                        <li> <a href="javascript:openapp('/xadmin/directorynotify/','11111Admin','文件夹通知',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                文件夹通知                         </span> </a> </li>
+
+
+                                        <li> <a href="javascript:openapp('/xadmin/directoryauth/','11112Admin','文件夹权限',true);">
+	                            &nbsp;<i class="fa fa-angle-double-right"></i> <span class="menu-text">
+	                                文件夹权限                            </span> </a> </li>
+
+                                    </ul>
+                                </li>
+                        </ul>
+                        </li>
+                        <li>
+                            <a href="#" class="dropdown-toggle"> <i class="fa fa-group normal"></i> <span class="menu-text normal">
+                                    用户管理                                </span> <b class="arrow fa fa-angle-right normal"></b> <i class="fa fa-reply back"></i> <span class="menu-text back">返回</span> </a>
+                            <ul class="submenu">
+                                <li>
+                                    <a href="javascript:openapp('/xadmin/usermanager_vue/','121Admin','用户管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    用户管理                             </span> </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:openapp('/xadmin/usermanager_vue/editRole/','124Admin','角色管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                   角色管理                             </span> </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:openapp('/xadmin/usermanager_vue/divisionManage/','125Admin','参建方管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                	   参建方管理                             </span> </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:openapp('/xadmin/usermanager_vue/majorManage/','127Admin','专业管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                   专业管理                             </span> </a>
+                                </li>
+
+
+                                <li>
+                                    <a href="javascript:openapp('/xadmin/usermanager_vue/companyManage/','128Admin','企业管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                   企业管理                             </span> </a>
+                                </li>
+
+                                <!--<li>
+                                    <a href="javascript:openapp('/admin/UserAndPrj/project/','129Admin','项目管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    项目管理                             </span> </a>
+                                </li>-->
+
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#" class="dropdown-toggle"> <i class="fa fa-bookmark normal"></i> <span class="menu-text normal">
+                                    知识管理                                </span> <b class="arrow fa fa-angle-right normal"></b> <i class="fa fa-reply back"></i> <span class="menu-text back">返回</span> </a>
+                            <ul class="submenu">
+                                <li>
+                                    <a href="javascript:openapp('/admin/UserAndPrj/knowledgehazardlist/','131Admin','危险源管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    危险源管理                             </span> </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:openapp('/admin/UserAndPrj/knowledgeclassfication/','132Admin','分类体系管理',true);" class="dropdown-toggle"> <i class="fa fa-caret-right"></i> <span class="menu-text">
+                                    分类体系管理                             </span> </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                </ul>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <a id="task-pre" class="task-changebt" style="display: none;">←</a>
+                <div id="task-content" style="width: 118px;">
+                    <ul class="macro-component-tab" id="task-content-inner" style="width: 118px;">
+                        <!--<li class="macro-component-tabitem noclose" app-id="0" app-url="/xadmin/adminmanagerpicture/" app-name="首页"> <span class="macro-tabs-item-text">图片设置</span> </li>-->
+                    </ul>
+                    <div style="clear:both;"></div>
+                </div>
+                <a id="task-next" class="task-changebt" style="display: none;">→</a>
+            </div>
+            <div class="page-content" id="content" style="height: 888px;">
+                <iframe name="rightframe" src="" style="width:100%;height: 100%;" frameborder="0" id="appiframe-0" class="appiframe"></iframe>
+            </div>
+        </div>
+    </div>
+    <script src="/js/jquery/jquery-2.2.3.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <script>
+        var ismenumin = $("#sidebar").hasClass("menu-min");
+        $(".nav-list").on("click", function(event) {
+            var closest_a = $(event.target).closest("a");
+            if (!closest_a || closest_a.length == 0) {
+                return
+            }
+            if (!closest_a.hasClass("dropdown-toggle")) {
+                if (ismenumin && "click" == "tap" && closest_a.get(0).parentNode.parentNode == this) {
+                    var closest_a_menu_text = closest_a.find(".menu-text").get(0);
+                    if (event.target != closest_a_menu_text && !$.contains(closest_a_menu_text, event.target)) {
+                        return false
+                    }
+                }
+                return
+            }
+            var closest_a_next = closest_a.next().get(0);
+            if (!$(closest_a_next).is(":visible")) {
+                var closest_ul = $(closest_a_next.parentNode).closest("ul");
+                if (ismenumin && closest_ul.hasClass("nav-list")) {
+                    return
+                }
+                closest_ul.find("> .open > .submenu").each(function() {
+                    if (this != closest_a_next && !$(this.parentNode).hasClass("active")) {
+                        $(this).slideUp(150).parent().removeClass("open")
+                    }
+                });
+            }
+            if (ismenumin && $(closest_a_next.parentNode.parentNode).hasClass("nav-list")) {
+                return false;
+            }
+            $(closest_a_next).slideToggle(150).parent().toggleClass("open");
+            return false;
+        });
+    </script>
+    <script src="/admin/js/xadmin-common.js"></script>
+    <script src="/admin/js/xadmin-index.js"></script>
+    <script>
+        $(function() {
+            openapp('/xadmin/adminmanagerpicture/', '115Admin', '图片设置', true);
+        });
+    </script>
+</body>
+
+</html>

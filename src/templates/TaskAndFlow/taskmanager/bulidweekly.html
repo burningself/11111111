@@ -1,0 +1,466 @@
+{% extends "base_v2.html" %}
+
+{% block ownerhead %} 
+		<link href="/css/project/buildweekly.css?ver=(2017-07-31)" media="all" rel="stylesheet" type="text/css" />
+
+		 <link href="/js/web3d/style.min.css" rel="stylesheet" />
+		 <script src="/js/web3d/three.min.js"></script>
+		 <script src="/js/web3d/viewer3D.min.js"></script>
+
+		<script src="http://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+		<script src="http://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.svg.min.js"></script>
+		
+		<link rel="stylesheet" href="/css/bootstrap/bootstrap-editable.css" type="text/css" >
+		<script src="/js/bootstrap/bootstrap-editable.min.js" type="text/javascript"></script>
+		
+  		<!-- wysihtml5 -->
+        <link href="/js/x-editable/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.3/bootstrap3-wysihtml5.min.css" rel="stylesheet">  
+        <script src="/js/x-editable/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.3/wysihtml5-0.3.0.min.js"></script>  
+      
+        <script src="/js/x-editable/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.3/bootstrap3-wysihtml5.all.min.js"></script>
+        
+        <script src="/js/x-editable/inputs-ext/wysihtml5/wysihtml5-0.0.3.js"></script>
+ 		<script src="/js/x-editable/inputs-ext/wysihtml5/bootstrap-wysihtml5-0.0.3/locales/bootstrap-wysihtml5.zh-CN.js"></script>
+
+		<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskStatus/Autodesk.ADN.Viewing.Extension.SampleTaskStatus.js"></script>
+     	<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskGoal/Autodesk.ADN.Viewing.Extension.SampleTaskGoal.js"></script>
+     	
+    	<script src="js/web3d/scripts/LoadModelBulidWeekly.js?ver=(2017-07-31)"></script>
+    	<script src="/js/vue/vue.min.js" type="text/javascript"></script>
+    	<script src="/js/common/buildweekly.js?ver=(2017-07-31)" type="text/javascript"></script>
+    	<script src="/js/common/resizebar.js"></script>
+    	<style>
+			.ResizeBottombar{
+				width: 100%;
+				background: white; 
+				cursor: n-resize; 
+				height: 5px;
+			}
+
+		</style>
+    	<script>
+    			$(function() {
+					bindResize(document.getElementById('Bottombar1'),"anquanshigongDesc");
+					bindResize(document.getElementById('Bottombar2'),"jishuzhiliangDesc");
+					
+				});
+    	</script>
+{% endblock %}
+
+{% block content %} 
+<div id="tbl_exception"  class="row" style="padding-bottom: 30px;font-size: 21px;">
+	<input type="hidden" id="weeklyid" value="{{weeklyid}}" />
+	<div class="content-row" style="color: rgb(106, 108, 111); width: 96%; margin-left: 2%;">
+		<div class="weeklypanel">
+			<div style="position: relative;">
+				<p class="body-title border-gray" >新华医院儿科综合楼新建工程施工管理周汇报————总包({{weekly_begindate|date:"Y.m.d"}}-{{weekly_enddate|date:"Y.m.d"}})</p>
+				<a v-if="needfile" style="position: absolute;right: 100px;top:5px;" onclick="SaveWeeklyFile()" class="btn-sm btn-danger">周报归档 </a>
+				<a  style="position: absolute;right: 10px;top:5px;"  class="btn-sm btn-info" href="/task/projecttask/buildweekly2_list/">查看历史 </a>
+			</div>
+			
+	<!-- 上周各项工作落实情况 -->
+			<h3 >上周各项工作落实情况</h3>
+			<div class="first">
+				<div class="first-title border-gray" style="margin-bottom: 0px;">
+					
+					<div class="task-from form-inline" style="padding-left: 0px;padding-right: 0px;">
+						
+						<div class="form-group">
+							<label  style="margin-right: 20px;">*进度目标实现情况</label>
+							<div class="input-group">
+								<label class="input-group-addon"  for="timerange">选择模型</label>
+								<select id="selUnitproject" class="form-control" style="min-width: 160px;">
+									{% for item in unitprjlist %}
+											<option value ="{{item.id}}">{{item.relatedunitproject.name}}-{{item.relatedmajor.name}}</option>
+		
+								{% endfor %}
+								</select>
+							</div>
+							<button id="btnLoadNewModel" style="margin-right: 60px;" onclick="_shiijindu.getModelFile()" class="btn btn-success-outline">切换模型 </button>
+							  <select id="selFloor" class="form-control" style="min-width: 160px;">
+							  	    <option value="" selected>选择空间结构</option>
+									{% for floor in floorList %}
+											<option value="{{floor.id}}">{{floor.name}}</option>		
+									{% endfor %}
+							 </select>	
+						</div>
+						
+					</div>
+				</div>
+				<div class="first-left">
+					<div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+						<div class="viewer" id="viewer"></div>
+						<div class="shotviewer" id="shotviewer" style="display: none;">
+							<img id="imgshotviewer" src='/img/body-img.png'> </img>
+						</div>
+					</div>
+				</div>
+			    <div class="first-right">
+			    	<div class="righttitle">
+			    		<span class="label label-default" style="min-width: 200px;">编号：<span id="pbnumber"></span></span>
+			    		<span class="label label-default" style="margin-left: 20px;min-width: 100px;">状态：<span id="pbstatusinfo"></span></span>
+			    		<a   class="btn btn-info pull-right" @click="tracepb()">过程追踪 </a>
+					</div>
+					<div id="shijijinduDesc" data-pk="1"   class="rightbody editable" tabindex="-1">
+			    		&nbsp;
+			    	</div>
+				</div>
+			</div>
+		</div>
+		
+
+		<div class="weeklypanel border-gray">
+			<div class="col-md-6 border-gray secondhead" style="position: relative;">
+				<label class="weeklytitle">*安全文明施工情况</label>
+				<button v-if="zongbao" style="position: absolute;right: 10px;top:10px;" v-on:click="additemDlg('anquan')" class="btn-sm btn-info"><i class="fa fa-plus">添加条目</i></button>
+			</div>
+			<div class="col-md-6 border-gray secondhead">
+				<label class="weeklytitle">*质量技术情况</label>
+				<button v-if="zongbao" style="position: absolute;right: 10px;top:10px;" v-on:click="additemDlg('zhiliang')" class="btn-sm btn-info"><i class="fa fa-plus">添加条目</i></button>
+			</div>
+			 <div class="col-md-6  border-gray secondbody">
+					<p class="font-weight">安全文明施工近期管理要点：</p>
+					<div id="anquanshigongDesc" data-pk="2"   class="editable descdefine" tabindex="-2">	
+						&nbsp;
+					</div>
+					<div class="ResizeBottombar" id="Bottombar1" ></div>
+					<div class="descdefinebody">
+						<table class="table border-gray">
+							  <thead>
+							    <tr>
+							      <td class="tdseq">序号</td>
+							      <td>安全文明施工事宜</td>
+							      <td class="tdstatus">状态</td>
+							      <td class="tdopr">操作</td>
+							    </tr>
+							  </thead>
+							  <tbody>
+							  	<tr v-for="(each,index) in anquan">
+				                    <td>[[index+1]]</td>
+				                    <td>[[each.desc ]]</td>
+				                    <td>[[each.status ]]</td>
+				                    <td>
+				                    	<button v-if="each.readurl != ''" class="btn-xs btn-info" @click="showissue(each.readurl)">查看</button>
+				                    	<button v-if="zongbao" class="btn-xs btn-danger" @click="deleteItem('anquan',index)">删除</button>
+				                    </td>
+				               </tr>
+							  </tbody>
+						</table>
+					</div>
+			 </div>
+			 <div class="col-md-6 border-gray secondbody">
+				<p class="font-weight">技术质量近期管理要点：</p>
+				<div id="jishuzhiliangDesc" data-pk="3"   class="editable descdefine" tabindex="-3">
+					&nbsp;
+				</div>
+				<div class="ResizeBottombar" id="Bottombar2" ></div>
+				<div class="descdefinebody">
+					<table class="table border-gray">
+						  <thead>
+						    <tr>
+						      <td class="tdseq">序号</td>
+						      <td>质量技术事宜</td>
+						      <td class="tdstatus">状态</td>
+						      <td class="tdopr">操作</td>
+						    </tr>
+						  </thead>
+						  <tbody>
+						  	<tr v-for="(each,index) in zhiliang">
+			                    <td>[[index+1]]</td>
+			                    <td>[[each.desc ]]</td>
+			                    <td>[[each.status ]]</td>
+			                    <td>
+			                    	<button v-if="each.readurl != ''" class="btn-xs btn-info" @click="showissue(each.readurl)">查看</button>
+			                    	<button v-if="zongbao" class="btn-xs btn-danger" @click="deleteItem('zhiliang',index)">删除</button>
+			                    </td>
+			               </tr>
+						  </tbody>
+						</table>
+				</div>
+
+			 </div>
+		</div>
+
+<!-- 下周计划工作安排 -->
+		<div class="weeklypanel">
+				<div style="height: 40px;"></div>
+				<h3>下周计划工作安排</h3>
+				<div class="first">
+					<div class="first-title border-gray" style="margin-bottom: 0px;">
+						
+						<div class="task-from form-inline" style="padding-left: 0px;padding-right: 0px;">
+							
+							<div class="form-group">
+		
+								<label style="margin-right: 20px;">*进度计划目标</label>
+								
+								<div class="input-group">
+									<label class="input-group-addon"  for="timerange">工作目标</label>
+									<select id="build-goal" class="form-control" style="min-width: 160px;">
+										{% for goal in workgoallist %}
+											{% ifequal goal.id curWorkGoal.id %}
+												<option value="{{goal.id}}" selected>{{goal.label}}</option>
+											{% else %}
+												<option value="{{goal.id}}">{{goal.label}}</option>
+											{% endifequal %}
+												
+										{% endfor %}
+									</select>
+								 </div>
+								<button id="btnGetTaskStatus" class="btn btn-info" onclick="_jihuajindu.getpbstatuslist()" style="min-width: 100px;margin-right: 30px;">查看 </button>
+								
+								<div class="input-group">
+									<label class="input-group-addon"  for="timerange">选择模型</label>
+								
+									<select id="selUnitproject2" class="form-control" style="min-width: 160px;">
+										{% for item in unitprjlist %}
+												<option value ="{{item.id}}">{{item.relatedunitproject.name}}-{{item.relatedmajor.name}}</option>
+			
+									{% endfor %}
+									</select>
+								</div>
+		
+								<button id="btnLoadNewModel" style="margin-right: 30px;" onclick="_jihuajindu.getModelFile()" class="btn btn-success-outline">切换模型 </button>
+								  <select id="selFloor2" class="form-control" style="min-width: 160px;">
+								  	    <option value="" selected>选择空间结构</option>
+										{% for floor in floorList %}
+												<option value="{{floor.id}}">{{floor.name}}</option>		
+										{% endfor %}
+								 </select>	
+							</div>
+							
+						</div>
+					</div>
+					<div class="first-left">
+						<div class="col-md-12" style="padding-left: 0px;padding-right: 0px; height: 350;">
+							<div class="viewer" id="viewer2">
+							</div>
+							<div class="shotviewer" id="shotviewer2" style="display: none;">
+								<img id="imgshotviewer2" src='/img/body-img.png'> </img>
+							</div>
+						</div>
+					</div>
+					<div id="jihuajinduDesc" data-pk="4"   class="first-right editable" tabindex="-4">
+						&nbsp;
+					</div>
+				</div>
+		</div>
+				
+		<div class="weeklypanel font-weight">
+			 <table style="width: 100%;">
+				<thead>
+					<tr>
+						<td class="col-md-6"><label class="weeklytitle">*安全文明施工计划</label></td>
+						<td class="col-md-6"><label class="weeklytitle">*质量技术保障计划</label></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="col-md-6">
+							<div id="jihuaanquanDesc" data-pk="5"   class="editable editdivdesc" tabindex="-5">
+								&nbsp;
+							<div>
+						</td>
+						<td class="col-md-6">
+							<div id="jihuazhiliangDesc" data-pk="6"   class="editable editdivdesc" tabindex="-6">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			 </table>
+		</div>
+
+	    <div class="weeklypanel font-weight" style="margin-top: 10px;">
+			 <table style="width: 100%;">
+				<thead>
+					<tr>
+						<td class="col-md-6"><label class="weeklytitle">*协调事宜情况</label></td>
+						<td class="col-md-6"><label class="weeklytitle">*其他措施计划</label></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="col-md-6">
+							<div id="xietiaoshiyiDesc" data-pk="8"   class="editable editdivdesc" tabindex="-8">
+								&nbsp;
+							<div>
+						</td>
+						<td class="col-md-6">
+							<div id="jihuaotherDesc" data-pk="7"   class="editable editdivdesc" tabindex="-7">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			 </table>
+		</div>
+
+		<div class="weeklypanel">
+			<p class="body-title border-gray">新华医院儿科综合楼新建工程施工管理周汇报————监理({{weekly_begindate|date:"Y.m.d"}}-{{weekly_enddate|date:"Y.m.d"}})</p>
+			<!-- 下周需注意问题 -->
+			<h3 >上周问题落实情况</h3>
+			<div class=" hour border-gray">
+				<div >
+					<div class="col-md-6 border-gray hourhead">
+						<label class="weeklytitle">*施工质量问题</label>
+						<button v-if="jianli" style="position: absolute;right: 10px;top:10px;" v-on:click="additemDlg('zhiliang_jianli')" class="btn-sm btn-info"><i class="fa fa-plus">添加条目</i></button>
+					</div>
+					<div class="col-md-6 border-gray hourhead">
+						<label class="weeklytitle">*施工安全问题</label>
+						<button v-if="jianli" style="position: absolute;right: 10px;top:10px;" v-on:click="additemDlg('anquan_jianli')" class="btn-sm btn-info"><i class="fa fa-plus">添加条目</i></button>
+					</div>
+					 <div class="col-md-6 hourdbody border-gray padding-top">
+							<table class="table border-gray">
+								  <thead>
+								    <tr>
+								      <td class="tdseq">序号</td>
+								      <td>施工质量</td>
+								      <td class="tdstatus">状态</td>
+								      <td class="tdopr">操作</td>
+								    </tr>
+								  </thead>
+								  <tbody>
+								  	<tr v-for="(each,index) in zhiliang_jianli">
+					                    <td>[[index+1]]</td>
+					                    <td>[[each.desc ]]</td>
+					                    <td>[[each.status ]]</td>
+					                    <td>
+					                    	<button v-if="each.readurl != ''" class="btn-xs btn-info" @click="showissue(each.readurl)">查看</button>
+					                    	<button v-if="jianli" class="btn-xs btn-danger" @click="deleteItem('zhiliang_jianli',index)">删除</button>
+					                    </td>
+					               </tr>
+								  </tbody>
+								</table>
+					 </div>
+					 <div class="col-md-6 hourdbody border-gray padding-top">
+							<table class="table  border-gray">
+								  <thead>
+								    <tr>
+								      <td class="tdseq">序号</td>
+								      <td>安全文明施工事宜</td>
+								      <td class="tdstatus">状态</td>
+								      <td class="tdopr">操作</td>
+								    </tr>
+								  </thead>
+								  <tbody>
+								  	<tr v-for="(each,index) in anquan_jianli">
+					                    <td>[[index+1]]</td>
+					                    <td>[[each.desc ]]</td>
+					                    <td>[[each.status ]]</td>
+					                    <td>
+					                    	<button v-if="each.readurl != ''" class="btn-xs btn-info" @click="showissue(each.readurl)">查看</button>
+					                    	<button v-if="jianli" class="btn-xs btn-danger" @click="deleteItem('anquan_jianli',index)">删除</button>
+					                    </td>
+					               </tr>
+								  </tbody>
+								</table>
+					 </div>
+				 </div>
+			</div>
+		</div>
+		
+		<div class="weeklypanel font-weight" style="margin-top: 10px;">
+			 <table style="width: 100%;">
+				<thead>
+					<tr>
+						<td class="col-md-6"><label class="weeklytitle">*工程进度情况</label></td>
+						<td class="col-md-6"><label class="weeklytitle">*其他事宜</label></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="col-md-6 padding">
+							<div id="luoshijinduDesc" data-pk="9"   class="editable editdivdesc" tabindex="-9">
+								&nbsp;
+							<div>
+						</td>
+						<td class="col-md-6 padding">
+							<div id="loushiotherDesc" data-pk="10"   class="editable editdivdesc" tabindex="-10">
+								&nbsp;
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			 </table>
+		</div>
+		
+ 
+ 	
+ 	   	<div class="modal fade" id="additemdlg" aria-hidden="true" style="text-align: left;">
+			<div class="modal-dialog" >
+			    <div class="modal-content">
+		            <div class="modal-header">
+			            <button type="button" class="close" data-dismiss="modal">×</button>
+			            	<label id="dlgtitle">新增条目</label>
+		            </div>
+		            <div class="modal-body">
+		            <form class="" id="additemForm"  align="left">
+			          <div class="form-group">
+							<div class="input-group">
+					            <span class="input-group-addon">描述</span>
+					            <textarea rows="3" class="form-control" placeholder="请输入描述" v-model="newItem.desc"></textarea>
+					        </div>
+					  </div>
+					    <div class="form-group">
+					        <div class="input-group">
+					            <span class="input-group-addon">状态</span>
+					            <input type="text" class="form-control" placeholder="请输入状态" v-model="newItem.status"/>
+					        </div>
+					    </div>
+					  </form>
+		            </div>
+		            <div class="modal-footer">
+		                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+						<button class="btn btn-info" type="button"  v-on:click="addItem"  >新增并继续</button>
+						<button class="btn btn-primary" type="button"  v-on:click="addItem" data-dismiss="modal" aria-hidden="true" >新增</button>
+		            </div>
+    			</div>
+    		</div>
+    	</div>
+    
+    <!-- 模态框（Modal） -->
+		<div class="modal fade" id="readissuredlg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" style="width:830px;">
+				<div class="modal-content" >
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+					</div>
+					<div class="modal-body" style="height: 700px;">
+							<iframe name="readframe" id="readframe" src="" style="width:100%;height: 100%;" frameborder="0" id="appiframe-0" class="appiframe"></iframe>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+						</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+    
+  		</div>   	
+  
+
+		<div class="modal fade" id="tracepbdlg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog" style="width:40%;float: right;">
+				<div class="modal-content" >
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+					</div>
+					<div class="modal-body" style="height: 700px;">
+							<iframe name="pbtraceframe" id="pbtraceframe" src="" style="width:100%;height: 100%;" frameborder="0" id="appiframe-0" class="appiframe"></iframe>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+					</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+  		</div>   
+
+   </div>
+</div>  
+{% endblock %}
+

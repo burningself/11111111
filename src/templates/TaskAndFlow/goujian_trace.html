@@ -1,0 +1,239 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %} 
+<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/timeline.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/navtab.css" media="all" rel="stylesheet" type="text/css" />
+<style>
+	.recorditem{
+		margin-right: 10px;
+	}
+</style>
+{% endblock %}
+{% block content %} 
+
+<div class="header-v2">
+	<div class="header-bg-v2">
+		<span class="title-v2">构件过程追踪</span>
+	</div>
+</div>
+<div class="content-v2">
+	  <div class="nav-tabs-custom">
+		<ul class="nav nav-tabs">
+		  <li class="active"><a href="#timeline" data-toggle="tab">构件过程追踪</a></li>
+		  <li><a href="#settings" data-toggle="tab">构件过程历史记录</a></li>
+		</ul>
+		<div class="tab-content">
+		  <div class="active tab-pane" id="timeline">
+		  <div class="col-md-1">
+		  </div>
+		  <div class="col-md-10">
+			<!-- The timeline -->
+			<ul class="timeline timeline-inverse">
+			  <!-- timeline time label -->
+			  <li class="time-label">
+					<span class="bg-navy">
+					  构件编号[{{pbinfo.drawnumber}}]&nbsp&nbsp类型[{% if pbinfo.pbtype %}{{pbinfo.pbtype}}{% else %}未知{% endif %}]
+					</span>
+			  </li>
+			  <!-- /.timeline-label -->
+			  <!-- timeline item -->
+			  {% for status in statuslist %}
+					 {% if status.status_record %}
+						<li>
+						<i class="fa fa-book bg-navy"></i>
+						<div class="timeline-item" style="color: #737171;">
+						  <span class="time">
+								<a  onclick="delStatusRecord({{pbinfo.id}},{{status.id}})" class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i>删除记录</a>
+						  </span>
+						  <div class="timeline-header" data-toggle="collapse" href="#collapse_{{status.id}}">
+
+								<label style="color:#001f3f;">{{status.statusname}}</label><label>累计完成百分比：{{status.sumPercentage}}%</label>
+
+						  </div>
+						  <div id="collapse_{{status.id}}" class="panel-collapse collapse in">
+						   <div class="timeline-body" >
+							<ul class="list-group" style="margin-bottom: 0px;">
+							 {% for substatus in status.status_record %}
+								<li class="list-group-item">
+									<span class="recorditem"><label>人员：</label>{{substatus.actor.truename}}</span>
+									<span class="recorditem"><label>时间：</label>{{substatus.time|date:"Y-m-d H:i"}}</span>
+									<span class="recorditem"><label>完成百分比：</label>{{substatus.percentage}}%</span>
+									<span class="recorditem"><label>备注：</label>{{substatus.description}}</span>
+									<a class="btn btn-primary btn-xs pull-right" onclick="javascript:ShowUpdateModel('{{substatus.id}}');"><i class="fa fa-edit"></i>修改记录</a>
+								</li>
+
+								{% if substatus.docList %}
+									<li class="list-group-item">
+									  {% for doc in substatus.docList %}
+										<img src="/{{doc.document.filepath}}{{doc.document.name}}" alt="..." width="150">
+									  {% endfor %}
+									</li>
+								  {% endif %}
+
+							   {% endfor %}
+							</ul>
+
+						  </div>
+						  </div>
+						</div>
+					  </li>
+					  {% else %}
+					  <li>
+						<i class="fa fa-book bg-red"></i>
+						<div class="timeline-item">
+						  <div class="timeline-header">
+							<label style="color:#001f3f;">{{status.statusname}}</label><label style="color:red;" >状态未录入</label>
+						  </div>
+						</div>
+					  </li>
+					  {% endif %}
+			 {% endfor %}
+
+			  <!-- END timeline item -->
+			  <li>
+				<i class="fa fa-clock-o bg-gray"></i>
+			  </li>
+			</ul>
+		  </div>
+		  </div>
+		  <!-- /.tab-pane -->
+
+		  <div class="tab-pane" id="settings">
+				<table class="table table-striped">
+				  <thead>
+					<tr>
+					  <th>状态</th>
+					  <th>人员</th>
+					  <th>时间</th>
+					  <th>备注</th>
+					  <th>文档</th>
+					</tr>
+				  </thead>
+				  <tbody>
+				   {% for status in statuslistHis %}
+					{% if status.isactive %}
+						<tr>
+					{% else %}
+						<tr style="color: red;">
+					{% endif %}
+					   <td>{{status.status}}</td>
+					   <td>{{status.actor.truename}}</td>
+					   <td>{{status.time|date:"Y-m-d H:i:s"}}</td>
+					   <td>{{status.description}}</td>
+					   <td>
+						 {% for doc in status.docList %}
+								<img src="/{{doc.document.filepath}}{{doc.document.name}}" alt="..." width="150">
+						 {% endfor %}
+					   </td>
+					</tr>
+				   {% endfor %}
+
+				  </tbody>
+				</table>
+		  </div>
+		  <!-- /.tab-pane -->
+		</div>
+		<!-- /.tab-content -->
+	  </div>
+	  <input type="hidden" id="pbstatusId" value="" />
+	  <!-- /.nav-tabs-custom -->
+</div>
+	<!-- /.col -->
+<div class="modal fade" id="update" aria-hidden="true">
+<div class="modal-dialog" >
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">×</button>
+			<h4>修改状态记录</h4>
+		</div>
+		<div class="modal-body">
+			  <div class="">
+				<label align="right">状态扫码时间：</label>
+				<input size="30" type="text" value="" class=" form_datetime" id="pbstatusNewTime">
+			  </div>
+		</div>
+		<div class="modal-footer">
+			<a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+			<button class="btn btn-primary" id="btnUpdatePb" data-dismiss="modal" aria-hidden="true">修改</button>
+		</div>
+</div>
+</div>
+</div>
+	<script type="text/javascript">
+		  $('.form_datetime').datetimepicker({
+	        language:'zh-CN',
+			dateFormat:'yyyy-mm-dd',
+			timeFormat: 'HH:ii',//格式化时间
+			autoclose: 1
+	    });
+		
+		$("#btnUpdatePb").click(function(){
+			pbstatusId=$("#pbstatusId").val();
+			pbstatusNewTime=$("#pbstatusNewTime").val();
+			if (pbstatusNewTime.length>0)
+			{
+				$.ajax({
+				type:"get",
+				url:"/task/goujian/updatepbstatus/",
+				cache:false,
+				dataType:"json",
+				data:{"pbstatusId": pbstatusId,"pbstatusNewTime": pbstatusNewTime,},
+				success: function(data){
+					if(data.issuc="true")
+					{
+						var labelid = "#"+pbstatusId
+						$(labelid).text("时间："+pbstatusNewTime+":00");
+					}
+				},		
+			 	  error: function(e){
+					if(e.status==403){
+						alert("您没有权限修改记录，请联系管理员！");
+					}else{
+						alert("服务器错误！")
+					}
+					}
+				});
+			}
+
+	    });
+		
+	   function delStatusRecord(pbId,pbstatusId){
+	   
+	     if(confirm("确定要删除记录吗？"))
+		 {
+			$.ajax({
+			type:"get",
+			url:"/task/goujian/delpbstatus/",
+			cache:false,
+			dataType:"json",
+			data:{"pbId": pbId,"pbstatusId": pbstatusId},
+			success: function(data){
+				if(data.issuc=="true")
+				{
+					window.location.reload(true);
+				}
+				else
+				{
+					alert("删除失败！");
+				}
+			},		
+			 error: function(e){
+				if(e.status==403){
+					alert("您没有权限删除记录，请联系管理员！");
+				}else{
+						alert("服务器错误！")
+				}
+			}
+			});
+		  }
+
+	    }
+	
+		function ShowUpdateModel(pbstatusId)
+		{
+			$("#pbstatusId").val(pbstatusId);
+			$("#update").modal();
+		}
+	</script>	
+{% endblock %}
+

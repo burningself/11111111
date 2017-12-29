@@ -1,0 +1,250 @@
+{% extends "base_mobile.html" %}
+
+{% block ownerhead %} 
+<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+<style>
+	#tab label{line-height:34px;}
+	.widget-container h3{margin:20px 0 20px 0;}
+	.row table{margin-top:20px; }
+	#tab i{top:4px;}
+	#tab .btn{margin-left:10px;}
+	#tab .btnTab{text-align:left;}
+	td,th{border-bottom:none;}
+	tr{border-bottom: solid 1px #ddd;}
+	
+</style>
+<div class="row" style="padding-bottom:10px;">
+ <div class="col-md-12 col-sm-12">
+ <div class="widget-container fluid-height clearfix">
+ 	<h3><i class="glyphicon glyphicon-retweet"></i> 流程模板管理</h3>
+	<div class="widget-content padded">
+	<form id="tab" action="" method="get"> {% csrf_token %}
+			<div class="form-group col-md-12 col-sm-12">
+			{{ form.name.errors }}
+            <label class="col-md-1" align="right">名称：</label>
+            <div class="col-md-2">
+			  <input type="text" name="tempName" maxlength="60" class="form-control"  value="{{tempName}}">
+            </div>
+			 <label class="col-md-1" align="right">类型：</label>
+            <div class="col-md-2">
+			  <select name="queryType" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for type in TypeChoices %}
+						{% ifequal type.id  queryType %}
+							<option value="{{type.id}}" selected>{{type.name}}</option>
+						{% else %}
+							<option value="{{type.id}}">{{type.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>	
+			<label class="control-label col-md-1" align="right">专业：</label>
+            <div class="col-md-2">
+			  <select name="queryMajor" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for major in MajorChoices %}
+						{% ifequal major.id queryMajor %}
+							<option value="{{major.id}}" selected>{{major.name}}</option>
+						{% else %}
+							<option value="{{major.id}}">{{major.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>
+			<div class="col-md-3 btnTab" >
+				<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+				<a style="margin-left:10px;" href="#" class="btn btn-success btn" data-toggle="modal" data-target="#createtemplate"><i class="fa fa-gear"></i>创建新模板</a>
+            </div>
+          </div>
+	</form>
+</div>                    
+</div>  
+</div>  
+</div>   
+
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+          <th>编号</th>
+		  <th>模板名称</th>
+		  <th>专业</th>
+		  <th>流程类型</th>
+		  <th>操作</th>
+          <th style="width: 26px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+	  <tr>
+          <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+	   </tr>
+	  {% endifequal %}
+	  {% for item in list_items.object_list %}
+        <tr>
+          <td>{{forloop.counter}}</td>
+		  <td>{{item.name}}</td>
+		  <td>{{item.major}}</td>
+		  <td><a>{{item.flowtype}}</a></td>
+          <td>
+          	[ <a href="/task/flowtemplate/edit/{{item.id}}?obj_url={{cur_url}}" title="设置模板信息" style="cursor: pointer;"><i class="fa fa-cog"></i>设置 </a>]
+			[ <a href="javascript:deleteTemplate({{item.id}})" title="查看模板信息" style="cursor: pointer;"><i class="glyphicon glyphicon-remove" style="top:3px;"></i>删除</a> ]       	
+          </td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+    <ul class="pagination pagination-lg">
+    	<li><a href="?page=1&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">首页</a></li>
+		{% if list_items.has_previous %}	
+			<li><a href="?page={{ list_items.previous_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+        <li><a> 
+        	<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;"/>
+        	</a>
+        	<a id="jumpBTN">
+        	跳转
+        	</a>
+        </li>
+		{% if list_items.has_next %}
+         <li><a href="?page={{ list_items.next_page_number }}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">下一页</a></li>
+		{% endif %}
+		<li><a href="?page={{paginator.num_pages}}&number={{pbnumber}}&postion={{pbpostion}}&status={{pbstatus}}&taskid={{pbtaskdes}}">尾页</a></li>
+		
+    </ul>
+</div>
+
+ </div>
+ 
+  	<div class="modal fade" id="createtemplate" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4>新建流程模板</h4>
+            </div>
+            <div class="modal-body">
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <label for="templateName" class="control-label col-lg-4">模板名称：</label>
+
+                    <div class="col-lg-7">
+                        <input type="text" id="templateName"  name="templateName" placeholder="请输入模板名称" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="templateMajor" class="control-label col-lg-4">专业：</label>
+                    <div class="col-lg-7">
+						  <select name="templateMajor" id="templateMajor" class="form-control">
+								{% for major in MajorChoices %}
+										<option value="{{major.id}}">{{major.name}}</option>
+								{% endfor %}
+							</select>
+                    </div>
+                </div>
+				
+                <div class="form-group">
+                    <label for="templateType" class="control-label col-lg-4">流程类型：</label>
+                    <div class="col-lg-7">
+						  <select name="templateType" id="templateType" class="form-control">
+								{% for type in TypeChoices %}
+										<option value="{{type.id}}">{{type.name}}</option>
+								{% endfor %}
+							</select>
+                    </div>
+                </div>
+	
+                <div class="form-group">
+                    <label for="templateDesc" class="control-label col-lg-4">模板描述：</label>
+
+                    <div class="col-lg-7">
+                        <textarea id="templateDesc" name="templateDesc" rows="3" placeholder="请输入模板描述" class="form-control"></textarea>
+                    </div>
+                </div>
+
+
+
+            </form>           
+             </div>         
+            <div class="modal-footer">
+				<button class="btn btn-success" id="btnCreateTemplate" data-dismiss="modal" aria-hidden="true">创建</button>
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+            </div>
+    </div>
+    </div>
+    </div>
+ 
+<script type="text/javascript">
+		$('#pageJump').bind('input propertychange', function() { 
+			var tgtPage = $('#pageJump').val();
+			if(tgtPage){
+				$("#jumpBTN").attr("href","?page=" + tgtPage + "&tempName={{tempName}}&tempType={{tempType}}&&tempMajor={{tempMajor}}");
+			}
+		});
+		
+		$("#btnCreateTemplate").click(function(){
+			var templateName = $('#templateName').val();
+			var templateMajor = $('#templateMajor').val();
+			var templateType = $('#templateType').val();
+			var templateDesc = $('#templateDesc').val();
+
+			$.ajax({
+			type:"post",
+			url:"/task/flowtemplate/create/",
+			cache:false,
+			dataType:"json",
+			data:{"templateName": templateName,"templateMajor": templateMajor,"templateType": templateType,"templateDesc": templateDesc,},
+			success: function(data){
+				if(data.issuc=="true")
+				{
+					window.location.href="/task/flowtemplate/edit/"+data.templateId;  
+				}
+				else
+				{
+					alert(data.error);  
+				}
+			}
+			});
+
+	    });
+	    
+	    function deleteTemplate(tmpid){
+	    	if(confirm("确认要删除阶段吗？")){
+				$.ajax({
+					type:"post",
+					url:"/task/flowtemplate/delete/",
+					cache:false,
+					dataType:"json",
+					data:{"tmpid":tmpid,},
+					success: function(data){
+						if(data.status==1)
+						{
+							alert("删除成功！");
+							window.location.reload();
+						}
+						else
+						{
+							alert(data.error);
+						}
+					}
+				});	
+			}
+	    	
+	    }
+</script>
+</div>
+
+
+
+{% endblock %}
+
+

@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+
+
+{% block content %} 	
+<div class="row">
+ <div class="col-lg-12">
+ <div class="widget-container fluid-height clearfix">
+	 <div class="widget-content padded">
+	<form id="tab" action="" method="get"> {% csrf_token %}
+
+		<div class="form-group">
+            <label class="control-label col-md-1" align="right">批次：</label>
+            <div class="col-md-3">
+              <input type="text" class="form-control" name="taskid" value="{{taskid}}">
+            </div>
+            <label class="control-label col-md-1" align="right">状态：</label>
+            <div class="col-md-3">
+               <select name="status" class="form-control">
+							  {% ifequal status 'ALL' %}
+								<option value="ALL" selected>全部</option>
+							  {% else %}
+								<option value="ALL" >全部</option>
+							  {% endifequal %}
+							  
+							  {% ifequal status 'DONE' %}
+								<option value="DONE" selected>已完成</option>
+							  {% else %}
+								<option value="DONE">已完成</option>
+							  {% endifequal %}
+							 
+							  {% ifequal status 'NOTDONE' %}
+								 <option value="NOTDONE" selected>正在进行</option>
+							  {% else %}
+								 <option value="NOTDONE">正在进行</option>
+							  {% endifequal %}
+				</select>
+            </div>
+			<div class="col-md-4">
+               <button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+            </div>
+          </div>
+		  
+		 <div class="form-group">
+			{{ form.planstartend.errors }}
+            <label class="control-label col-md-1" align="right">创建时间：</label>
+            <div class="col-sm-3">
+              		<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+								<input type="text" class="form-control" value="{{planstartbegin|date:"Y-m-d"}}" name="planstartbegin">
+								<span class="add-on"><i class="icon-remove"></i></span>
+								<span class="add-on"><i class="icon-th"></i></span>
+					</a>  
+            </div>
+            <div class="col-sm-3">
+              							<a class="controls input-append date form_date" data-date="" data-date-format="yyyy-mm-dd">
+							<input  type="text" class="form-control" value="{{planstartend|date:"Y-m-d"}}" name="planstartend">
+							<span class="add-on"><i class="icon-remove"></i></span>
+							<span class="add-on"><i class="icon-th"></i></span>
+							</a>
+            </div>
+		 </div>
+	</form>
+</div>  
+</div>        
+</div>  
+</div>            
+
+<div class="row">
+  <div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+          <th>生产批次</th>
+          <th>任务描述</th>
+		  <th>创建时间</th>
+		  <th>任务状态</th>
+		  <th>结束时间</th>
+		  <th>编辑</th>
+          <th style="width: 26px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+	  <tr>
+          <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+	   </tr>
+	  {% endifequal %}
+	  {% for item in listqs %}
+	  {% ifequal status 'ALL' %}
+		  <tr>
+          <td>{{item.id}}</td>
+          <td>{{item.description}}</td>
+		  <td>{{item.planstart|date:"Y-m-d"}}</td>
+		  {% if item.percent < 20 %}
+		  	<td style="color:red">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+		  {% elif item.percent < 50 %}
+		  	<td style="color:blue">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+		  {% elif item.percent < 90 %}
+		  	<td style="color:green">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>	
+		  {% else %}
+		  	<td style="color:darkgrey">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+		  {% endif %}
+		  <td>{{item.planfinish|date:"Y-m-d"}}</td>
+		  
+          <td>
+			  <a href="{% url 'task.views.view_projecttask' item.id %}"><i class="fa fa-eye" title="查看任务" style="cursor: pointer;"></i></a>
+			  &nbsp;
+			  <a href="{% url 'task.views.edit_projecttask' item.id %}"><i class="fa fa-pencil" title="编辑任务" style="cursor: pointer;"></i></a>
+			  &nbsp;
+			  <a href="{% url 'task.views.editqrcode_projecttask' item.id %}"><i class="glyphicon glyphicon-qrcode" title="打印二维码" style="cursor: pointer;"></i></a>
+			  &nbsp;
+			  <a href="{% url 'task.views.editmaterial_projecttask' item.id %}"><i class="glyphicon glyphicon-edit" title="材料编辑" style="cursor: pointer;"></i></a>
+			  &nbsp;
+			  <a id="{{item.id}}" onClick="delProject(this.id)"><i class="glyphicon glyphicon-remove" title="删除任务" style="cursor: pointer;"></i></a>
+          </td>
+        </tr>
+	  {% endifequal %}
+	  {% ifequal status 'DONE' %}
+		 {% ifequal item.status '已完成' %}
+			 <tr>
+			  <td>{{item.id}}</td>
+			  <td>{{item.description}}</td>
+			  <td>{{item.planstart|date:"Y-m-d"}}</td>
+			  {% if item.percent < 20 %}
+				<td style="color:red">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% elif item.percent < 50 %}
+				<td style="color:blue">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% elif item.percent < 90 %}
+				<td style="color:green">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>	
+			  {% else %}
+				<td style="color:darkgrey">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% endif %}
+			  <td>{{item.planfinish|date:"Y-m-d"}}</td>
+			  <td>
+				  <a href="{% url 'task.views.view_projecttask' item.id %}"><i class="fa fa-eye" title="查看任务" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.edit_projecttask' item.id %}"><i class="fa fa-pencil" title="编辑任务" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.editqrcode_projecttask' item.id %}"><i class="glyphicon glyphicon-qrcode" title="打印二维码" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.editmaterial_projecttask' item.id %}"><i class="glyphicon glyphicon-edit" title="材料编辑" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a id="{{item.id}}" onClick="delProject(this.id)"><i class="glyphicon glyphicon-remove" title="删除任务" style="cursor: pointer;"></i></a> 
+			  </td>
+			 </tr>	
+		 {% endifequal %}
+	  {% endifequal %}
+	  {% ifequal status 'NOTDONE' %}
+		 {% ifequal item.status '正在进行' %}
+			 <tr>
+			  <td>{{item.id}}</td>
+			  <td>{{item.description}}</td>
+			  <td>{{item.planstart|date:"Y-m-d"}}</td>
+			  {% if item.percent < 20 %}
+				<td style="color:red">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% elif item.percent < 50 %}
+				<td style="color:blue">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% elif item.percent < 90 %}
+				<td style="color:green">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>	
+			  {% else %}
+				<td style="color:darkgrey">计划：{{item.total}} 片,已完成：{{item.finish}} 片，完成比例：{{item.percent}}%</td>
+			  {% endif %}
+			  <td>{{item.planfinish|date:"Y-m-d"}}</td>
+			  <td>
+				  <a href="{% url 'task.views.view_projecttask' item.id %}"><i class="fa fa-eye" title="查看任务" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.edit_projecttask' item.id %}"><i class="fa fa-pencil" title="编辑任务" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.editqrcode_projecttask' item.id %}"><i class="glyphicon glyphicon-qrcode" title="打印二维码" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a href="{% url 'task.views.editmaterial_projecttask' item.id %}"><i class="glyphicon glyphicon-edit" title="材料编辑" style="cursor: pointer;"></i></a>
+				  &nbsp;
+				  <a id="{{item.id}}" onClick="delProject(this.id)"><i class="glyphicon glyphicon-remove" title="删除任务" style="cursor: pointer;"></i></a>
+			  </td>
+			 </tr>	
+		 {% endifequal %}
+	  {% endifequal %}
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+	 <ul class="pagination pagination-lg">
+    	<li><a href="?page=1&planstartbegin={{planstartbegin|date:'Y-m-d'}}&planstartend={{planstartend|date:'Y-m-d'}}&status={{status}}&taskid={{taskid}}">首页</a></li>
+		{% if listqs.has_previous %}	
+			<li><a href="?page={{ listqs.previous_page_number }}&planstartbegin={{planstartbegin|date:'Y-m-d'}}&planstartend={{planstartend|date:'Y-m-d'}}&status={{status}}&taskid={{taskid}}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ listqs.number }} 页，共 {{ listqs.paginator.num_pages }}页</a></li>
+		{% if listqs.has_next %}
+         <li><a href="?page={{ listqs.next_page_number }}&planstartbegin={{planstartbegin|date:'Y-m-d'}}&planstartend={{planstartend|date:'Y-m-d'}}&status={{status}}&taskid={{taskid}}">下一页</a></li>
+		{% endif %}
+		<li><a href="?page={{listqs.paginator.num_pages}}&planstartbegin={{planstartbegin|date:'Y-m-d'}}&planstartend={{planstartend|date:'Y-m-d'}}&status={{status}}&taskid={{taskid}}">尾页</a></li>
+		
+    </ul>
+</div>
+
+<div class="modal small hide fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">删除确认对话框</h3>
+    </div>
+    <div class="modal-body">
+        <p class="error-text"><i class="icon-warning-sign modal-icon"></i>是否要删除该任务？</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+        <button class="btn btn-danger" data-dismiss="modal" >删除</button>
+    </div>
+</div>
+            </div>
+</div>
+
+<script type="text/javascript">
+	function delProject(id){
+		var delID=id;
+		if(confirm("你确认要删除吗？")){
+        	$.ajax({ 
+        	type:"POST",
+            url: "projecttask/delete/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":delID},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("删除成功!");
+            		self.location='projecttask/list/';
+                }
+                else{
+                	alert("项目已启动！");
+                }
+                
+                
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+	    }
+        
+    };
+</script>
+
+
+{% endblock %}

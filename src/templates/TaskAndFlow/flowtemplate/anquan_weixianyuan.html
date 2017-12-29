@@ -1,0 +1,196 @@
+{% extends "base.html" %} {% block ownerhead %}
+
+<link rel="stylesheet" href="/js/web3d/style.css" type="text/css">
+<script src="/js/web3d/viewer3D.js"></script>
+<script src="/js/web3d/three.min.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="/css/BootSideMenu/BootSideMenu.css">
+<link rel="stylesheet" type="text/css" href="css/BootSideMenu/default.css">
+<link rel="stylesheet" type="text/css" href="/css/bootstrap-treeview/bootstrap-treeview.min.css" />
+<script src="/js/bootstrap-treeview/bootstrap-treeview.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/BootSideMenu/BootSideMenu.js"></script>
+
+{% endblock %} {% block content %}、
+<style type="text/css">
+	th {
+		text-align: center;
+	}
+	body{overflow:hidden}
+</style>
+<div style="margin-top: 2px;">
+
+	<div id="left" style="background-color: white; text-align:center; margin:auto;margin-top: 135px;">
+		<div>
+			<h2>Custom Icons</h2>
+			<div id="treeview5" class="treeview">
+				<ul class="list-group">
+					<li class="list-group-item node-treeview5" data-nodeid="0" style="color:undefined;background-color:undefined;"><span class="icon expand-icon glyphicon glyphicon-chevron-down"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Parent 1</li>
+					<li class="list-group-item node-treeview5" data-nodeid="1" style="color:undefined;background-color:undefined;"><span class="indent"></span><span class="icon expand-icon glyphicon glyphicon-chevron-right"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Child 1</li>
+					<li class="list-group-item node-treeview5" data-nodeid="4" style="color:undefined;background-color:undefined;"><span class="indent"></span><span class="icon glyphicon"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Child 2</li>
+					<li class="list-group-item node-treeview5" data-nodeid="5" style="color:undefined;background-color:undefined;"><span class="icon glyphicon"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Parent 2</li>
+					<li class="list-group-item node-treeview5" data-nodeid="6" style="color:undefined;background-color:undefined;"><span class="icon glyphicon"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Parent 3</li>
+					<li class="list-group-item node-treeview5" data-nodeid="7" style="color:undefined;background-color:undefined;"><span class="icon glyphicon"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Parent 4</li>
+					<li class="list-group-item node-treeview5" data-nodeid="8" style="color:undefined;background-color:undefined;"><span class="icon glyphicon"></span><span class="icon node-icon glyphicon glyphicon-bookmark"></span>Parent 5</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div id="right" style="background-color: white; text-align:center; margin:auto;margin-top: 135px;">
+		<table class="table">
+			<div class="title">
+				<h2 style="color: black;">质量问题</h2>
+				<hr>
+			</div>
+			<thead>
+				<tr>
+					<th>
+						编号
+					</th>
+					<th>
+						当前阶段
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<td>
+						1
+					</td>
+					<td>
+						已处理
+					</td>
+				</tr>
+				<tr class="error">
+					<td>
+						2
+					</td>
+					<td>
+						未处理
+					</td>
+				</tr>
+				<tr class="warning">
+					<td>
+						3
+					</td>
+					<td>
+						正在处理
+					</td>
+				</tr>
+				<tr class="info">
+					<td>
+						4
+					</td>
+					<td>
+						正在处理
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table">
+			<div class="title">
+				<hr>
+				<h2 style="color: black;">质量检查工作</h2>
+				<hr>
+			</div>
+			<thead>
+				<tr>
+					<th>
+						构件编号
+					</th>
+					<th>
+						当前阶段
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<td>
+						1
+					</td>
+					<td>
+						安装完成
+					</td>
+				</tr>
+				<tr class="error">
+					<td>
+						2
+					</td>
+					<td>
+						正在处理
+					</td>
+				</tr>
+				<tr class="warning">
+					<td>
+						3
+					</td>
+					<td>
+						安装完成
+					</td>
+				</tr>
+				<tr class="info">
+					<td>
+						4
+					</td>
+					<td>
+						正在处理
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div>
+			<button>发起问题</button>
+			<button>整改单</button>
+		</div>
+	</div>
+	<div id="ani" style="padding-left: 0px;padding-right: 0px;margin-top: -12px;margin-left:230px">
+		<div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+			<div id="viewer" style="height: 88vh;width:100vw ;">
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+//	$('#treeview5').treeview({
+//        color: "#428bca",
+//        expandIcon: 'glyphicon glyphicon-chevron-right',
+//        collapseIcon: 'glyphicon glyphicon-chevron-down',
+//        nodeIcon: 'glyphicon glyphicon-bookmark',
+//        data: defaultData
+//  });
+	window.onload = function() {
+		$('#left').BootSideMenu({
+			side: "left",
+			autoClose: false
+		});
+		$('#right').BootSideMenu({
+			side: "right",
+			autoClose: true
+		});
+		initialize();
+	};
+
+	function initialize() {
+		var options = {
+			'document': "/js/web3d/nanxiangmodels/1haolou/Resource/____/_3D_/_3D_.svf",
+			'env': 'Local'
+		};
+
+		var viewerElement = document.getElementById('viewer');
+
+		//		    viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {});
+		viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {
+			extensions: ['BasicExtension']
+		});
+
+		Autodesk.Viewing.Initializer(options, function() {
+			viewer.start();
+			//					viewer.initialize();
+			viewer.load(options.document);
+			//					viewer.start();
+			//					loadDocument(viewer, options.document);
+		});
+
+	}
+</script>
+{% endblock %}

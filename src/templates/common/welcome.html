@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link href="/css/bootstrap/bootstrap.css" media="all" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="/css/project/welcome.css" type="text/css">
+		
+		<title>智慧建造信息平台</title>
+	</head>
+	<body>
+		<h1>&nbsp;智慧建造信息平台&nbsp;</h1>
+		<div class="container-fluid">
+			{% for each in proList %}
+				<div class="unit col-xs-4">
+					<a href="{{each.url}}"><img src="/images/base/icon_38.png" />
+					</a>
+					<p>{{each.name}}</p> 
+				</div>
+			{% endfor %}
+		</div>
+		
+		<footer>&nbsp;更多项目，即将上线!&nbsp;</footer>
+	</body>
+</html>

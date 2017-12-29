@@ -1,0 +1,21 @@
+.titleLabel{width:100%; font-size:1.5em; margin-bottom:0px;color: white;
+		background-color: #007aff;text-align:center;}
+
+.widget-container {background:white; min-height:calc(100vh - 160px); margin-top:2px; padding:10px;}
+.widget-container .heading{vertical-align:middle; padding-bottom:10px;}
+.widget-container .heading i {padding-top: 10px;}
+.widget-container .heading input{ width:40%;display:inline-block;}
+.widget-container .heading button {display:inline-block; }
+.widget-container .heading2{vertical-align:middle; padding-bottom:10px;}
+.widget-container .heading2 a {margin-top:3px;}
+.widget-container .heading2 span {font-weight:bold;}
+
+.infoState{
+	text-align:left;
+	background-color:whitesmoke;
+}
+.infoState tr{border-top:solid #DDDDDD 2px;}
+.infoState thead tr th{text-align:left;font-size:1em;}
+.infoState tbody tr td{font-weight:bold;font-size:0.7em;}
+.infoState tbody .fa-refresh { color: blue;}
+.infoState tbody .fa-circle { color: green; font-size:1.5em;}

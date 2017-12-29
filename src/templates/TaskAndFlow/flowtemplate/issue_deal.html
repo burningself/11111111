@@ -1,0 +1,137 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link href="/css/project/issuedeal.css" media="all" rel="stylesheet" type="text/css" />
+
+<!-- 正在操作表单 -->
+<script src="/js/mdialog/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/mdialog/mdialog.js" type="text/javascript" charset="utf-8"></script>
+
+<link href="/js/jQuery.filer-1.3.0/css/jquery.filer.css" rel="stylesheet">
+<script src="/js/jQuery.filer-1.3.0/js/jquery.filer.js" type="text/javascript"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/mdialog/mdialog.css"> 
+<link href="/css/issue_readstyle.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/viewer-master/dist/viewer.min.css">
+<script type="text/javascript" src="/js/viewer-master/dist/viewer.min.js"></script>
+<script>
+		$(document).ready(function() {
+		// $('div.small_pic a').fancyZoom({scaleImg: true, closeOnClick: true});
+		$('div.small_pic').viewer({title:false,navbar:false,movable:false,rotatable:true});
+	});
+</script>
+{% endblock %} 
+{% block content %}
+<div class="row">
+	<div class="dealform">
+		<div class="header-row ">
+			事件处理
+		</div>
+		<div align="left">
+			<div class="breadcrumb">
+					<div>
+						<label>编号：</label> <span id="issuenumber"></span><span class="spansplit">/</span>
+						<label>发起人：</label> <span id="faqiren"></span><span class="spansplit">/</span>
+						<label>发起时间：</label> <span id="faqishijian"></span>
+						
+					</div>
+					<div>
+					<label>当前阶段：</label><span id="dangqianjieduan" style="color:white;"></span><span class="spansplit">/</span>
+		
+					<label>当前步骤：</label><span id="dangqianbuzhou"></span><span class="spansplit">/</span>
+		
+					<label>截至时间：</label><span id="jiezhishijian"></span><span class="spansplit" >/</span>
+	
+					<label>优先级：</label><span id="youxianji"></span>
+					</div>
+					<div>
+						<label>关联元素：</label> <span id="guanlianyuansu"></span><span class="spansplit">/</span>
+						<label>专业：</label> <span id="zhuanye"></span>
+					</div>
+			</div>
+
+			<div class="divissuedesc">
+				<label>描述：</label><span id="describe"></span>
+			</div>
+
+			<div style="color: #3E3E3E;">
+				<div>
+					<label>处理意见</label>
+					<textarea class="form-control" name="chuli_qfeedback" id="chuli_qfeedback" rows="5"></textarea>
+				</div>
+				<div style="margin-top: 10px;">
+					<label>附件</label>
+					<input type="file" name="files" id="uploadfile_chuli" multiple="multiple">
+				</div>
+				<div class="div_biaodan">
+					<label>表单</label>
+					<ul class="list-group ul_biaodan">
+					</ul>
+				</div>
+				<div class="form-group">
+					<div id="chuli_dlgfooter" style=" text-align: center;">
+					</div>
+				</div>
+			</div>
+			
+			<header style="text-align: left;">
+				<label>历史处理记录 : </label>
+			</header>
+			{% for each in issueoprlistWithDoc %}
+			<ul class="timeline" style="margin-left: -90%;">
+				<li class="timeline-inverted">
+					<div class="tl-circ"></div>
+					<div class="timeline-panel" style="text-align: left;">
+						<div class="tl-heading">
+							<label style="float: right;">{{each.issueopr.oprtime|date:"Y-m-d H:i:s"}}</label>
+						</div>
+						<div class="tl-body">
+							<p><label>人员：</label>{{each.issueopr.actor.truename}}</p>
+							<p><label>步骤：</label>{{each.issueopr.eventstep.flowstep.name}}</p>
+							<p><label>操作：</label>{{each.issueopr.flowstepoper.name}} </p>
+							{% if each.bds %}
+								<p><label>表单：</label>{% for bd in each.bds %}<a href="/assist/biaodanedit/?bdid={{bd.bdid}}&readonly=true" title="{{bd.bdname}}" target="_blank">{{bd.bdname}}<i class="fa fa-book"></i></a>{% endfor %} </p>
+							{% endif %}
+
+							<p><label>反馈：</label>{% ifequal each.issueopr.comment None %}{% else %}{{each.issueopr.comment}}{% endifequal %}</p>
+							<div style="margin: 10px auto;">
+								{% for doc in each.issueoprimg %}
+								<div class="small_pic" >
+								<a href="#pic_{{doc.document.id}}">
+									<img src="/{{doc.document.filepath}}{{doc.document.name}}" width="150px"></a>
+								</div>
+								{% endfor %}
+								
+							</div>
+							<ul class="list-group ul_biaodan">
+								{% for doc in each.issueoprdoc %}
+								<li class="list-group-item li-magright">
+									<a href="/{{doc.document.filepath}}{{doc.document.name}}">
+									{{doc.document.shortname}}</a> 
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<script>
+						</script>
+					</div>
+				</li>
+
+			</ul>
+
+			{% endfor %}
+			
+		</div>
+	</div>
+</div>
+	<script src="/js/common/issuedeal.js?2222" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			if("True" == "{{issave}}") {
+				$("#divRelateFile").css("display", "none");
+			}
+
+			FunChuliwentiConfig({{issueId}});
+
+		});
+	</script>
+	{% endblock %}

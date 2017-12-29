@@ -1,0 +1,156 @@
+{% extends "base_mobile.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+    <!-- Weather -->
+    <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/project/calendar.min.css">
+    <p class="date" style="position:relative; top:-10px; left:5px; color: white;font-size:15px;"></p>	
+    <div style="position:relative; top:-43px; right:5px; width:100%; text-align:right;" >
+	    <select class="periodChoose" style="width:50px;">
+	    	<option value="week">周</option>
+	    	<option value ="month">月</option> 
+	    </select>
+	</div>
+    <div class="title_row" style="margin-top:-75px; background:#1B7DC0; color: white; height:50px; padding-top:1px;text-align:center;">
+		<h3 style="margin-top:7px; font-size:20px;"><i class="fa fa-th">&nbsp</i> 任务时间轴</h3>
+	</div>	
+    <div id="calendar" style="background: white; margin-top:-10px; padding-bottom:30px;"></div>
+
+    <script type="text/javascript" src="/js/schedule/underscore-min.js"></script>
+    <script type="text/javascript" src="/js/schedule/language/zh-CN.js"></script>
+    <script type="text/javascript" src="/js/schedule/calendar.js"></script>
+    <script type="text/javascript">
+    	var now   = new Date();
+        var monthn = now.getMonth();
+ 		var yearn  = now.getFullYear();
+ 		$(".date").html(String(yearn) + "-" + String(monthn + 1) + "");
+		
+		function showModal(id){ $("#" + String(id)).modal('show');}
+		loadDraw('week');
+
+		$(".periodChoose").bind("change", function() { 
+			var mode=$(".periodChoose").val();
+			loadDraw(mode);
+		});
+		
+		function loadDraw(mode){
+			$("#calendar").html("");
+			
+			var calendar = $("#calendar").calendar(
+        	{
+        	language: 'zh-CN',
+        	view:mode,
+        	modal: "#events-modal",
+        	modal_type : "ajax", 
+        	modal_title : function (e) { return e.title },
+        	views: {
+			year: {
+					slide_events: 1,
+					enable: 1
+				},
+				month: {
+					slide_events: 1,
+					enable: 1
+				},
+				week: {
+					enable: 1
+				},
+				day: {
+					enable: 0
+				}
+			},
+            tmpl_path: "/css/tmpls/",
+            events_source: [
+            	{% for item in proList %}
+			        {
+			            "id": 293, 
+			            "title": "{{item.ProName}}",
+//			            "url": "/task/query_projecttask/",
+			            "class": "{{item.ProId}}",
+			            "start": {{item.ctime}} * 1000, // Milliseconds
+			            "end": {{item.etime}} * 1000, // Milliseconds
+			        },
+			    {% endfor %}
+		    ]}); 
+		    
+		    if(mode=="month"){
+		    	$('.cal-row-fluid').css("height","120px"); 
+		    }
+		    if(mode=="week"){
+		    	$('.cal-row-fluid').css("height","50px");
+				$(document).ready(function(){
+					$(".day-highlight").each(function(){
+						var tmp = $(this).attr("data-event-class");
+						$(this).attr("onclick","showModal(" + tmp + ")");
+					});
+				});
+		    
+		    }
+		    
+		    $('.cal-row-head').css("height","50px");
+		}
+			    
+	</script>
+
+	<style>
+		small{font-size:20px;}
+		small span{margin-right:0!important;}
+		.cal-day-today > small > span {border:solid 1px; border-radius:40px;}
+		
+		.cal-row-fluid{height:50px; padding: 10px 0 10px 0; border-top: solid 1px #e1e1e1;}
+		.cal-day-today small {font-weight:bold!important;}
+		.day-highlight{background:forestgreen; text-align:center; padding-left:0px!important; overflow:visible!important;}
+		.day-highlight a {color:white; font-weight:bold;}
+		.day-highlight i {margin-left:1px; color: navajowhite; font-size:25px; vertical-align:middle;}
+		
+		.modal-dialog{height:100%; padding-top:2%;}
+		.modal-dialog .form-group {height:40px;}
+		.modal-dialog .form-group label {text-align:right;}
+		.modal-dialog .form-group div {text-align:left; padding-left:0px;}
+		
+		.close{font-size:30px;}
+	</style>
+	{% for item in proList %}
+		<div class="modal fade" id="{{item.ProId}}">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		                <h3>项目名称：{{item.ProName}}</h3>
+		            </div>
+		            <div class="modal-body" style="min-height: 400px; text-align:center;">
+		            	<div class="form-group">
+			            	<label class="col-xs-6">项目代码：  </label> 
+			            	<div class="col-xs-6">{{item.ProCode}}  </div>
+			            </div>
+			            <div class="form-group">
+			            	<label class="col-xs-6">项目类型：  </label> 
+			            	<div class="col-xs-6">{{item.ProGenre}}  </div> 	
+		            	</div>
+		            	
+		            	<div class="form-group">
+			            	<label class="col-xs-6">客户名称：  </label> 
+			            	<div class="col-xs-6">{{item.ClientName}}  </div> 	
+			            </div> 
+			            <div class="form-group">
+			            	<label class="col-xs-6">联系人：  </label> 
+			            	<div class="col-xs-6">{{item.Linkman}}  </div> 
+		            	</div> 
+		            	<div class="form-group">
+			            	<label class="col-xs-6">计划时间：  </label> 
+			            	<div class="col-xs-6">{{item.CreaTime}}  </div> 	
+		            	</div> 
+		            	<div class="form-group">
+			            	<label class="col-xs-6">计划完成:  </label> 
+			            	<div class="col-xs-6">{{item.endTime}}   </div> 
+			            </div> 	
+		            </div>
+		            <div class="modal-footer">
+		                <a href="#" data-dismiss="modal" class="btn">Close</a>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	{% endfor %}
+{% endblock %}

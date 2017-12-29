@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<getpbrsp>
+	<result>{{result}}</result>
+	<pbinfo>
+		<pbpostion>{{precastbeam.postion}}</pbpostion>
+		<pbstatus>{{precastbeam.status}}</pbstatus>
+		<curpredestal>{{precastbeam.curpredestal}}</curpredestal>
+	</pbinfo>
+</getpbrsp>

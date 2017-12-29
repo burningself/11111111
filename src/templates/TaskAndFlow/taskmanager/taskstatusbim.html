@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+
+    <script src="js/web3d/scripts/libs/jscolor/jscolor.js"></script>
+    
+        <!-- jsTree library -->
+    <link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+    <script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+    
+        <!-- prism syntax higlighting library -->
+    <link href="js/web3d/scripts/libs/prism/prism.css" rel="stylesheet" />
+    <script src="js/web3d/scripts/libs/prism/prism.min.js"></script>
+    <!-- 
+	<link rel="stylesheet" href="https://autodeskviewer.com/viewers/2.9/style.css" type="text/css">
+	<script src="https://autodeskviewer.com/viewers/2.9/viewer3D.min.js"></script>
+	-->
+	<link rel="stylesheet" href="/js/web3d/style.css" type="text/css">
+	<script src="/js/web3d/viewer3D.min.js"></script>
+       
+	<link href="/css/project/navtab.css" media="all" rel="stylesheet" type="text/css" />
+	  
+        <!-- This apps includes -->
+    <link href="js/web3d/stylesheets/theme.css" rel="stylesheet">
+    <script src="js/web3d/scripts/MyAuthToken.js"></script>
+    <script src="js/web3d/scripts/DebugUtils.js"></script>
+	<link href="css/project/model.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="css/project/panel.css" media="all" rel="stylesheet" type="text/css" />
+	<script src="js/web3d/three.min.js"></script>
+	
+	<link rel="stylesheet" href="/css/BootSideMenu/BootSideMenu.css">
+	<link rel="stylesheet" type="text/css" href="css/BootSideMenu/default.css">
+	<script src="/js/BootSideMenu/BootSideMenu.js"></script>
+    <script>
+
+        $(document).ready(function() {
+        	
+            wgetFit();	
+            
+		 	$('#sideMenuleft').BootSideMenu({
+		 		side: "left",
+		 		autoClose: false
+		 	});
+		 	
+		 	$('#sideMenuright').BootSideMenu({
+				side: "right",
+				autoClose: true
+			});
+	
+			LoadAllCustomTrees();
+            
+	
+			
+           loadInitialModel();
+		 
+        });
+        
+    </script>
+
+{% endblock %}
+ {% block content %} 
+           <div id="sideMenuleft" class="sideMenuDiv" style="text-align:left;width: 18%;position:absolute;top: 163px;">
+           	
+           	
+           	 <ul class="nav nav-tabs">
+              <li class="active" ><a href="#pbtreespacetab"  style="color:#007aff;font-size: 16px; " data-toggle="tab">空间结构</a></li>
+              <li ><a href="#pbtreecategorytab" style="color:#007aff;font-size: 16px; " data-toggle="tab">构件类型</a></li>
+            </ul>
+           	 <div class="tab-content">
+           	 	 <div class="active tab-pane" id="pbtreespacetab">
+           	 	 	<div id="jstree_div" style=" overflow-x:auto;"> </div>
+           	 	 </div>
+           	 	  <div class="tab-pane" id="pbtreecategorytab">
+           	 	  	<div id="jstree_div_pbtype" style="overflow-x:auto;"> </div>
+           	 	 </div>
+           	 </div>
+             </div>
+ 
+ 			
+			<div id="sideMenuright"  class="nav-tabs-custom sideMenuDiv" style="text-align:left;width: 18%; position:absolute;top: 163px;">
+            <ul class="nav nav-tabs">
+              <li class="active" ><a href="#pbproptab"  style="color:#007aff;font-size: 16px; " data-toggle="tab">属性</a></li>
+              <li ><a href="#pbrelatefiletab" style="color:#007aff;font-size: 16px; " data-toggle="tab">文件</a></li>
+              <li ><a href="#pblisttab" style="color:#007aff;font-size: 16px; " data-toggle="tab">列表</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="active tab-pane" style="padding-left: 10px;" id="pbproptab">
+						<div class="pbwell-property" ><a>编号</a><label id="pbnumber" ></label ></div>
+						<div class="pbwell-property" ><a>类型</a><label id="pbtype" ></label > </div>
+						<div class="pbwell-property" ><a>状态</a> <label id="pbstatus" ></label ></div>
+						<div class="pbwell-property" ><a>体积</a><label id="pbvolume" ></label ><sup id="pbvolumeunit"><sup></div>
+						<div class="pbwell-property" ><a>楼层</a><label id="pbelevation" ></label ></div>
+						<div class="pbwell-operator">
+							<a href="#" id="pbqrcode" class="btn btn-primary model-from"><i class="fa fa-qrcode"></i>打印身份牌</a>
+							<a href="#" id="pbtrace"  class="btn btn-primary model-from"><i class="fa fa-truck"></i>过程追踪</a>
+						</div>
+			  </div>
+              <!-- /.tab-pane -->
+              
+               <div class="tab-pane" id="pbrelatefiletab">
+							<table class="table table-striped" id="file_relate_table">
+								<thead>
+									<tr>
+										<th>关联文件</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td style="width: 75%;"><a href="#" style="cursor: pointer;">设计文档.doc</a></td>
+										<td><a href="#" title="删除文件"  onclick="funDelFileRelate(this)" style="cursor: pointer;">[删除]</a></td>
+									</tr>
+									<tr>
+										<td style="width: 75%;"><a href="#" style="cursor: pointer;">质量图片.jpg</a></td>
+										<td><a href="#" title="删除文件" onclick="funDelFileRelate(this)" style="cursor: pointer;">[删除]</a></td>
+									</tr>
+									<tr>
+										<td style="width: 75%;"><a href="#" style="cursor: pointer;">模型文件.rvt</a></td>
+										<td><a href="#" title="删除文件" onclick="funDelFileRelate(this)" style="cursor: pointer;">[删除]</a></td>
+									</tr>
+									<tr>
+										<td style="width: 75%;"><a href="#" style="cursor: pointer;">图纸.pdf</a></td>
+										<td><a href="#" title="删除文件" onclick="funDelFileRelate(this)" style="cursor: pointer;">[删除]</a></td>
+									</tr>
+								</tbody>
+							</table>
+			  </div>
+              <!-- /.tab-pane -->
+
+              <div class="tab-pane" style="padding-left: 10px;" id="pblisttab">
+		
+					<table class="table table-striped" id = "pbtable" style="margin-bottom: 5px;">
+					  <thead>
+						<tr>
+						  <th></th>
+						  <th>编号</th>
+						  <th>状态</th>
+						</tr>
+					  </thead>
+					  <tbody>
+					  {% ifequal listcount 0 %}
+					  <tr>
+						  <td colspan="6" align="center"><h3>没有相关记录！</h3></td>
+					   </tr>
+					  {% endifequal %}
+					  {% for item in list_items.object_list %}
+						<tr>
+						  <td><input type="checkbox" value=""></td>
+						  <td>{{item.number}}</td>
+						  <td>{{item.curstatus}}</td>
+						</tr>
+					   {% endfor %}
+					  </tbody>
+					</table>
+					
+				
+					<ul class="pagination pagination-sm" id="pagebar">
+						<li><a onclick="changepage2Page(1)">首页</a></li>
+						{% if list_items.has_previous %}	
+							<li><a onclick="changepage2Page({{ list_items.previous_page_number }})"><i class="fa fa-chevron-left"></a></li>
+						{% endif %}
+						<li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+						{% if list_items.has_next %}
+						 <li><a onclick="changepage2Page({{ list_items.next_page_number}})"><i class="fa fa-chevron-right"></i></a></li>
+						{% endif %}
+						<li><a onclick="changepage2Page({{paginator.num_pages}})">尾页</a></li>
+					</ul>
+					
+					<div class="pbwell-operator">
+						<a href="javascript:PrintPbQrcode2();" id="pbqrcode2" class="btn btn-primary model-from"><i class="fa fa-qrcode"></i>打印身份牌</a>
+						<a href="/task/goujian/" id="pbmanage"  class="btn btn-primary model-from">构件管理</a>
+					</div>
+
+              </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+				
+ 
+<div class="row">
+    	<div class="header-row">
+	        <i class="fa fa-industry"></i>施工状态
+	    </div>
+          <!-- Viewer and API function selection -->
+        <div id="ani" class="content-row" style="margin-left:18%;padding-left: 0px;padding-right: 0px">
+            <div class="col-lg-12" id="viewer" style="color: white;">          <!-- Viewer goes here -->        
+                <!-- Upon the viewer initalizaiton, it will append a div to the above div to insert the viewer.  It
+                    will use 100% width and height so that it will fill up whatever the above div's dimensions are. 
+                    NOTE: I had to set height in theme.css for this object or bootstrap would set height to 1px -->
+                <div id="lmvdbg_toolbar_canvas_div" style="position: relative; top: 10px; left: 0px; z-index: 200;"></div>
+                    <!-- the Toolbars test function will position the in-canvas toolbar using this div.  See partials/toolbars.html -->
+            </div>
+            </div>
+       </div>
+  </div>
+  
+   	<div class="modal fade" id="relatefiledlg" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4 align="left">关联文件</h4>
+            </div>
+            <div class="modal-body">
+	          	<div class="widget-content padded">
+					<div id="filetree_div" style="max-height:500px; overflow:auto;"> </div>
+			  	</div>
+			  	<input type="hidden" id="file_relatetype"  value="" />
+			  	<input type="hidden" id="file_relatetypeId"  value='' />
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnFaqiWenTiCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" onclick="FunCommonRelateFile()" id="btnFaqiWenTi" >确认</button>
+            </div>
+    </div>
+    </div>
+    </div>
+	
+
+  	<div class="form-group">
+		<textarea class="form-control"  name="sqllist" id="sqllist" rows="100" style="display:none"></textarea>
+	</div>
+
+	<script type="text/javascript" src="/js/common/filerelate.js" ></script>
+	<script src="js/datastruct.js"></script>
+	<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.Sample/Autodesk.ADN.Viewing.Extension.Sample.js?ver=1111"></script>
+	<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskStatus/Autodesk.ADN.Viewing.Extension.SampleTaskStatus.js?ver=1111"></script>
+    <script src="js/web3d/scripts/LoadModelTaskStatus.js"></script>
+	<script src="js/web3d/scripts/getObjectTreeTaskStatus.js"></script>
+	 <script type="text/javascript">	
+
+	 
+	 
+	function PrintPbQrcode()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function TracePbStatus()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/trace/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/trace/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	
+	function PrintPbQrcode2()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(selPbtypes.length>0 || selElevations.length>0)
+		{
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function changepage2Page(page){
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,},
+			  success: function(data){
+				$("#pbtable tbody").html(data.pblist);
+				$("#pagebar").html(data.pageinfo);
+			  }
+		});
+	}
+	
+	
+    function changepage2PageStatus(page){
+			var pbstatus=$("#pbstatussel").val();
+			var timerange=$("#timerange").val();
+	
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist2",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,"pbstatus": pbstatus,"timerange":timerange},
+			  success: function(data){
+				if(data.issuc=="true")
+				{
+					$("#pbtable tbody").html(data.pblist);
+					$("#pagebar").html(data.pageinfo);
+				}
+				else
+				{
+					alert(data.error);
+				}
+			  }
+		});
+	}
+
+	
+	function changefunction()
+	{
+		var str="";
+        $("input[type='radio'][name='pbcheck']:checked").each(function(){ 
+             str = $(this).val();
+			 _viewer.select(parseInt(str));
+        })
+	}
+	
+	function wgetFit(){
+		$(".content-row").height($(window).height() -150);
+		$(".content-row > div").height($(window).height() -160);
+		$(".sideMenuDiv").height($(window).height() -165);
+	}
+	
+	
+
+</script>
+{% endblock %}

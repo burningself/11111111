@@ -1,0 +1,62 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+
+ {% endblock %}
+{% block content %}
+<div id="app">
+<template >
+	<div class="header-v2" style="min-width: 1024px;">
+		<div class="header-bg-v2">
+			<span class="title-v2 line_height32">构件查询</span>
+
+			<a  @click="PrintPbQrcode()" title="批量打印二维码"><i class="profont pro-font-ccgl-dayinliebiao-3 pointer font18 margin_left15"></i></a>
+			<a  @click="exportData()"  title="导出构件" class="profont pro-font-daochu font18 margin_left15" ></a>
+
+			    <i-form style="display: inline;float: right;"  inline >
+			    	 
+			        <Form-Item prop="space">
+						 <Cascader :data="spaceData" :load-data="loadElevation" v-model="spacevalue" placeholder="选择空间" style="width: 200px;" change-on-select></Cascader>
+			        </Form-Item>
+			        
+
+			         
+			    	<Form-Item prop="type">
+						 <Cascader :data="typeData" :load-data="loadSubType" v-model="typevalue" placeholder="选择类型状态" style="width: 250px;" change-on-select></Cascader>
+			        </Form-Item>
+			        <!--<Form-Item prop="undo">
+			    		  <Checkbox v-model="isundo">未完成</Checkbox>
+			        </Form-Item>-->
+
+			        <Form-Item prop="pbnumber">
+			            <i-Input type="text"  placeholder="构件编号" v-model="search" style="width: 200px;"></i-Input>
+			        </Form-Item>
+			        <Form-Item>
+			            <i-Button type="primary"  @click="handleSubmit()">筛选</i-Button>
+			        </Form-Item
+			    </i-form>
+
+				
+		</div>
+	</div>
+	<div style="min-width: 1024px;">
+		<i-table border :loading="loading" :columns="columnsPb" :data="dataPb" :height='tableheight'  @on-sort-change="sortPb"  ref="pbtable" style="margin-bottom: 5px;"></i-table>
+		
+		<div style="margin: 10px;overflow: hidden">
+	        <div style="float: right;">
+	           <Page :total="total"   :page-size="perPage"  @on-change="loadList" show-total></Page>
+	        </div>
+	    </div>
+    </div>
+
+ </template>
+ </div>
+<link href="/dist_vue/plugin/iview/styles/iview.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/dist_vue/plugin/iview/iview.min.js" type="text/javascript"></script>
+<script src="/js/common/goujian.js" type="text/javascript"></script>
+
+ 
+</div>
+
+
+
+{% endblock %}

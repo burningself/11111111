@@ -1,0 +1,219 @@
+{% extends "baseadmin.html" %} {% block content %}
+<link href="/css/bootstrap/bootstrap-switch3.3.2.min.css" rel="stylesheet" type="text/css" />
+<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+<link rel="stylesheet" href="/js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="/js/web3d/scripts/libs/jstree/dist/jstree3.3.4.min.js"></script>
+<script src="/js/bootstrap/bootstrap-switch3.3.2.min.js" type="text/javascript"></script>
+</head>
+<style>
+	.all {
+		width: 102%;
+		background-color: white;
+		height: 800px;
+		margin: 3px auto auto -11px;
+		padding-top: 5px;
+		padding-left: 5px;
+	}
+	
+	.all h4 {
+		font-weight: bold;
+	}
+	
+	.header-row {
+		width: 100%;
+		margin: 5px 0 5px 5px;
+		padding: 0;
+		text-align: left;
+		font-size: 18px;
+		font-weight: bold;
+		color: #2e6da4;
+	}
+	
+	.left {
+		width: 25%;
+		height: 95%;
+		overflow: auto;
+	}
+	
+	.panel-body {
+		text-align: left;
+	}
+	
+	.right {
+		width: 73%;
+		border-radius: 3px;
+		color: #337ab7;
+		height: 95%;
+		border-left: 1px solid #337ab7;
+	}
+	
+	#content_3 {
+		width: 750px;
+	}
+	
+	.right_header {
+		text-align: center;
+		margin: 10px auto;
+	}
+	.col-md-2{
+		width: 100px;
+	}
+	.save{
+		width: 100px;
+	}
+</style>
+<div class="all">
+	<div class="header-row"><i class="fa fa-book"></i>导航编辑</div>
+	<div class="left  col-lg-2 col-md-3 col-sm-3">
+		<div class="panel-body">
+			<div id="jstree_navigation"></div>
+		</div>
+	</div>
+	<div class="right col-lg-10 col-md-9 col-sm-9">
+		<div id="content_3" class="modal-body">
+			<div class="right_header">
+				<h4>修改设置</h4></div>
+			<form class="form-horizontal bv-form">
+				<div class="form-group">
+					<label class="col-md-2">名称:</label>
+					<div class="col-md-9"><input type="text" id="name" class="form-control" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2">图标:</label>
+					<div class="col-md-9"><input type="text" id="icon" class="form-control" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2">颜色:</label>
+					<div class="col-md-9"><input type="text" id="color" class="form-control" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2">父节点:</label>
+					<div class="col-md-9"><input type="text" id="parent_id" class="form-control" readonly="true" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2">URL:</label>
+					<div class="col-md-9"><input type="text" id="url" class="form-control" readonly="true" /></div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2">扩展参数:</label>
+					<div class="col-md-9"><input type="text" id="param" class="form-control" /></div>
+				</div>
+				<div class="form-group has-feedback">
+					<label class="col-md-2">是否显示:</label>
+					<div class="col-md-2 switch">
+						<div class="switch switch-large">
+							<input id="isrecord" type="checkbox" checked />
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="right_header">
+				<button class="save btn btn-primary">保存</button>
+			</div>
+			
+		</div>
+	</div>
+</div>
+<script>
+	$('#isrecord').bootstrapSwitch({
+		onText: "显示",
+		offText: "隐藏",
+		onColor: "primary",
+		onSwitchChange: function(event, state) {
+			if (state == true) {
+				$(this).val("1");
+			} else {
+				$(this).val("0");
+			}
+		}
+	});
+	$("#jstree_navigation").jstree({
+		"core": {
+			'multiple': false,
+			'check_callback': true,
+			'data': {
+				'url': '/xadmin/navigat/menutreemobile/',
+				'data': function(node) {
+					return {
+						'id': node.id
+					};
+				}
+			}
+		},
+		/*"plugins": ["dnd"],*/
+	});
+	
+
+
+	$("#jstree_navigation").bind("activate_node.jstree", function(e, data) {
+		var node = data.node;
+		var get_node = $("#jstree_navigation").jstree("get_node", node.id);
+		var children = $("#jstree_navigation").jstree("get_children_dom", "menutree");
+		if (node.id != "#" || node.id != "menutree") {
+			$("#name").val(node.data.name);
+			$("#icon").val(node.data.icon);
+			$("#color").val(node.data.color);	
+			$("#parent_id").val(node.data.parent_id);
+			$("#url").val(node.data.url);
+			$("#param").val(node.data.param);
+			$("#isrecord").val(node.data.isrecord);
+			
+			console.log(node.data.isrecord);
+			if(node.data.isrecord){
+				$("#isrecord").bootstrapSwitch("state",true );
+			}else{
+				$("#isrecord").bootstrapSwitch("state", false);
+			}
+			
+		}
+		
+		$('.save').unbind("click");
+		$('.save').bind("click", function() {
+			var name = $("#name").val();
+			var icon = $("#icon").val();
+			var param = $("#param").val();
+			var isrecord = $("#isrecord").val();
+			var color = $("#color").val();
+			
+			$.ajax({
+				type: "post",
+//				url: "/xadmin/navigat/savemenu/",
+				data: {
+					"id": node.data.id,
+					"name": name,
+					"icon": icon,
+					"param": param,
+					"isrecord": isrecord,
+					"color": color,
+				},
+				success: function(data) {
+					if(data.issuc=="true"){
+						$("#jstree_navigation").jstree("set_text", node.id, name);
+						if (icon != "") {
+							$("#jstree_navigation").jstree("set_icon", node.id, icon);
+						}
+						if (color != "") {
+							$("#" + node.id).css("color", color);
+						}
+						
+						if (isrecord == 0) {
+							$("#" + node.id).css("opacity", "0.3");	
+						}else{
+							$("#" + node.id).css("opacity", "1");	
+						}
+						
+						alert("保存成功");
+					}else{
+						alert("保存失败");
+					}
+				},
+				error: function(data) {
+					alert("服务器错误");
+				}
+			});
+			
+		});
+
+	});
+</script>
+{% endblock %}

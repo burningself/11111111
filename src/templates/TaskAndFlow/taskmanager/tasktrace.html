@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<script src="/js/commonopr.js" type="text/javascript"></script>
+<script src="/js/common/tasktrace.js" type="text/javascript"></script>
+<link href="/css/project/tasktrace.css" media="all" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+	
+<div class="row">
+ <div class="col-md-12 col-sm-12">
+ <div class="widget-container fluid-height clearfix">
+ 	<h3><i class="fa fa-arrows"></i>{{task.name}}-任务追踪</h3>
+	<div class="widget-content padded">
+	<form id="tab" action="" method="get"> {% csrf_token %}
+			<input type="hidden" name="taskid"  class="form-control"  value="{{taskid}}">
+			<div class="form-group col-md-12 col-sm-12">
+			{{ form.name.errors }}
+            <label class="col-md-2" align="right">构件编号：</label>
+            <div class="col-md-2">
+			  <input type="text" name="number"  class="form-control"  value="{{pbnumber}}">
+            </div>
+			 <label class="col-md-2" align="right">标高：</label>
+            <div class="col-md-2">
+			  <select name="pbelevation" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for elevation in ElevationChoices %}
+						{% ifequal elevation.id  pbelevation %}
+							<option value="{{elevation.id}}" selected>{{elevation.unitproject}}{{elevation.name}}</option>
+						{% else %}
+							<option value="{{elevation.id}}">{{elevation.unitproject}}{{elevation.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>	
+			<div class="col-md-4" >
+				<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+            </div>
+          </div>
+		 <div class="form-group col-md-12 col-sm-12">
+			<label class="control-label col-md-2" align="right">构件类型：</label>
+            <div class="col-md-2">
+			  <select name="pbtype" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for type in PBTypeChoices %}
+						{% ifequal type.id pbtype %}
+							<option value="{{type.id}}" selected>{{type.name}}</option>
+						{% else %}
+							<option value="{{type.id}}">{{type.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>
+			<label class="control-label col-md-2" align="right">构件状态：</label>
+            <div class="col-md-2">
+					<select name="pbstatus" class="form-control">
+					<option value="0" selected>全部</option>
+					{% for status in PBStatusChoices %}
+						{% ifequal status.id pbstatus %}
+							<option value="{{status.id}}" selected>{{status.statusname}}</option>
+						{% else %}
+							<option value="{{status.id}}">{{status.statusname}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+            </div>
+			 <div class="col-md-4" >
+				<a href="javascript:PrintPbQrcode();" class="btn btn-primary" ><i class="glyphicon glyphicon-qrcode"></i>批量打印二维码</a>
+            </div>
+          </div>
+	</form>
+</div>                    
+</div>  
+</div>  
+</div>  
+
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-bordered table-striped " id="dataTables-example">
+      <thead>
+        <tr>
+          <th id="sign">构件编号<span class="pull-right" id="span_sign"><img src="/images/sort_both.png"></span></th>
+		  <th id="pbtype">构件类型<span class="pull-right" id="span_pbtype"><img src="/images/sort_both.png"></span></th>
+		  <th id="curstatus">当前状态<span class="pull-right" id="span_curstatus"><img src="/images/sort_both.png"></span></th>
+		  <th id="elevation">楼层<span class="pull-right" id="span_elevation"><img src="/images/sort_both.png"></span></th>
+		  <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% ifequal listcount 0 %}
+	  <tr>
+          <td colspan="5"><h3>没有相关记录！</h3></td>
+	  </tr>
+	  {% endifequal %}
+	  {% for item in list_items %}
+        <tr>
+          <td>{% ifequal item.sign None %}     {% else %}{{item.sign}}{% endifequal %}</td>
+		  <td>{% ifequal item.pbtype None %}  未知   {% else %}{{item.pbtype}}{% endifequal %}</td>
+		  <td>{% ifequal item.curstatus None %}  没有记录 {% else %}{{item.curstatus}}{% endifequal %} </td>
+		  <td>{% ifequal item.elevation None %}未知 {% else %}{{item.elevation.unitproject}}{{item.elevation}}{% endifequal %}</td>
+          <td>
+			 <a href="/task/goujian/trace/?pbid={{item.id}}" title="追踪构件状态" style="cursor: pointer;">[过程追踪]</a>  
+			 <a href="javascript:PrintPbQrcode({{item.id}});" title="打印构件二维码" style="cursor: pointer;">[打印二维码]</a>			 
+          </td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+    <ul class="pagination pagination-lg">
+    	<li><a onclick="FunChangePage(1)">首页</a></li>
+		{% if list_items.has_previous %}	
+			<li><a onclick="FunChangePage({{ list_items.previous_page_number }})">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+        <li><a> 
+        	<input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;"/>
+        	</a>
+        	<a id="jumpBTN">
+        	跳转
+        	</a>
+        </li>
+		{% if list_items.has_next %}
+         <li><a onclick="FunChangePage({{ list_items.next_page_number }})">下一页</a></li>
+		{% endif %}
+		<li><a onclick="FunChangePage({{paginator.num_pages}})">尾页</a></li>
+		
+    </ul>
+	
+</div>
+ </div>
+
+ <script type="text/javascript">
+        $(document).ready(function () {
+		  
+			var id="#span_{{orderby}}";
+			if ({{clickcount}}==0){
+				$(id).html('<img src="/images/sort_desc.png">')
+			}
+			else{
+				$(id).html('<img src="/images/sort_asc.png">')
+			}
+				
+			
+			 $("#dataTables-example th").click(function () {
+				var curOrder = $(this).attr("id");
+				if (curOrder!=undefined){
+					if("{{orderby}}"!=curOrder){
+						clickcount = 0;
+					}
+					else{
+						clickcount = ({{clickcount}}+1)%2
+					}
+					
+					var oldpbnumber = $('<div/>').text('{{pbnumber}}').html();
+					var pbnumber=oldpbnumber.replace("#","%23");  
+					window.location.href="?page=1&number="+pbnumber+"&pbelevation={{pbelevation}}&pbstatus={{pbstatus}}&pbtype={{pbtype}}&orderby="+curOrder+"&clickcount="+clickcount+"&taskid={{taskid}}"; 
+				}
+			})
+         });
+
+		 
+		$('#pageJump').bind('input propertychange', function() { 
+			var tgtPage = $('#pageJump').val();
+			if(tgtPage){
+				$("#jumpBTN").attr("onclick","FunChangePage(" + tgtPage + ")");
+			}
+		});
+		
+	function FunChangePage(page)
+	{
+		var oldpbnumber = $('<div/>').text('{{pbnumber}}').html();
+		var pbnumber=oldpbnumber.replace("#","%23");  
+		var href = "?page="+page+"&number="+pbnumber+"&pbelevation={{pbelevation}}&pbstatus={{pbstatus}}&pbtype={{pbtype}}&orderby={{orderby}}&clickcount={{clickcount}}&taskid={{taskid}}"; 
+	
+		window.location.href=href;
+	}
+	
+	function PrintPbQrcode()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+		else
+		{
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?number={{pbnumber}}&pbelevation={{pbelevation}}&pbstatus={{pbstatus}}&pbtype={{pbtype}}&taskid={{taskid}}", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?number={{pbnumber}}&pbelevation={{pbelevation}}&pbstatus={{pbstatus}}&pbtype={{pbtype}}&taskid={{taskid}}", 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+		$("#btnUpdateCol").click(function(){
+		
+			var custominfo="";
+			$("input[type='checkbox']:checked").each(function(){ 
+				 custominfo += $(this).val()+",";
+			})
+
+			$.ajax({
+			type:"get",
+			url:"/task/goujian/setpbcustominfo",
+			cache:false,
+			dataType:"json",
+			data:{"custominfo": custominfo,},
+			success: function(data){
+				if(data.issuc="true")
+				{
+					window.location.reload(true);
+				}
+			}
+			});
+
+	    });
+		
+</script>
+ 
+</div>
+
+
+
+{% endblock %}
+

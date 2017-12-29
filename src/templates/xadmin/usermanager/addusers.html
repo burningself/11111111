@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <style>
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        body{  position: absolute;  top: 0;  left: 0;  right: 0;  bottom: 0;  }
+        .main{  width: 800px;  margin: 20px auto;  background-color: #fff;  padding: 20px 20px;  }
+        .main h2{  margin: 0 auto 20px;  }
+        .footer{  margin-top: 15px;  padding: 5px;  text-align: center;  }
+        .btn{  margin-left: 10px;  }
+        .line{  margin: 20px;  height: 1px;border: 1px solid #EFF0F2;  }
+        .passShow{  display: none;  }
+    </style>
+</head>
+<body>
+<div id="addUser">
+    <card class="main">
+        <h2 class="eDit">添加用户</h2>
+        <p class="line"></p>
+        <i-form ref="formCustom" :model="formCustom" :rules="ruleCustom" label-position="right" :label-width="100" style="margin-top: 20px;">
+            <form-item label="用户名:" prop="name">
+                <i-input v-model="formCustom.name" style="width: 300px"></i-input>
+            </form-item>
+            <form-item label="实际姓名:" prop="truename">
+                <i-input v-model="formCustom.truename" style="width: 300px"></i-input>
+            </form-item>
+            <form-item label="联系方式:" prop="tel">
+                <i-input v-model="formCustom.tel" style="width: 300px"></i-input>
+            </form-item>
+            <p class="line"  :class="{passShow: passShow}"></p>
+            <form-item :class="{passShow: passShow}" label="密码" prop="passwd">
+                <i-input type="password" v-model="formCustom.passwd" style="width: 300px"></i-input>
+            </form-item>
+            <form-item  :class="{passShow: passShow}" label="确认密码" prop="passwdCheck">
+                <i-input type="password" v-model="formCustom.passwdCheck" style="width: 300px"></i-input>
+            </form-item>
+            <p class="line"></p>
+            <form-item label="所属企业:" prop="company">
+                <i-select v-model="formCustom.company" style="width:300px" filterable>
+                    <i-option v-for="companyname in companynames" :value="companyname.id" :key="companyname.id">[[companyname.name]]</i-option>
+                </i-select>
+            </form-item>
+            <form-item label="专业:" prop="major">
+                <i-select v-model="formCustom.major" style="width:300px" filterable>
+                    <i-option v-for="majorname in majornames" :value="majorname.id" :key="majorname.id">[[ majorname.name]]</i-option>
+                </i-select>
+            </form-item>
+            <form-item label="参建方:" prop="userdivisions">
+                <i-select v-model="formCustom.userdivisions" style="width:300px" filterable>
+                    <i-option v-for="visionName in visionNames" :value="visionName.id" :key="visionName.id">[[ visionName.name]]</i-option>
+                </i-select>
+            </form-item>
+            <form-item label="角色:" prop="roledatas">
+                <tag v-for="roledata,index in formCustom.roledatas" :key="roledata.id.toString()" :name="index" closable @on-close="handleClose2">[[roledata.name]]</tag>
+                <i-button icon="ios-plus-empty" type="dashed" size="small" @click="handleAdd = true">添加角色</i-button>
+                <modal v-model="handleAdd" title="添加用户角色" ok-text="确定" cancel-text="取消" width="450" @on-ok="addRole" @on-cancel="cancelRole">
+                    <transfer
+                            :data="rolenames"
+                            :target-keys="targetKeys2"
+                            filterable
+                            :filter-method="filterMethod"
+                            :list-style = "{height:'300px'}"
+                            @on-change="handleChange2"></transfer>
+                </modal>
+            </form-item>
+            <!--<form-item label="身份:">-->
+                <!--<radio-group v-model="formCustom.root">-->
+                    <!--<radio label="False">普通成员</radio>-->
+                    <!--<radio label="True">超级管理员</radio>-->
+                <!--</radio-group>-->
+            <!--</form-item>-->
+            <p class="line"></p>
+        </i-form>
+        <div class="footer">
+            <i-button class="btn" type="primary" @click="saveAll('saveAnd')">保存并继续添加</i-button>
+            <i-button class="btn" type="info" @click="saveAll('saveClose')">保存</i-button>
+            <i-button class="btn" type="ghost" @click="cancelAll('formCustom')"><a href="javascript:history.go(-1);location.reload()" style="color: #495060;">取消</a></i-button>
+        </div>
+    </card>
+
+</div>
+</body>
+<script>
+    new Vue({
+        el:'#addUser',
+        delimiters:['[[',']]'],
+        data:function () {
+            const validatePass = (rule, value, callback) => {
+                if (value.length < 6 || value.length > 12) {
+                    callback(new Error('请输入6位-12位密码'));
+                } else {
+                    if (this.formCustom.passwdCheck !== '') {
+                        // 对第二个密码框单独验证
+                        this.$refs.formCustom.validateField('passwdCheck');
+                    }
+                    callback();
+                }
+            };
+            const validatePassCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请确认密码'));
+                } else if (value !== this.formCustom.passwd) {
+                    callback(new Error('两次密码不一致'));
+                } else {
+                    callback();
+                }
+            };
+            const telCheckAll = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入手机号码'));
+                }else {
+                    let myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+                    if (!myreg.test( value )) {
+                        callback(new Error('请输入手机号码'));
+                    }else {
+                        callback();
+                    }
+                }
+            };
+            return {
+                formCustom: {
+                    name:'',
+                    truename:'',
+                    tel:'',
+                    passwd: '',
+                    passwdCheck: '',
+                    company:'',
+                    major:'',
+                    root:'False',
+                    roledatas:[],
+                },
+                ruleCustom: {
+                    name: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    truename: [
+                        { required: true, message: '请输入实际姓名', trigger: 'blur' }
+                    ],
+                    company: [
+                        { required: true, type: 'number', message: '请选择所属企业', trigger: 'change' }
+                    ],
+                    major: [
+                        { required: true, type: 'number',  message: '请选择专业', trigger: 'change' }
+                    ],
+                    userdivisions: [
+                        { required: true, type: 'number',  message: '请选择参建方', trigger: 'change' }
+                    ],
+                    roledatas: [
+                        { required: true, type: 'array', min: 1, message: '请选择角色', trigger: 'blur' }
+                    ],
+                    passwd: [
+                        { required: true,validator: validatePass, trigger: 'blur' }
+                    ],
+                    passwdCheck: [
+                        { required: true,validator: validatePassCheck, trigger: 'blur' }
+                    ],
+                    tel:[
+                        { required: true,validator:telCheckAll, trigger: 'blur'}
+                    ]
+                },
+                companynames:'',
+                majornames:'',
+                handleAdd: false,
+                role:'',
+                rolenames:this.getMockData(),
+                targetKeys2: this.getTargetKeys(),
+                timer1:'',
+                passShow:false,
+                editUser:[],
+                userdivisions:'',
+                visionNames:[]
+            }
+        },
+        methods:{
+            saveAll:function ( name ) {
+                let that = this;
+                let rolesId = [];
+                for(let i = 0;i < this.formCustom.roledatas.length ;i++){
+                    rolesId.push( this.formCustom.roledatas[i].id );
+                };
+                this.$refs.formCustom.validate((valid) => {
+                    if (valid) {
+                        $.ajax({
+                            url:"/user/adduser/",
+                            dataType:"json",
+                            type:"post",
+                            data:{username: that.formCustom.name,
+                                contract:that.formCustom.tel,
+                                truename:that.formCustom.truename,
+                                is_admin:that.formCustom.root,
+                                company:that.formCustom.company,
+                                major:that.formCustom.major,
+                                password1:that.formCustom.passwd,
+                                password2:that.formCustom.passwdCheck,
+                                roles:JSON.stringify(rolesId),
+                                division:that.formCustom.userdivisions
+                            },
+                            success:function( datas ){
+                                if(datas.issuc === true){
+                                    that.$Message.success('添加用户成功');
+                                    if(name == 'saveClose'){
+                                        window.history.go( -1 );
+                                        window.location.reload();
+                                    }else if(name == 'saveAnd'){
+                                        that.$refs.formCustom.resetFields();
+                                        that.targetKeys2 = [];
+                                    }
+                                }else {
+                                    that.$Message.error('添加失败:' + datas.error );
+                                    console.log( datas );
+                                }
+                            },
+                            error:function () {
+                                that.addSucceed = false;
+                                console.log("加载失败");
+                            }
+                        });
+                    } else {
+                        this.$Message.error('添加失败');
+                    }
+                })
+            },
+            cancelAll:function () {
+                this.$refs.formCustom.resetFields();
+            },
+            getMockData:function () {
+                let that =this;
+                var mockData = [];
+                $.ajax({
+                    url:"/config/roles/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage: 999999 },
+                    success:function( datas ){
+                        that.role = datas.results;
+                        for (let i = 0; i < datas.results.length; i++) {
+                            mockData.push({
+                                key: datas.results[i].id,
+                                label: datas.results[i].name,
+                                description:  datas.results[i].url
+                            });
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                return mockData;
+            },
+            getTargetKeys () {
+                return this.getMockData()
+            },
+            handleChange2 (newTargetKeys) {
+                this.targetKeys2 = newTargetKeys;
+            },
+            filterMethod (data, query) {
+                return data.label.indexOf(query) > -1;
+            },
+            addRole:function () {
+                this.formCustom.roledatas = [];
+                for(let i = 0; i < this.targetKeys2.length ; i++){
+                    for(let j = 0;j<this.role.length; j++){
+                        if(this.targetKeys2[i] == this.role[j].id){
+                            this.formCustom.roledatas.push( this.role[j] )
+                            break;
+                        }
+                    }
+                }
+            },
+            cancelRole () {
+                this.targetKeys2 = [];
+            },
+            handleClose2 (event, name) {
+                if( name > -1 ){
+                    this.formCustom.roledatas.splice(name, 1);
+                }
+            }
+        },
+        mounted:function () {
+            let that = this;
+            // init
+            $.ajax({
+                url:"/user/companys/",
+                dataType:"json",
+                type:"get",
+                data:{perPage: 99999 },
+                success:function( datas ){
+                    that.companynames = datas.results;
+                },
+                error:function () {
+                    console.log("加载失败");
+                }
+            });
+            $.ajax({
+                url:"/user/majors/",
+                dataType:"json",
+                type:"get",
+                data:{isAll: true },
+                success:function( datas ){
+                    that.majornames = datas.results;
+                },
+                error:function () {
+                    console.log("加载失败");
+                }
+            });
+            $.ajax({
+                url:"/config/divisions/",
+                dataType:"json",
+                type:"get",
+                success:function( datas ){
+                    that.visionNames = datas.results;
+                },
+                error:function () {
+                    console.log("加载失败");
+                }
+            });
+            //编辑
+//            if( sessionStorage.obj == ''||sessionStorage.obj ==undefined||sessionStorage.obj == null ){
+//                    console.log( 1 )
+//            }else {
+//                let userContent = JSON.parse( sessionStorage.obj );
+//                $(".eDit").html("编辑用户");
+//                this.passShow = true;
+//                let tempCompany = userContent.company.split("/");
+//                let tempMajor = userContent.major.split("/");
+//                console.log(tempCompany[tempCompany.length-2])
+//                console.log( userContent);
+//                that.formCustom.name = userContent.name;
+//                that.formCustom.truename = userContent.truename;
+//                that.formCustom.tel = userContent.contract;
+//                that.formCustom.company = parseInt(tempCompany[tempCompany.length-2]);
+//                that.formCustom.major = parseInt(tempMajor[tempMajor.length-2]);
+//                for(let i = 0;i < userContent.userPrjRoles.length; i++){
+//                    that.formCustom.roledatas.push({
+//                        id:userContent.userPrjRoles[i].id,
+//                        name:userContent.userPrjRoles[i].rolename,
+//                    })
+//                }
+//                sessionStorage.removeItem('obj');
+//            }
+        }
+    })
+</script>
+</html>

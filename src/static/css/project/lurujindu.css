@@ -1,0 +1,121 @@
+.qiehuan-label>span {
+	float: left;
+	margin-right: 20px;
+	line-height: 34px;
+	width: 70px;
+}
+.qiehuan-label>textarea {
+	width: 580px;
+}
+.qiehuan-label>input {
+	width: 580px;
+}
+.qiehuan-label>select {
+	width: 580px;
+}
+.qiehuan-label>a {
+	width: 580px;
+	text-align: left;
+	/*float: left;*/
+}
+.qiehuan-label>div {
+	width: 580px;
+	float: left;
+	text-align: left;
+}
+.qiehuan-label>button {
+	width: 580px;
+	float: left;
+	text-align: left;
+}
+.qiehuan-label {
+	padding-left: 40px;
+	font-weight: normal;
+	font-size: 15px;
+}
+.nav_tool {
+	display: none;
+}
+#item-donut {
+	width: 250px;
+	margin-right: 2vw;
+	float: right;
+}
+.qiehuan {
+	/*min-height: 84vh;*/
+	background-color: white;
+	margin-top: 2px;
+}
+.add-one {
+	padding: 20px 10px;
+	width: 750px;
+	background: #FFF;
+	margin: auto;
+	border: 1px solid #ccc;
+	overflow: hidden;
+}
+
+.add-two {
+	padding: 0px 0px 20px 0px;
+    background-color: #E7E0DC;
+ }
+.add-two p{
+	padding: 12px;
+	line-height: 17px;
+	font-size: 18px;
+	font-weight: bold;
+	color: #000810;
+	text-align: left;
+	background-color: #fff;
+}
+.add-two p a{
+	font-size: 14px;
+	margin-left: 10px;
+	font-width:normal;
+}
+.form-group {
+	margin-top: 10px;
+}
+
+.modal-content-custom {
+	min-height: 640px;
+	min-width: 600px;
+}
+
+.modal-header {
+	padding: 10px;
+}
+
+.tabbable {
+	margin-top: 5px;
+}
+
+.add-three {
+	height: 40px;
+	padding-top: 6px;
+	width: 100%;
+}
+
+#guolvgj {
+	float: right;
+	width: 251px;
+}
+
+#guolvrw {
+	float: right;
+	width: 251px;
+}
+
+.input-group-addon,.form-control{
+	border-radius: 0px!important;
+}
+.jFiler-theme-default .jFiler-input{
+	border-radius: 0px!important;
+}
+.jFiler-theme-default .jFiler-input-button{
+	background-image: -webkit-linear-gradient(top,#eee,#eee) ;
+	background-image: -moz-linear-gradient(top,#eee,#eee) ;
+	background-image: -o-linear-gradient(top,#eee,#eee) ;
+	background-image: linear-gradient(top,#eee,#eee) ;
+
+}

@@ -1,0 +1,71 @@
+/*common*/
+.panel{
+  border-radius: 0px;
+  border: 0;
+}
+.panel-body{
+  overflow: auto;
+}
+.panel-heading{
+  background-color: #D05354;
+  color: #fff;
+  border-radius: 0px!important;
+}
+.left,.right,.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.form-group-sm select.form-control{
+  height: 30px;
+  line-height: 20px;
+}
+.unactive{display: none;}
+.active{display: block;}
+.qingdantable{}
+.qingdantable thead th{
+  text-align:center;
+  background-color: #337ab7;
+  color: white;
+}
+a.editable-click, a.editable-click:hover {
+  text-decoration: none;
+  border-bottom: 0px;
+}
+.fenbaopact_table thead th{
+  text-align:center;
+  background-color: #337ab7;
+  color: white;
+}
+.dataTables_info{
+  text-align: center;
+}
+.datatable{
+  margin-top:0px!important;
+}
+.table-active{
+  display: block;
+}
+.table-unactive{
+  display: none;
+}
+.datatable th{
+  text-align:center;
+}
+.datatable.tboperate{
+  width:103px;
+}
+.amcharts-export-menu.amcharts-export-menu-top-right.amExportButton{
+    display: none;
+}
+.tr-selected{
+  background: #c7c7c7!important;
+}
+/*outandin*/
+#chartdiv {
+  width: 100%;
+  height: 700px;
+}
+table thead tr{
+  background-color: #D05354;
+  color: #fff;
+}

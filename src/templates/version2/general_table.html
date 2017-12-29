@@ -1,0 +1,93 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link href='/js/fullcalendar/fullcalendar.min.css' rel='stylesheet' />
+<link href='/js/fullcalendar/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+<script src="/js/fullcalendar/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/fullcalendar/fullcalendar.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/fullcalendar/locale-all.js" type="text/javascript" charset="utf-8"></script>
+<style>
+    .row-fluid1{background-color: white; margin-top: 2px; display: inline-block; border: 5px solid white; border-radius: 5px; width: 100%; height: calc(100vh - 130px); vertical-align: top; text-align: left;}
+</style>
+{% endblock %}
+{% block content %}
+<div style="width: 100%;">
+    <div class="row-fluid1" style="padding: 10px;">
+        <div id='calendar'></div>
+    </div>
+
+</div>
+
+<script>
+    $(function(){
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'listMonth,month,agendaWeek,agendaDay'
+            },
+            defaultDate: getNowFormatDate(),
+            defaultView: 'listMonth',
+            locale: 'zh-cn',
+            navLinks: true, // can click day/week names to navigate views
+            businessHours: true, // display business hours
+            editable: true,
+            eventOrder: 'order',
+            events: {
+                url: "/assist/todolist/",
+                type: 'post'
+            },
+            events: function(start, end, timezone, callback) {
+                $.ajax({
+                    url: "/assist/todolist/",
+                    dataType: 'json',
+                    data: {
+                        start: start.unix(),
+                        end: end.unix()
+                    },
+                    type: 'post',
+                    success: function(data) {
+
+                        callback(data.todolist);
+
+                        $('#calendar a').attr("target","_blank");
+
+                        //滚动到当天
+                        var curDate = getNowFormatDate();
+                        var offsettop = $(".fc-list-heading[data-date='"+curDate+"']").offset().top;
+                        $(".fc-scroller").scrollTop($(".fc-scroller").scrollTop() + offsettop - $(".fc-scroller").offset().top);
+
+                    }
+                });
+            },
+            eventMouseover: function(calEvent, jsEvent, view) {
+                var fstart = moment(calEvent).format('YYYY/MM/DD HH:mm');
+                var fend = moment(calEvent).format('YYYY/MM/DD HH:mm');
+                $(this).attr('title', calEvent.contant);
+                //				$(this).attr('title', calEvent);
+                //				$(this).css('font-weight', 'normal');
+                //				$(this).tooltip({
+                //					effect: 'toggle',
+                //					cancelDefault: true
+                //				});
+            },
+
+        });
+
+        function getNowFormatDate() {
+            var date = new Date();
+            var seperator1 = "-";
+            var seperator2 = ":";
+            var month = date.getMonth() + 1;
+            var strDate = date.getDate();
+            if(month >= 1 && month <= 9) {
+                month = "0" + month;
+            }
+            if(strDate >= 0 && strDate <= 9) {
+                strDate = "0" + strDate;
+            }
+            var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            return currentdate;
+        }
+    })
+</script>
+{% endblock %}

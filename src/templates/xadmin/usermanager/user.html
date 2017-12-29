@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>智慧建造信息平台</title>
+    <script src="../../dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+    <script src="../../dist_vue/plugin/vue/vue.js"></script>
+    <link href="../../dist_vue/plugin/iview/styles/iview.css" rel="stylesheet">
+    <script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+    <script src="../../dist_vue/plugin/clickEditor/Meditor.js"></script>
+    <style>
+        *{ padding: 0;margin: 0;letter-spacing: 1px;}
+        #app{padding: 10px;min-width: 1640px;}
+        .leftMenu{  width: 250px;  margin: 0px auto;  }
+        .mar10{  margin-top: 5px;  padding-left: 15px;  }
+        .pointer span{  display: inline-block;   padding:0 2px; border-radius: 3px; }
+        .pointer span:hover{  background-color: rgba(45,140,240,0.1);  }
+        .add-user{  margin-bottom: 10px;  float: right;  }
+        .add-user1{  margin-bottom: 10px;  margin-right: 10px;  float: right;  }
+        .add-user1 a{  color: #495060;  }
+        .row-is-admin td{  background-color: rgba(187,218,250, 0.1);  }
+        .ivu-checkbox-wrapper{  margin-right: 0;  }
+        .ivu-table-cell{  padding-left: 5px;  padding-right: 5px; }
+        .ivu-icon-checkmark-round{  cursor: pointer;  }
+        .c-input{width: 65%;}
+        .c-btn{padding: 0 0;color:#2DB7F5; }
+        .c-btn:hover{color:#2D8CF0}
+        .c-btn-red{padding: 0 0;color:#ED3F14; }
+        .c-btn-red:hover{ color: darkred;}
+        .pointer{  cursor: pointer;  }
+    </style>
+</head>
+<body>
+<div id="app">
+    <Row>
+        <i-col :span="4" style="overflow: auto">
+            <div class="leftMenu">
+                <tabs value="name1" size="small">
+                    <tab-pane label="组织架构" name="name1">
+                        <tree :data="leftData" @on-select-change="searchCompany"></tree>
+                    </tab-pane>
+                    <tab-pane label="参建方" name="name3">
+                        <ul>
+                            <li class="pointer" @click="searchDivision()"><span>全部</span></li>
+                            <li class="pointer mar10" v-for="site in division.DivisionDatas" @click="searchDivision( site )"><span>[[site.name]]</span></li>
+                        </ul>
+                    </tab-pane>
+                    <tab-pane label="专业" name="name2">
+                        <ul>
+                            <li class="pointer" @click="searchMajor()"><span>全部</span></li>
+                            <li class="pointer mar10" v-for="site in leftMajorData" @click="searchMajor( site )"><span>[[site.name]]</span></li>
+                        </ul>
+                    </tab-pane>
+                </tabs>
+            </div>
+        </i-col>
+        <i-col :span="20" style="background-color: #fff;">
+            <poptip  class="add-user"
+                     confirm
+                    title="您确认删除吗？"
+                    @on-ok="deleteUser"
+                    placement="bottom-end">
+                <i-button type="error">批量删除</i-button>
+            </poptip>
+            <!--<i-button class="add-user1" type="info">编辑</i-button>-->
+            <i-button class="add-user1" type="ghost"><a href="/xadmin/usermanager_vue/addusers/">添加用户</a></i-button>
+            <i-button class="add-user1" type="ghost" ><a href="/xadmin/usermanager_vue/batchUser/">导入现有用户</a></i-button>
+            <i-button class="add-user1" type="ghost" ><a href="/xadmin/usermanager_vue/guideusers/">批量导入</a></i-button>
+            <i-input v-model="searchValue" placeholder="用户名查找" style="width: 300px;margin-bottom:10px;" @on-change="find" icon="ios-search">
+            </i-input>
+            <i-table ref="selection" :columns="columnsData" :data="dataTable" @on-selection-change="selectedChill" @on-sort-change="sortAll"></i-table>
+            <page show-total :total="pages" :page-size="pageSize" @on-change="userTable" style="margin:20px auto;float:right;" show-elevator ref="page"></page>
+            <spin size="large" fix v-if="spinShow"></spin>
+        </i-col>
+    </Row>
+    <modal
+            v-model="reset"
+            title="重置密码"
+            @on-ok="resetOk"
+            @on-cancel="cancel">
+            <i-form ref="formCustom" :model="formCustom" :rules="ruleCustom" label-position="right" :label-width="100" style="margin-top: 20px;">
+                <form-item label="密码" prop="passwd">
+                    <i-input type="password" v-model="formCustom.passwd" style="width: 300px"></i-input>
+                </form-item>
+                <form-item label="确认密码" prop="passwdCheck">
+                    <i-input type="password" v-model="formCustom.passwdCheck" style="width: 300px"></i-input>
+                </form-item>
+            </i-form>
+    </modal>
+    <modal v-model="role.addRoleShow" title="添加角色" ok-text="确定" cancel-text="取消" width="450" @on-ok="addRoleTrue" @on-cancel="cancel">
+        <transfer
+                :data="role.rolenames"
+                :target-keys="role.targetKeys2"
+                filterable
+                :filter-method="filterMethod"
+                :list-style = "{height:'300px'}"
+                @on-change="handleChange2"></transfer>
+    </modal>
+    <modal v-model="division.addDivisionShow" title="修改参建方" ok-text="确定" cancel-text="取消" width="450" @on-ok="addDivision" @on-cancel="cancel">
+        <i-select v-model="division.targetDivision" style="width:300px" filterable>
+            <i-option v-for="divisiondata in division.DivisionDatas" :value="divisiondata.url" :key="divisiondata.id">[[ divisiondata.name]]</i-option>
+        </i-select>
+    </modal>
+</div>
+</body>
+<script>
+    Vue.component('clickInput', MEditor);
+    var user = new Vue({
+        el:'#app',
+        delimiters:['[[',']]'],
+        data () {
+            const validatePass = (rule, value, callback) => {
+                if (value.length < 6 || value.length > 12) {
+                    callback(new Error('请输入6位-12位密码'));
+                } else {
+                    if (this.formCustom.passwdCheck !== '') {
+                        // 对第二个密码框单独验证
+                        this.$refs.formCustom.validateField('passwdCheck');
+                    }
+                    callback();
+                }
+            };
+            const validatePassCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请确认密码'));
+                } else if (value !== this.formCustom.passwd) {
+                    callback(new Error('两次密码不一致'));
+                } else {
+                    callback();
+                }
+            };
+           return {
+               formCustom:{
+                   userId:'',
+                   passwd: '',
+                   passwdCheck: ''
+               },
+               ruleCustom:{
+                   passwd: [
+                       { required: true,validator: validatePass, trigger: 'blur' }
+                   ],
+                   passwdCheck: [
+                       { required: true,validator: validatePassCheck, trigger: 'blur' }
+                   ]
+               },
+               reset:false,
+               selectDele:[],
+               spinShow:false,
+               leftMajorData:[],
+               leftData:[],
+               dataTable:[],
+               leftcompany:[],
+               columnsData: [
+                   {
+                       type: 'selection',
+                       width: 60,
+                       align: 'center'
+                   },
+                   {
+                       title: '用户名',
+                       width: 120,
+                       sortable: 'custom',
+                       render: (h , param) => {
+                           let that = this;
+                           return  h('clickInput', {
+                               props: {
+                                   type:"input",
+                               },
+                               model:{
+                                   value:param.row.name,
+                                   callback(t){
+                                       if( param.row.name != t ){
+                                           param.row.name = t;
+                                           that.recomposeUser( param.row );
+                                       }
+                                   },
+                                   expression:"param.row.name"
+                               }
+                           },param.row.name)
+                       }
+                   },
+                   {
+                       title: '实际姓名',
+                       width: 120,
+                       sortable: 'custom',
+                       render: (h , param) => {
+                           let that = this;
+                           return  h('clickInput', {
+                               props: {
+                                   type:"input",
+                               },
+                               model:{
+                                   value:param.row.truename,
+                                   callback(t){
+                                       if( param.row.truename != t ){
+                                           param.row.truename = t;
+                                           that.recomposeUser( param.row );
+                                       }
+                                   },
+                                   expression:"param.row.truename"
+                               }
+                           },param.row.truename)
+                       }
+                   },
+                   {
+                       title: '联系方式',
+                       width: 150,
+                       render: (h , param) => {
+                           let that = this;
+                           return  h('clickInput', {
+                               props: {
+                                   type:"input",
+                               },
+                               model:{
+                                   value:parseInt(param.row.contract),
+                                   callback(t){
+                                       if( param.row.contract != t ){
+                                           param.row.contract = t;
+                                           that.recomposeUser( param.row );
+                                       }
+                                   },
+                                   expression:"param.row.contract"
+                               }
+                           },param.row.contract)
+                       }
+                   },
+                   {
+                       title: '所属企业',
+                       width:220,
+                       sortable: 'custom',
+                       render: (h,param) =>{
+                           let that = this;
+                           return  h('clickInput', {
+                               props: {
+                                   type:"select",
+                                   seleValue:param.row.company,
+                                   List:user.leftcompany
+                               },
+                               model:{
+                                   callback(t){
+                                       if( param.row.company != t ){
+                                           param.row.companyname = t.label;
+                                           param.row.company = t.value;
+                                           that.recomposeUser( param.row );
+                                       }
+                                   }
+                               }
+                           },param.row.companyname)
+                       }
+                   },
+                   {
+                       title: '专业',
+                       width:150,
+                       sortable: 'custom',
+                       render: (h,param) =>{
+                           let that = this;
+                           return  h('clickInput', {
+                               props: {
+                                   type:"select",
+                                   seleValue:param.row.major,
+                                   List:user.leftMajorData
+                               },
+                               model:{
+                                   callback(t){
+                                       if( param.row.major != t ){
+                                           param.row.majorname = t.label;
+                                           param.row.major = t.value;
+                                           that.recomposeUser( param.row );
+                                       }
+                                   }
+                               }
+                           },param.row.majorname)
+                       }
+                   },
+                   {
+                       title:'参建方',
+                       width:120,
+                       render: (h , params) => {
+                           if(params.row.userdivisions.length > 0){
+                               return  h('Button', {
+                                           props: {
+                                               type:"ghost",
+                                               size:'small'
+                                           },
+                                           on: {
+                                               click: () => {
+                                                   this.division.targetDivision = params.row.userdivisions[0].division;
+                                                   this.setting = 1;
+                                                   this.division.onePersion = params;
+                                                   this.division.addDivisionShow = true;
+                                               }
+                                           }
+                                       },params.row.userdivisions[0].divisionname)
+                           } else {
+                              return  h('Button',{
+                                      props:{
+                                          icon:'ios-plus-empty',
+                                          type:'dashed',
+                                          size:'small'
+                                      },
+                                      on: {
+                                          click: () => {
+                                              this.setting = 0;
+                                              this.division.onePersion = params;
+                                              this.division.addDivisionShow = true;
+                                          }
+                                      }
+                                  },
+                                  '添加')
+                           }
+                       }
+                   },
+                   {
+                       title:'角色',
+                       render: (h, params) => {
+                           let nodes = [];
+//                           角色展现
+                           if( params.row.is_admin === true ) {
+                               nodes.push( h('tag',{
+                                               props:{
+                                                   type:'border',
+                                                   color:'red'
+                                               }
+                                           },
+                                           '管理员'));
+                           }
+                           if(params.row.userPrjRoles.length > 0){
+                               for(let i = 0;i < params.row.userPrjRoles.length ;i++){
+                                   nodes.push( h('tag',{
+                                       props: {
+                                           closable: true,
+                                           type:'border',
+                                           color:'blue'
+                                       },
+                                       on: {
+                                           "on-close": () => {
+                                               this.role.closeIndex = params.index;
+                                               this.role.closeIndex2 = i;
+                                               this.closeRole(params.row.userPrjRoles[i])
+                                           }
+                                       }
+                                   },params.row.userPrjRoles[i].rolename ))
+                               }
+                          }
+                           nodes.push( h('Button',{
+                               props:{
+                                   icon:'ios-plus-empty',
+                                   type:'dashed',
+                                   size:'small'
+                               },
+                               on: {
+                                   click: () => {
+                                       this.role.targetKeys2 = [];
+                                       this.role.nowPerson = params;
+                                       if(params.row.userPrjRoles.length > 0){
+                                           params.row.userPrjRoles.forEach(value => {
+                                               this.role.targetKeys2.push(value.role);
+                                               this.role.targetKeysOld = this.role.targetKeys2;
+                                           });
+                                       }
+                                       this.role.addRoleShow = true;
+                                   }
+                               }
+                           },'添加角色'))
+                           return h('div', nodes );
+                       }
+                   },
+                   {
+                       title: '操作',
+                       width: 150,
+                       align: 'center',
+                       render: (h, params) => {
+                           return h('div', [
+                               h('Button', {
+                                   props: {
+                                       size: 'small'
+                                   },
+                                   style: {
+                                       marginRight: '5px'
+                                   },
+                                   on: {
+                                       click: () => {
+                                           this.formCustom.userId = params.row.id;
+                                           this.reset = true;
+                                       }
+                                   }
+                               }, '重置密码'),
+                               h('Poptip' , {
+                                   props: {title: '您确认删除吗？',placement:'left',confirm:true},
+                                   on: {
+                                       'on-ok': () => {
+                                           this.deleteUser(params.row.id);
+                                       }
+                                   }
+                               },[
+                                   h('Button', {
+                                       props: {
+                                           type: 'error',
+                                           size: 'small'
+                                       }
+                                   }, '删除')
+                               ])
+                           ]);
+                       }
+                   }
+               ],
+               pageSize:15,
+               pages:0,
+               searchValue: null,
+               major:null,
+               company:null,
+               role:{
+                   addRoleShow:false,
+                   rolenames:this.getMockData(),
+                   targetKeys2:[],
+                   targetKeysOld:[],
+                   nowPerson:null,
+                   closeIndex:null,
+                   closeIndex2:null,
+               },
+               division:{
+                   DivisionDatas:[],
+                   targetDivision:null,
+                   addDivisionShow:false,
+                   onePersion:null,
+                   setting:0,
+                   divisionId:null
+               },
+               inputdata:null,
+               aas:[{aa:0},{aa:2}]
+           }
+        },
+        methods:{
+            sortAll ( value ) {
+                switch (value.column.title){
+                    case "用户名":
+                       user.userTable(1, (value.order == "asc") ? "name" : "-name");
+                       break;
+                    case "实际姓名":
+                        user.userTable(1, (value.order == "asc") ? "truename" : "-truename");
+                        break;
+                    case "所属企业":
+                        user.userTable(1, (value.order == "asc") ? "company__name" : "-company__name");
+                        break;
+                    case "专业":
+                        user.userTable(1, (value.order == "asc") ? "major__name" : "-major__name");
+                        break;
+                }
+            },
+            addDivision () {
+                let that = this;
+                if(that.setting == 1){
+                    $.ajax({
+                        url:this.division.onePersion.row.userdivisions[0].url,
+                        dataType:"json",
+                        type:'put',
+                        data:{
+                            user: this.division.onePersion.row.url,
+                            division:this.division.targetDivision,
+                        },
+                        success:function( datas ){
+                            that.dataTable[that.division.onePersion.index].userdivisions = [];
+                            that.dataTable[that.division.onePersion.index].userdivisions.push(datas);
+                        },
+                        error:function () {
+                            console.log("加载失败");
+                        }
+                    });
+
+                } else {
+                    $.ajax({
+                        url:"/config/userdivisions/",
+                        dataType:"json",
+                        type:'post',
+                        data:{
+                            user: this.division.onePersion.row.url,
+                            division:this.division.targetDivision
+                        },
+                        success:function( datas ){
+                            that.dataTable[that.division.onePersion.index].userdivisions.push(datas);
+                        },
+                        error:function () {
+                            console.log("加载失败");
+                        }
+                    });
+                }
+            },
+            closeRole ( param ) {
+                let that = this;
+                $.ajax({
+                    url:param.url,
+                    dataType:"json",
+                    type:"DELETE",
+                    success:function( data ){
+                        that.$Message.success('删除成功');
+                        that.dataTable[that.role.closeIndex].userPrjRoles.splice(that.role.closeIndex2,1);
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            addRoleTrue () {
+                let that = this;
+                //删除已有的角色id,剩余新加id
+                for(let i = 0; i < that.role.targetKeysOld.length ; i++){
+                    for(let j = 0;j < that.role.targetKeys2.length; j++){
+                        if(that.role.targetKeysOld[i] == that.role.targetKeys2[j] ){
+                            let index = that.role.targetKeys2.indexOf( that.role.targetKeysOld[i] );
+                            if (index > -1) {
+                                that.role.targetKeys2.splice(index, 1);
+                            }
+                            break;
+                        }
+                    }
+                }
+                //添加角色
+                if(that.role.targetKeys2.length > 0){
+                    for(let n = 0;n < that.role.targetKeys2.length;n ++){
+                        $.ajax({
+                            url:"/config/userroles/",
+                            dataType:"json",
+                            type:"post",
+                            data:{
+                                user:that.role.nowPerson.row.url,
+                                role:that.role.targetKeys2[n]
+                            },
+                            success:function( data ){
+                                that.$Message.success('添加成功');
+                                if(data != ''||data != undefined||data != null){
+                                    that.dataTable[that.role.nowPerson.index].userPrjRoles.push({
+                                        id:data.id,
+                                        role:data.role,
+                                        rolename:data.rolename,
+                                        url:data.url,
+                                        user:data.user
+                                    })
+                                }else {
+                                    that.$Message.error('添加失败:' + datas.error );
+                                }
+                            },
+                            error:function () {
+                                console.log("加载失败");
+                            }
+                        });
+                    }
+                }
+            },
+            resetOk () {
+                let that = this;
+                $.ajax({
+                    url:"/user/resetpwd/",
+                    dataType:"json",
+                    type:"post",
+                    data:{
+                        userid:this.formCustom.userId,
+                        password1:this.formCustom.passwd,
+                        password2:this.formCustom.passwdCheck
+                    },
+                    success:function( data ){
+                        if(data.issuc == true){
+                            that.$Message.success('重置成功');
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            deleteUser ( id ) {
+                let that = this;
+                if(id != undefined){
+                    $.ajax({
+                        url:"/config/delprojectusers/",
+                        dataType:"json",
+                        type:"post",
+                        data:{
+                            users:JSON.stringify([id])
+                        },
+                        success:function( data ){
+                            if(data.issuc == true){
+                                that.$Message.success('删除成功');
+                                that.userTable(1,"name");
+                            }
+                        },
+                        error:function () {
+                            console.log("加载失败");
+                        }
+                    });
+                } else if ( this.selectDele.length > 0) {
+                    $.ajax({
+                        url:"/config/delprojectusers/",
+                        dataType:"json",
+                        type:"post",
+                        data:{
+                            users:JSON.stringify(this.selectDele)
+                        },
+                        success:function( data ){
+                            if(data.issuc == true){
+                                that.$Message.success('删除成功');
+                                that.userTable(1,"name");
+                            }
+                        },
+                        error:function () {
+                            console.log("加载失败");
+                        }
+                    });
+                }else {
+                    this.$Message.warning('请选择成员再删除');
+                }
+            },
+            leftMenu () {
+                let that = this;
+                $.ajax({
+                    url:"/user/companytree/",
+                    dataType:"json",
+                    type:"get",
+                    success:function( datas ){
+                        that.leftData = datas;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                $.ajax({
+                    url:"/user/companys/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage : 9999},
+                    success:function( datas ){
+                        that.leftcompany = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            leftMajor () {
+                let that = this;
+                $.ajax({
+                    url:"/user/majors/",
+                    dataType:"json",
+                    type:"get",
+                    data:{isAll : "True"},
+                    success:function( datas ){
+                        that.leftMajorData = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            userTable ( page ,order) {
+                let that = this;
+                $.ajax({
+                    url:"/user/users/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        ordering:order,
+                        isAll:'',
+                        company:that.company,
+                        major:that.major,
+                        search:that.searchValue,
+                        page:page,
+                        divisionId:that.division.divisionId
+                    },
+                    beforeSend:function(){
+                        that.spinShow = true;
+                    },
+                    success:function( datas ){
+                        that.spinShow = false;
+                        that.dataTable = datas.results;
+                        that.pages = datas.count;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            searchMajor ( ele ) {
+                if(ele == '' ||ele == undefined||ele ==null){
+                    this.$refs.page.currentPage = 1;
+                    this.major = null;
+                    this.userTable(1,"name");
+                }else {
+                    this.$refs.page.currentPage = 1;
+                    this.major = ele.id;
+                    this.userTable(1,"name");
+                }
+            },
+            searchDivision ( division ) {
+                if(division == '' ||division == undefined||division ==null){
+                    this.$refs.page.currentPage = 1;
+                    this.division.divisionId = null;
+                    this.userTable(1,"name");
+                }else {
+                    this.$refs.page.currentPage = 1;
+                    this.division.divisionId = division.id;
+                    this.userTable(1,"name");
+                }
+            },
+            searchCompany ( event ) {
+                try{
+                    this.$refs.page.currentPage = 1;
+                    if(event[0].id === "all"){
+                        this.company = null;
+                        this.major = null;
+                        this.userTable(1,"name");
+                    }else {
+                        this.company = event[0].id;
+                        this.userTable(1,"name");
+                    }
+
+                }catch(e){
+                    this.company = null;
+                    this.major = null;
+                    this.userTable(1,"name");
+                }
+
+            },
+            find ( event ) {
+                this.$refs.page.currentPage = 1;
+                this.searchValue = event.target.value;
+                this.userTable(1,"name");
+            },
+            getMockData:function () {
+                let that =this;
+                let mockData = [];
+                $.ajax({
+                    url:"/config/roles/",
+                    dataType:"json",
+                    type:"get",
+                    data:{perPage: 999999 },
+                    success:function( datas ){
+                        for (let i = 0; i < datas.results.length; i++) {
+                            mockData.push({
+                                key:  datas.results[i].url,
+                                label: datas.results[i].name,
+                            });
+                        }
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+                return mockData;
+            },
+            getDivision () {
+                let that = this;
+                $.ajax({
+                    url:"/config/divisions/",
+                    dataType:"json",
+                    type:"get",
+                    data:{
+                        prePage:99999
+                    },
+                    success:function( datas ){
+                      that.division.DivisionDatas = datas.results;
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            },
+            handleChange2 (newTargetKeys) {
+                this.role.targetKeys2 = newTargetKeys;
+            },
+            filterMethod (data, query) {
+                return data.label.indexOf(query) > -1;
+            },
+            cancel () {
+                this.$refs.formCustom.resetFields();
+                this.role.targetKeys2 = [];
+                this.division.targetDivision = null;
+            },
+            selectedChill ( selection ) {
+                try{
+                    this.selectDele = [];
+                    for(let i = 0;i < selection.length; i ++){
+                        this.selectDele.push(selection[i].id);
+                    }
+                }
+                catch (e) {
+
+                }
+            },
+            editUser (params) {
+                sessionStorage.obj = JSON.stringify( params.row );
+                window.location.href="/xadmin/usermanager_vue/addusers/";
+            },
+            recomposeUser ( params ) {
+                let that = this;
+                $.ajax({
+                    url:params.url,
+                    dataType:"json",
+                    type:"PUT",
+                    data:{
+                        name:params.name,
+                        truename:params.truename,
+                        contract:params.contract,
+                        password:params.password,
+                        last_login:params.last_login,
+                        company:params.company,
+                        major:params.major
+                    },
+                    success:function(){
+                        that.$Message.success('编辑成功');
+                    },
+                    error:function () {
+                        console.log("加载失败");
+                    }
+                });
+            }
+        },
+        mounted:function () {
+            let that = this;
+            that.leftMenu();
+            that.leftMajor();
+            that.userTable(1,"name");
+            that.getDivision();
+        }
+    })
+</script>
+</html>

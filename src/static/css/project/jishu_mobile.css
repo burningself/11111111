@@ -1,0 +1,42 @@
+.row-fluid {background:white; height:81.3vh;}
+.title_row{width:100%; padding-top: 1px; margin-top: 2px; font-size:1em; margin-bottom:0px;color: dodgerblue; text-align:center;}
+
+.row{width:100%; margin:0; padding: 0; border-radius:15px; display:inline-block;}
+.search-row {margin-top:10px; padding-top:5px; height:170px; text-align:center; background: darkseagreen; }
+.serarch-tab {height:100%; }
+.serarch-tab .form-group {display:inline-block; vertical-align:middle;}
+.serarch-tab .search-group {width: 70%; max-width:800px;}
+.serarch-tab .search-group .search-item {vertical-align: middle; font-size:1em; height:40px; width:100%; max-width:350px;}
+.serarch-tab .col-md-1 {width:40%; padding:0; line-height:40px; display:inline-block;}
+.serarch-tab .col-md-3 { width: 55%; min-width:100px; max-width:300px; display:inline-block; padding-left:0;}
+.serarch-tab .col-md-3 select {background: white; color:black;}
+.serarch-tab .btn-group {width: 25%; max-width:150px; text-align:left;}
+.serarch-tab .btn-group .col-md-3 {width: 100%; height:40px;}
+.serarch-tab .btn-group .col-md-3 button {font-size:1em;}
+.serarch-tab .export-btn-group {width: 25%; min-width:100px; max-width:200px;}
+.serarch-tab .export-btn-group .col-md-3{width: 80%; height:40px;}
+
+.content-row{margin-top:10px; min-height:300px;background:white; padding-top:5px;}
+.content-row .widget-container {width:95%; min-height:200px;}
+.content-row .widget-container table {font-size:1em;}
+.content-row .widget-container table thead tr th{text-align:center;}
+.content-row .widget-container table tbody tr th{text-align:center;}
+
+th{text-align:center;}
+.green{background:green; color:white; text-align;center;}
+.blue{background:blue; color:white; text-align;center;}
+.orange{background:orange; color:white; text-align;center;}
+.blank{background:grey; color:white; text-align;center;}
+
+.row-fluid .input-group{ width:98%;margin-left:1%; margin-top:1%; }
+.row-fluid .input-group .input-group-addon { font-weight: bold; background-color:#069CD8; border:0; color: white;}
+.row-fluid .input-group .fa { margin-right:2px; }
+
+.input-group a{font-size: 20px;}
+
+div.content{
+    width: 100%;
+    overflow: scroll;
+    height:calc(100vh - 115px);
+}
+body{overflow:hidden;font-size: 1.3em}

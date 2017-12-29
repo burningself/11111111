@@ -1,0 +1,4 @@
+.header-row{width:100%; padding: 5px;text-align:left;font-size: 18px;font-weight:bold;color: #2e6da4;}
+.constant{background: white;min-height: 85vh;}
+.table>thead>tr>th{text-align: center;}
+.table>tbody>tr>td{text-align: center;}

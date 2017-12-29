@@ -1,0 +1,663 @@
+{% extends "base_v2.html" %}
+ {% block content %}
+<link href="https://cdn.bootcss.com/iview/2.7.3/styles/iview.css" rel="stylesheet">
+<link href="/css/project/introduce_zyf.css" media="all" rel="stylesheet" type="text/css" />
+<div id="introducetables">
+	<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2">项目概述</span>
+        <button class="btn pull-right " id="printButton" @click="newprint()">打印</button>
+        <button class="btn pull-right" id="exportButton" @click="newexport()">导出Excel</button>
+        <a href=" " id="exportExcel" style="display:none"></a>
+    </div>
+	</div>
+<div class="content_main introducetable">
+		<table class="tbclass" id="introtable" border="1" bordercolor="#cccccc" cellspacing="0" cellpadding="0">
+			<tr class="tb_head">
+				<td class="line_head" colspan="6" style="width: 100%;
+    height: 40px;
+    text-align: center;
+    font-size: 22px;
+    color: #333333;
+    letter-spacing: 60px;
+    font-weight: 600;">工程概况登记</td>
+			</tr>
+			<tr class="tb_line">
+
+				<td class="line_o" style="width: 12%;" colspan="3">工程名称</td>
+				<td class="line_t">
+					<input-text @newresponselist="newresponse" :dataalls="responselist" :type="PrjName" :usercan="usercanedit"></input-text>
+				</td>
+				<td class="line_o">工程地址</td>
+				<td class="line_t">
+					<input-text @newresponselist="newresponse" :dataalls="responselist" :type="address" :usercan="usercanedit"></input-text>
+				</td>
+	
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">基层单位</td>
+				<td class="line_t">
+					<input-text :dataalls="responselist" :type="GCGS" :usercan="usercanedit" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o">项目经理</td>
+				<td class="line_t">
+					<input-text :dataalls="responselist" :type="XMJL" :usercan="usercanedit" @newresponselist="newresponse"></input-text>
+				</td>
+				
+				
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">工程编号</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="PrjId" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o">建设单位</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="jsdw" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">开工日期</td>
+				<td class="line_t">
+					<data-pickers :usercan="usercanedit" :dataalls="responselist" :type="KGRQ" @newresponselist="newresponse"></data-pickers>
+				</td>
+				<td class="line_o">计划竣工日期</td>
+				<td class="line_t">
+					<data-pickers :usercan="usercanedit" :dataalls="responselist" :type="JGRQ" @newresponselist="newresponse"></data-pickers>
+				</td>
+				
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">结构设计单位</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="jgsjdw" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o">围护设计单位</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="whsjdw" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">建筑面积(m2)</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="area" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o">地下建筑面积(m2)</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="dxarea" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">建筑物总高度(m)</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="height" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" >地上层数/层高(m)</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="dscs" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">地下层数(m)</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="dxcs" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o">工程占地面积(m2)</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="gczdmj" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">土层特征</td>
+				<td class="line_t" colspan="3">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="tctz" @newresponselist="newresponse"></input-text>
+				</td>
+
+			</tr>
+
+
+			<tr class="tb_line">
+				<td class="linerowspan" rowspan="2">维护结构</td>
+				<td class="line_o" style="width: 12%;" colspan="2">围护结构类型</td>
+				<td class="line_t" colspan="3">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="whjglx" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="2">维护桩长(m)</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="whzc" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" style="">支撑形式</td>
+				<td class="line_t" style="">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zcxs" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+
+
+
+			<tr class="tb_line">
+				<td class="linerowspan" rowspan="4">地基及基础</td>
+				<td class="line_o" style="width: 12%;" colspan="2">基坑面积(m2)</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="jkmj" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" style="">最深挖土深度(m)</td>
+				<td class="line_t" style="">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zswtsd" @newresponselist="newresponse"></input-text>
+				</td>
+				
+				
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="2">平均挖土深度</td>
+				<td class="line_t" colspan="3">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="pjwtsd" @newresponselist="newresponse"></input-text>
+				</td>
+				<!-- <td class="line_o" style="" colspan="2"></td> -->
+				
+				
+			</tr>
+			<tr class="tb_line">
+				<td style="width: 2%;color:#333333" rowspan="2">桩基</td>
+				<td class="line_o" style="width: 12%;">桩基类别</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zjlb" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" style="">长度/节数</td>
+				<td class="line_t" style="">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zjcd_js" @newresponselist="newresponse"></input-text>
+				</td>
+				
+				
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;">桩设计承载力</td>
+				<td class="line_t" colspan="3">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zsjcz" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+
+			
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">结构类型(上部结构)</td>
+				<td class="line_t" >
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="jglx" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" style="">结构最大跨度(m)</td>
+				<td class="line_t" style="">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="jgzdkd" @newresponselist="newresponse"></input-text>
+				</td>
+
+				
+				
+			</tr>
+			<tr class="tb_line">
+				<td class="line_o" style="width: 12%;" colspan="3">质量目标</td>
+				<td class="line_t">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="zlmb" @newresponselist="newresponse"></input-text>
+				</td>
+				<td class="line_o" style="">安全目标</td>
+				<td class="line_t" style="">
+					<input-text :usercan="usercanedit" :dataalls="responselist" :type="aqmb" @newresponselist="newresponse"></input-text>
+				</td>
+			</tr>
+		</table>
+</div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.9/vue.js"></script>
+<script src="https://cdn.bootcss.com/iview/2.7.3/iview.min.js"></script>
+<!-- <script src="/js/common/introducetable.js"></script> -->
+<script>
+	
+	/**
+	 * format 需要转换的日期格式
+	 **/
+	Date.prototype.format = function(format) {
+	   var date = {
+	        "M+": this.getMonth() + 1,
+	        "d+": this.getDate(),
+	        "h+": this.getHours(),
+	        "m+": this.getMinutes(),
+	        "s+": this.getSeconds(),
+	        "q+": Math.floor((this.getMonth() + 3) / 3),
+	        "S+": this.getMilliseconds()
+	   };
+	   if (/(y+)/i.test(format)) {
+	        format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+	   }
+	   for (var k in date) {
+	        if (new RegExp("(" + k + ")").test(format)) {
+	            format = format.replace(RegExp.$1, RegExp.$1.length == 1
+	                ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+	        }
+	   }
+	   return format;
+	}
+
+	//iput组件
+	var inputText = {
+	    template: `
+	    <Tooltip content="单击编辑" v-if="!edit && usercan" @click.native="focusit()" placement="top-start" class="tooltopbox">
+	        <span class="m-span m-spancursor" v-text="currentValue"></span>
+	    </Tooltip>
+	    <span class="m-span m-spancursor" v-else-if="!usercan" v-text="currentValue"></span>
+	    <div v-else-if="edit && usercan">
+	        <i-input  v-model="currentValue" class="inputText_input" ref="focusinput"/>
+	        <div class="perserveData">
+	            <div @click="perserve">
+	                <Button type="text" icon="checkmark-round"></Button>
+	            </div>
+	            <div @click="cancel">
+	                <Button type="text" icon="close-round"></Button>
+	            </div> 
+	        </div> 
+	    </div>
+	    `,
+	    data() {
+	        return {
+	            edit: false,
+	            currentValue: null,
+	            contentlist:{},
+	        }
+	    },
+	    props: ['dataalls', 'type', 'usercan'],
+	    methods: {
+	        perserve() {
+	            var that = this;
+	            var newurl = this.dataalls.url;
+	            var test =  newurl.split("user");
+	            newurl = "/user"+test[1];
+
+	            //this.contentlist = JSON.parse(this.dataalls.content);
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	            this.contentlist[that.type] = this.currentValue;
+	            this.dataalls.content = JSON.stringify(this.contentlist);
+	            $.ajax({
+	                url:newurl,
+	                type:"PUT",
+	                data: that.dataalls,
+	                success:function(response){
+	                    that.edit = false;
+	                    that.$emit("newresponselist",that.contentlist,that.type);
+	                },
+	                error:function(){
+
+	                }
+	            })
+	            
+	        },
+	        cancel() {
+
+	            this.edit = false;
+	            this.currentValue = this.contentlist[this.type];
+	        },
+	        focusit(){
+	            this.edit=true;
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	            this.$nextTick(function(){
+	                 this.$refs.focusinput.focus();
+	            })
+	           
+	        }
+	    },
+	    watch:{
+	        dataalls(){
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	            this.currentValue = this.contentlist[this.type];
+	        },
+	        usercan(val,old){
+	            if(val == false) {
+	                this.cancel();
+	            }
+	        }
+	        
+	    },
+	    mounted(){
+
+	    }
+
+	}
+
+	//日期选择组件
+
+	var  dataPickers= {
+	    template: `
+	    <Tooltip content="单击编辑" v-if="!edit && usercan" @click.native="focusit()" placement="top-start" class="tooltopbox">
+	        <span class="m-span m-spancursor" v-text="currentValue"></span>
+	    </Tooltip>
+	    <span class="m-span m-spancursor" v-else-if="!usercan" v-text="currentValue"></span>
+	    <div v-else-if="edit && usercan">
+	        <DatePicker v-model="currentValue" type="date" class="inputText_input"></DatePicker>
+	        <div class="perserveData">
+	            <div @click="perserve">
+	                <Button type="text" icon="checkmark-round"></Button>
+	            </div>
+	            <div @click="cancel">
+	                <Button type="text" icon="close-round"></Button>
+	            </div> 
+	        </div> 
+	    </div>
+	    `,
+	    data() {
+	        return {
+	            edit: false,
+	            currentValue: null,
+	            contentlist:{},
+	        }
+	    },
+	    props: ['usercan', 'dataalls', 'type'],
+	    methods: {
+	        perserve() {
+	            var that = this;
+	            var newurl = this.dataalls.url;
+	            var test =  newurl.split("user");
+	            newurl = "/user"+test[1];
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	            // this.contentlist = JSON.parse(this.dataalls.content);
+	            this.contentlist[this.type] = this.currentValue.format("yyyy-MM-dd");
+	            this.dataalls.content = JSON.stringify(this.contentlist);
+	            $.ajax({
+	                url:newurl,
+	                type:"PUT",
+	                data: that.dataalls,
+	                success:function(response){
+	                    that.edit = false;
+	                    that.currentValue = that.contentlist[that.type];
+	                    that.$emit("newresponselist",that.contentlist,that.type);
+	                },
+	                error:function(){
+
+	                }
+	            })
+	            
+	        },
+	        cancel() {
+	            this.edit = false;
+	            this.currentValue = this.contentlist[this.type];
+
+	        },
+	        focusit(){
+	            this.edit=true;
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	        }
+	    },
+	    watch:{
+	        dataalls(){
+	            if(this.dataalls.content != '' && this.dataalls.content != null) {
+	                this.contentlist = JSON.parse(this.dataalls.content);
+	                
+	            }else {
+	                this.contentlist = {};
+	            }
+	            this.currentValue = this.contentlist[this.type];  
+	        },
+	         usercan(val,old){
+	            if(val == false) {
+	                this.cancel();
+	            }
+	        }
+	        
+	    }
+
+	}
+
+	!function () {
+	    initVue();
+
+	}();
+
+
+
+	function initVue() {
+	    
+	    // Vue.component('inputText',inputText);
+	    introtable = new Vue({
+	        el: '#introducetables',
+	        data(){
+	            return {
+	                responselist:null,
+	                INTRO:{
+	                },
+	                PrjName:"PrjName",
+	                address:"address",
+	                GCGS:"GCGS",
+	                XMJL:"XMJL",
+	                PrjId:"PrjId",
+	                KGRQ:"KGRQ",
+	                JGRQ:"JGRQ",
+	                jsdw:"jsdw",
+	                jgsjdw:"jgsjdw",
+	                whsjdw:"whsjdw",
+	                area:"area",
+	                dxarea:"dxarea",
+	                height:"height",
+	                dscs:"dscs",
+	                dxcs:"dxcs",
+	                gczdmj: "gczdmj",
+	                tctz:"tctz",
+	                whjglx:"whjglx",
+	                whzc:"whzc",
+	                zcxs:"zcxs",
+	                jkmj:"jkmj",
+	                zswtsd:"zswtsd",
+	                pjwtsd:"pjwtsd",
+	                zjlb:"zjlb",
+	                zjcd_js:"zjcd_js",
+	                zsjcz:"zsjcz",
+	                jglx:"jglx",
+	                jgzdkd:"jgzdkd",
+	                zlmb:"zlmb",
+	                aqmb: "aqmb",
+	                usercanedit:{{usercanedit}}
+	            }
+	        },
+	        components: {
+	            inputText,
+	            dataPickers
+	        },
+	        created() {
+	            var that = this;
+	            $.ajax({
+	                url: "/user/project/?curProject=True",
+	                type:"GET",
+	                success:function(response) {
+	                    that.responselist = response.results[0];
+	                    if(that.responselist.content != '' && that.responselist.content != null) {
+	                        that.INTRO = JSON.parse(that.responselist.content);
+	                    }else {
+	                        that.INTRO = {};
+	                    }
+	                   
+	                }
+	            })
+	        },
+	        methods:{
+	            newprint(){
+	                var that = this;
+	                this.usercanedit = false;
+
+	                
+	                setTimeout(function(){
+	                    print_excel();
+	                    that.usercanedit = true;
+	                },10);
+	            },
+	            newexport() {
+	                var that = this;
+	                this.usercanedit = false;
+	                
+	                setTimeout(function(){
+	                    export_execl();
+	                    that.usercanedit = true;
+	                },10);
+	            },
+	            newresponse(a,b){
+	                this.INTRO = a;
+	            },
+	            tback() {//清空数据
+
+	                var that = this;
+	                that.responselist.content = '';
+	                var newurl = that.responselist.url;
+	                var test =  newurl.split("user");
+	                newurl = "/user"+test[1];
+	                $.ajax({
+	                    url:newurl,
+	                    type:"PUT",
+	                    data: that.responselist,
+	                    success:function(response){
+	                        console.log(response);
+	                    },
+	                    error:function(){
+
+	                    }
+	                })
+	                }
+	        }
+
+	    })
+	}
+
+	var idTmr;
+	var export_name = "项目概述";
+	var export_tableid = "introtable";
+	function  getExplorer() {
+	    var explorer = window.navigator.userAgent ;
+	    if (explorer.indexOf("MSIE") >= 0) {
+	        return 'ie';
+	    }else if (explorer.indexOf("Firefox") >= 0) {
+	        return 'Firefox';
+	    }else if(explorer.indexOf("Chrome") >= 0){
+	        return 'Chrome';
+	    }else if(explorer.indexOf("Opera") >= 0){
+	        return 'Opera';
+	    }else if(explorer.indexOf("Safari") >= 0){
+	        return 'Safari';
+	    }
+	}
+	function export_execl() {
+
+	    var tableid = export_tableid;
+
+	    if(getExplorer()=='ie')
+	    {
+	        var curTbl = document.getElementById(tableid);
+	        var oXL = new ActiveXObject("Excel.Application");
+	        var oWB = oXL.Workbooks.Add();
+	        var xlsheet = oWB.Worksheets(1);
+	        var sel = document.body.createTextRange();
+	        sel.moveToElementText(curTbl);
+	        sel.select();
+	        sel.execCommand("Copy");
+	        xlsheet.Paste();
+	        oXL.Visible = true;
+	        try {
+	            var fname = oXL.Application.GetSaveAsFilename("Excel.xlsx", "Excel Spreadsheets (*.xlsx), *.xlsx");
+	        } catch (e) {
+	            print("Nested catch caught " + e);
+	        } finally {
+	            oWB.SaveAs(fname);
+	            oWB.Close(savechanges = false);
+	            oXL.Quit();
+	            oXL = null;
+	            idTmr = window.setInterval("Cleanup();", 1);
+	        }
+
+	    }
+	    else
+	    {
+	        tableToExcel(tableid,export_name);
+	    }
+	}
+	function Cleanup() {
+	    window.clearInterval(idTmr);
+	    CollectGarbage();
+	}
+	var tableToExcel = (function() {
+	    var uri = 'data:application/vnd.ms-excel;base64,',
+	            //template = '<html><head><meta charset="UTF-8"><style>td,th{border: 1px solid #ddd;}</style></head><body><table>{table}</table></body></html>',
+	            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"'+
+	                'xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>'
+	                +'<x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets>'
+	                +'</x:ExcelWorkbook></xml><![endif]-->'+
+	                ' <style type="text/css">'+
+	                '.excelTable  {'+
+	                'border-collapse:collapse;'+
+	                 ' border:thin solid #999; '+
+	                '}'+
+	                '.excelTable  th {'+
+	                'border: thin solid #999;'+
+	                'padding:20px;'+
+	                'text-align: center;'+
+	                'border-top: thin solid #999;'+
+	                'background-color: #E6E6E6;'+
+	                '}'+
+	                '.excelTable .line_t {'+
+	                'width:300px'+
+	                '}'+
+	                '.excelTable .line_o {'+
+	                'width:150px'+
+	                '}'+
+	                '.excelTable  td{'+
+	                'border:thin solid #999;'+
+	                'padding:2px 5px;'+
+	                'text-align: left;'+
+	                '}</style>'+
+	                '</head><body ><table class="excelTable">{table}</table></body></html>',
+	            base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) },
+	            format = function(s, c) {
+	                return s.replace(/{(\w+)}/g,
+	                        function(m, p) { return c[p]; }) }
+	    return function(table, name) {
+	        //if (!table.nodeType)
+	        console.log(table);
+	        table = document.getElementById(table);
+	        var ctx = {worksheet:name || 'Worksheet', table: table.innerHTML};
+	        // window.location.href = uri + base64(format(template, ctx))
+	        document.getElementById("exportExcel").href = uri + base64(format(template, ctx));
+	        document.getElementById("exportExcel").download = export_name;
+	        document.getElementById("exportExcel").click();
+	        
+	    }
+	})()
+
+	function print_excel() {
+	            var tableToPrint = document.getElementById('introtable');//将要被打印的表格
+	            $(".line_t").css("width","30%");
+	            var newWin= window.open("");//新打开一个空窗口
+	            newWin.document.write(tableToPrint.outerHTML);//将表格添加进新的窗口
+	            newWin.document.close();//在IE浏览器中使用必须添加这一句
+	            newWin.focus();//在IE浏览器中使用必须添加这一句
+	            newWin.print();//打印
+	            newWin.close();//关闭窗口
+	}
+</script>
+{% endblock %}

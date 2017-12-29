@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<style>
+.form-group{
+	width:70%;
+	text-align:center;
+}
+</style>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container fluid-height clearfix">
+      <div class="heading">
+        <i class="fa fa-user"></i>天气记录
+      </div>
+      <br>
+    <ul class="nav nav-tabs" id="notes_tabs">
+      <li class="active"><a href="#history" data-toggle="tab">天气列表</a></li>
+    </ul>
+	<div id="notes_tabs" class="tab-content">
+		<div class="tab-pane fade in active" id="history">
+		   <form id="tab" class="form-horizontal">
+			  <div class="widget-content padded" style="padding-left:5%">
+			    <table class="table table-striped" >
+			      <thead>
+			        <tr>
+			          <th>记录时间</th>
+					  <th>天气</th>
+					  <th>温度(℃)</th>
+					  <th>编辑</th>
+			          <th style="width: 26px;"></th>
+			        </tr>
+			      </thead>
+			      <tbody>
+			      	{% for each in list_items%}
+						<tr id="tr_{{each.id}}">
+							<td>{{each.created|date:"Y-m-d"}}</td>
+							<td>{{each.weather}}</td>
+							<td>{{each.tmp}}</td>
+							<td>			  
+								<a data-target='#EditWeather' id="{{each.id}}" data-toggle='modal' onClick="refreshEditModal(this.id)"><i class="fa fa-pencil"></i></a>
+							</td>
+						</tr>
+					{% endfor %}
+			      </tbody>
+			    </table>
+				    
+			    <div class="widget-content padded text-center" >
+				    <ul class="pagination pagination-lg" >
+						{% if list_items.has_previous %}
+						<li><a style="font-size:10px;" href="?page={{ list_items.previous_page_number }}">前一页</a></li>
+						{% endif %}
+				        <li><a style="font-size:10px;">第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+						{% if list_items.has_next %}
+				         <li><a style="font-size:10px;" href="?page={{ list_items.next_page_number }}">下一页</a></li>
+						{% endif %}
+				    </ul>
+			    </div>
+		      </div>
+		   </form>
+		</div>
+	</div>
+  </div>
+ </div>
+
+<div class="modal fade" id="EditWeather" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="title-edit" align="center">
+               	更新天气信息
+            </h4>
+         </div>
+         <div class="modal-body">
+        	<div align="center">
+	            <label class="control-label col-md-3" align="center" style="width:100%;">天气：</label>
+	            <textarea class="form-control" cols="15" rows="1" id="weather" style="text-align:center;"></textarea>
+	            <br>
+	            <label class="control-label col-md-3" align="center" style="width:100%;">温度：</label>
+	            <textarea class="form-control" cols="15" rows="1" id="tmp" style="text-align:center;"></textarea>
+	        </div>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+            	返回
+            </button>
+            <button type="button" class="btn btn-primary" id="editBtn">更新</button>
+         </div>
+      </div>
+    </div>
+</div>
+<script type="text/javascript">
+		function refreshEditModal(id){
+			parObj = $("#tr_" + id.toString()).find("td");
+			var weather = parObj[1].firstChild.data;
+			var tmp = parObj[2].firstChild.data;
+
+			$("#weather").html(weather);
+			$("#tmp").html(tmp);
+			$("#editBtn").attr("onclick","editWeather("+ id + ")");
+		}
+        
+        function editWeather(id){
+        	var weather = $("#weather").val();
+        	var tmp = $("#tmp").val();
+
+        	$.ajax({ 
+        	type:"POST",
+            url: "/weather/update/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":id,"weather":weather,"tmp":tmp},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("更新成功!");
+            		self.location='/weather/';
+                }
+                else{
+                	alert("服务器错误，稍后再试.");
+                }    
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+        	
+        
+        }
+
+        
+      
+        
+
+</script>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+	
+{% endblock %}
+
+{% block content %} 
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container label-container fluid-height">
+      <div class="heading">
+        <i class="fa fa-pencil-square-o"></i>个人工作台-任务编辑
+      </div>
+	<form id="tab" action="" method="POST"> {% csrf_token %}
+		<div class="form-group">
+            <label class="control-label col-md-1" align="right">编号：</label>
+            <div class="col-md-2">
+			  <input type="text" class="form-control" name="number"  list="pblist" value="{{number}}">
+				<datalist id="pblist">
+				   {% for item in list_items.object_list %}
+					  <option value="{{item.number}}">
+				   {% endfor %}
+				</datalist>
+            </div>
+            <label class="control-label col-md-1" align="right">位置：</label>
+            <div class="col-md-2">
+               <input type="text" class="form-control" name="postion" value="{{postion}}">
+            </div>
+		   <div class="col-md-3">
+               <button type="submit" class="btn btn-primary" ><i class="icon-search"></i> 查询 </button>
+            </div>
+			<div class="col-md-3">
+               <a href="javascript:PrintPbAll({{task.id}})" class="btn btn-success btn"><i class="fa fa-qrcode"></i>&nbsp&nbsp批量打印&nbsp&nbsp </a>
+            </div>
+          </div>
+	</form>
+                  
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+		  <th>生产批次</th>
+          <th>编号</th>
+		  <th>梁段位置</th>
+		  <th>结束时间</th>
+		  <th>操作</th>
+          <th style="width: 26px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% for item in list_items.object_list %}
+        <tr>
+		  <td>{{item.id}}</td>
+          <td>{{item.number}}</td>
+		  <td>{{item.postion}}</td>
+		  <td>{{item.task.planfinish|date:"Y-m-d"}}</td>
+          <td>
+			  <a href="javascript:DialogViewQrcode({{item.id}});">打印二维码 <i class="icon-qrcode"></i></a>
+          </td>
+        </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+
+</div>  
+<div class="widget-content padded text-center" >
+    <ul class="pagination pagination-lg">
+		{% if list_items.has_previous %}
+		<li><a href="?page={{ list_items.previous_page_number }}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+		{% if list_items.has_next %}
+         <li><a href="?page={{ list_items.next_page_number }}">下一页</a></li>
+		{% endif %}
+    </ul>
+</div>
+
+
+<script type="text/javascript" language="javascript"> 
+	function DialogViewQrcode(id) { 
+	    var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+        
+		if(window.ActiveXObject)
+		{ //IE  
+			 var dlgResult = window.showModalDialog("/task/precastbeam/printqrcode/?pbid="+id, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		}
+		else
+		{  //非IE  
+			window.open("/task/precastbeam/printqrcode/?pbid="+id, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+		} 		
+    } 
+	
+	function PrintPbAll(taskid)
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+        //var dlgResult = window.showModalDialog("/task/precastbeam/printqrcode/?taskid="+taskid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		if(window.ActiveXObject)
+		{ //IE  
+			 var dlgResult = window.showModalDialog("/task/precastbeam/printqrcode/?taskid="+taskid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		}
+		else
+		{  //非IE  
+			window.open("/task/precastbeam/printqrcode/?taskid="+taskid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+		} 	
+	}
+	
+</script>
+
+
+ </div>
+</div>
+
+{% endblock %}
+

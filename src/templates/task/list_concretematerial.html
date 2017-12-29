@@ -1,0 +1,104 @@
+{% extends "base.html"  %}
+{% include 'baseuser.html' %}
+{% block content %} 
+<script src="/js/commonopr.js" type="text/javascript"></script>
+		
+<div class="row">
+ <div class="col-lg-12">
+ <div class="widget-container fluid-height clearfix">
+<div class="widget-content padded">
+<form id="tab" action="" method="get"> {% csrf_token %}
+
+		<div class="form-group">
+			{{ form.name.errors }}
+            <label class="control-label col-md-2" align="right">混凝土批次号：</label>
+            <div class="col-md-4">
+			  <input type="text" class="form-control" name="number" value="{{number}}">
+            </div>
+            <div class="col-md-6">
+				<button type="submit" class="btn btn-primary" ><i class="fa fa-search"></i> 查询 </button>
+            </div>
+          </div>
+	</form>
+</div>
+</div>   
+</div>   
+</div>             
+
+<div class="row">
+<div class="col-lg-12">
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped" >
+      <thead>
+        <tr>
+		  <th>混凝土批次号</th>
+          <th>材料批次号</th>
+		  <th>内容</th>
+		  <th>录入人</th>
+		  <th>强度校验报告</th>
+		  <th>操作</th>
+          <th style="width: 26px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+	  {% for item in list_items.object_list %}
+			<tr>
+			  <td rowspan="6">{{item.id}}</td>
+			  <td>{{item.cement}}</td>
+			  <td>水泥</td>
+			  <td rowspan="6">{{item.creator}}</td>
+			  <td rowspan="6"><a href="{{item.testreport.content}}">{{item.testreport.name}}</a></td>
+			  <td rowspan="6">
+				  <a href="javascript:void(0)" onclick="DialogConcretTrace({{item.id}});">[追踪<i class="fa fa-search-plus"></i>]</a>
+				  <a href="/task/concretematerial/upload/{{item.id}}" >[添加<i class="fa fa-paperclip"></i>]</a>
+				  <a href="/task/concretematerial/attach/{{item.id}}" >[查看<i class="fa fa-paperclip"></i>]</a>
+			  </td>
+			</tr>
+			<tr>
+			  <td>{{item.stone}}</td>
+			  <td>碎石</td>
+			</tr>
+			<tr>
+			  <td>{{item.sand}}</td>
+			  <td>砂石</td>
+			</tr>
+			<tr>
+			  <td>{{item.mineralpowder}}</td>
+			  <td>矿粉</td>
+			</tr>
+			<tr>
+			  <td>{{item.coaldust}}</td>
+			  <td>粉煤灰</td>
+		   </tr>
+		   <tr>
+			  <td>{{item.other}}</td>
+			  <td>其他</td>
+		   </tr>
+	   {% endfor %}
+      </tbody>
+    </table>
+</div>
+<div class="widget-content padded text-center" >
+	 <ul class="pagination pagination-lg">
+    	<li><a href="?page=1&number={{number}}">首页</a></li>
+		{% if list_items.has_previous %}	
+			<li><a href="?page={{ list_items.previous_page_number }}&number={{number}}">前一页</a></li>
+		{% endif %}
+        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+		{% if list_items.has_next %}
+         <li><a href="?page={{ list_items.next_page_number }}&number={{number}}">下一页</a></li>
+		{% endif %}
+		<li><a href="?page={{paginator.num_pages}}&number={{number}}">尾页</a></li>
+		
+    </ul>
+</div>
+
+
+ </div>
+</div>
+
+	
+
+{% endblock %}
+
+

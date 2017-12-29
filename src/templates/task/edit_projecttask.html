@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block ownerhead %} 
+<link rel="stylesheet" href="/css/style.min.css" />
+ <script src="/js/jstree.min.js"></script>
+  <script src="/js/datastruct.js"></script>
+  <script src="/js/taskselect.js"></script>
+<script type="text/javascript">
+
+$(function () {
+    // 6 create an instance when the DOM is ready
+	$('#jstree').jstree({
+		"core" : {'data' : {
+		      'url' : '/task/precastbeam/tree/',
+		      'data' : function (node) {
+					return { 'id' : node.id };
+			}
+		  }
+		},
+		"plugins" : [ "themes", "html_data" ,"checkbox","search" ] 
+		});
+});
+
+  
+$(document).ready(function(){
+	$("#btnReleatePbs").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbAddSignRow(pbs);
+	});
+	
+	$("#btnCancle").click(function(){
+		ref = $('#jstree').jstree(true);
+		pbs = ref.get_selected();
+		PbDeleteUnSelect(pbs);
+	});
+});
+
+
+
+</script>
+{% endblock %}
+
+
+{% block content %} 
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container label-container fluid-height">
+      <div class="heading">
+        <i class="fa fa-tags"></i>编辑任务-基本信息
+      </div>
+<fieldset style="width:100%; height:5%;padding:2%;padding-left:0; padding-top:1%;">
+		{% if task %}
+			<style type="text/css">
+				.taskInfo {
+					font-size:14px;
+					width:150px;
+					margin-left:0px;
+					text-align:right;
+					display:inline-block;
+					color:#999999;
+					
+				}
+				.taskVal{
+					margin-left:10px;
+					width:100px;
+					font-size:14px;
+					display:inline-block;
+				}
+				.taskValdate{
+					margin-left:10px;
+					width:100px;
+					font-size:14px;
+					display:inline-block;
+				}
+			
+			</style>
+			<div class=taskInfo>生产批次：</div><span class="taskVal" style="text-decoration:none;">{{task.id}} </span>
+			<div class=taskInfo>任务下达人：</div><span class="taskVal">{{task.creator.truename}}</span>
+			<div class=taskInfo  align="right">材料负责人：</div><span class="taskVal">{{task.material.truename}}</span>
+			<div class=taskInfo  align="right">计划梁段数量：</div><span class="taskVal" style="font-weight:bold;">{{pbplan}}</span>
+			<br></br>
+			<div class=taskInfo  align="right">技术负责人：</div><span class="taskVal">{{task.technology.truename}}</span>
+			{% if task.actualstart %}
+				<div class=taskInfo  nowrap align="right">启动时间：</div><span class="taskValdate">{{task.actualstart|date:"Y-m-d"}}</span>
+			{%else%}	
+				<div class=taskInfo nowrap align="right">任务创建时间：</div><span class="taskValdate">{{task.planstart|date:"Y-m-d"}}</span>
+			{%endif%}	
+			{% if task.actualfinish %}
+				<div class=taskInfo  nowrap align="right">出厂时间：</div ><span class="taskValdate">{{task.actualfinish|date:"Y-m-d"}}</span>
+			{%else%}	
+				<div class=taskInfo  nowrap align="right">任务结束时间：</div><span class="taskValdate">{{task.planfinish|date:"Y-m-d"}}</span>
+			{%endif%}	
+			<div class=taskInfo  align="right" >完成梁段数量：</div><span class="taskVal" style="font-weight:bold;">{{pbfinish}}</span>
+		{% endif %}
+</fieldset>	
+</div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container fluid-height clearfix">
+      <div class="heading">
+        <i class="fa fa-plus-square"></i>编辑任务-关联梁段
+      </div>
+	  <div class="widget-content padded">
+    {% if form.errors %}
+        <p style="color: red;">
+            请修改以下错误再次提交！
+        </p>
+    {% endif %}
+    <form id="tab" action="" method="POST"> {% csrf_token %}
+		<table border="0" cellpadding="2" cellspacing="1" style="width:100%">
+		<tr>
+			<td style="width:10%" align="right" valign="top">
+			<a href="#" class="btn btn-success btn" data-toggle="modal" data-target="#update"><i class="fa fa-plus"></i>添加梁段</a>
+			</td>
+			<td align="left" style="width:60%">
+				<table class="table" id="RelatePbItem">
+						<tr >
+						<td colspan="2" style="height:20px;" ><h3 style="text-align:center; margin:0;">关联梁段</h3></td>
+						</tr>
+						<tr id="tr1" >
+							<td >编号 </td>	 					
+							<td align='left' >编辑(状态)</td>							
+						</tr>
+						{% if list_items %}
+							{% for item in list_items %}
+							<tr>
+							  <td>{{item.number}}</td>
+							{% ifequal item.status_id 1 %}
+								<td>{{item.status}}<a id={{item.id}} onclick="delProjectPB(this.id)" title="删除关联梁段" style="cursor:pointer;" >[删除关联<i class="glyphicon glyphicon-remove"></i>]</a></td>
+							{% else %}
+								<td>{{item.status}}</a></td>
+							{% endifequal %}
+							</tr>
+							{% if forloop.last %} 
+								<input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value={{pbcount}} />
+							{% endif %}
+						   {% endfor %}
+						{% else %}
+							<input name='PbTRLastIndex' type='hidden' id='PbTRLastIndex' value="1" />
+					   {% endif %}
+				</table>
+		</td>
+		</tr>
+		<input name='PbSelected' type='hidden' id='PbSelected' value="" />
+	</table>
+ </div>
+	  <div class="btn-toolbar" align="right">
+    <button type="submit" class="btn btn-primary" ><i class="fa fa-save"></i> 保存修改 </button>
+    <a class="btn btn-default btn" onclick="javascript:history.back(1)" > 返回</a>
+</div>
+  </div>
+
+</div>
+
+
+  </form>
+		
+		
+
+	<div class="modal fade" id="update" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <a>选择梁段</a>
+            </div>
+            <div class="modal-body" style="overflow:scroll;min-height:100px;max-height:300px;">
+				  <div id="jstree" >
+					<!-- the tree is populated from inline HTML -->
+				  </div>
+            </div>
+            <div class="modal-footer">
+				<input type="text" value="" id="search_pb" onkeyup="searchFunction()" placeholder="搜索" />
+                <a class="btn btn-default btn" role="button"  id="btnCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnReleatePbs" data-dismiss="modal" aria-hidden="true">确定</button>
+            </div>
+    </div>
+    </div>
+    </div>
+		
+				
+        </div>
+    </div>
+	
+	<script type="text/javascript">
+	function delProjectPB(id){
+		var delID=id;
+		if(confirm("确认删除关联梁段吗？")){
+        	$.ajax({ 
+        	type:"POST",
+            url: "projecttask/deleteRelatedPB/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":delID},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("删除成功!");
+            		location.reload();
+                }
+                else{
+                	alert("删除不了,服务器问题！");
+                }
+                
+                
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+	    }
+        
+    };
+</script>
+
+{% endblock %}

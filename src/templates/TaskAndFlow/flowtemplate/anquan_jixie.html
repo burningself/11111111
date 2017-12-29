@@ -1,0 +1,392 @@
+{% extends "base.html" %} 
+
+{% block ownerhead %}
+
+<link rel="stylesheet" href="/js/web3d/style.css" type="text/css">
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script src="/js/web3d/viewer3D.js"></script>
+<script src="/js/web3d/three.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+
+{% endblock %} 
+
+{% block content %}、
+<style type="text/css">
+body{overflow-x:hidden;}
+td{text-align:center;}
+.main-content{margin-top:75px;}
+#left {width:200px;  height:calc(100vh - 95px); display:inline-block; background:white;}
+#right {width:200px; height:calc(100vh - 95px); display:inline-block; background:white;}
+#viewerContent{ width: calc(100% - 400px); height:calc(100vh - 95px); display:inline-block; border:solid 1px#ddd; }
+#viewer{width:100%; height:calc(100vh - 97px); }
+
+.panel-group {padding:5px 10px;}
+.panel-group .panel{border:none;}
+.panel-group .panel-heading{background: #337AB7; color:white; font-weight:bold;}
+.panel-group .panel-heading .caret {float:none!important; margin-left:10px; }
+.panel-group .panel-body{background: white; padding:5px 5px; text-align:left; }
+
+.more{font-size:10px; font-weight:normal; position:absolute; text-decoration:underline;right:20px;}
+
+.left-control{position: absolute;
+    top: 50%;
+    left: 200px;
+    z-index: 1500;
+    margin-top: -30px;
+    padding: 12px 3px;
+    padding-left:1px;
+    font-size: 26px;
+    height: 60px;
+    border: solid 1px #ddd;
+    border-left: 0px;
+    border-top-right-radius:5px;
+    border-bottom-right-radius:5px;
+    background: white;
+    color:black;
+}
+
+.right-control{position: absolute;
+    top: 50%;
+    right: 200px;
+    z-index: 1500;
+    margin-top: -30px;
+    padding: 12px 3px;
+    padding-right:1px;
+    font-size: 26px;
+    height: 60px;
+    border: solid 1px #ddd;
+    border-right: 0px;
+    border-top-left-radius:5px;
+    border-bottom-left-radius:5px;
+    background: white;
+    color:black;
+}
+
+.right-control:hover,.left-control:hover{
+	color:black;
+}
+
+.newIssue{position:fixed; bottom:150px; right:60px;
+	height:80px; width:80px; border-radius: 50px;
+	background:#a94442; color:white; font-weight:bold; font-size:22px;outline:none;
+}
+
+.newIssue:active{border:none;}
+
+footer{display:none;}
+
+</style>
+<div style="margin-top: -3px; height:calc(100vh - 140px);">
+	<div id="left" class="pull-left" >
+		<div class="col-lg-12" style="overflow-y:auto; padding:0px;">
+            <div class="panel-group" id="accordion">
+             <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+                      	空间结构</a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse in" id="collapseOne">
+                  <div class="panel-body">
+					 <div id="jstree_div_jixie" style="max-height:400px; overflow-x:auto;"> </div>
+                  </div>
+                </div>
+              </div>
+			  <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseThree">
+                      <span>状态查看</span></a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseThree">
+                  <div class="panel-body">
+						<label class="control-label" align="right">状态：</label>
+						<div>
+								<select name="pbstatussel" id="pbstatussel" class="form-control">
+								{% for status in cm_status_list %}
+									{% ifequal status.id pbstatus %}
+										<option value="{{status.id}}" selected>{{status.statusname}}</option>
+									{% else %}
+										<option value="{{status.id}}">{{status.statusname}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+						</div>
+						  <div class="form-group">
+						 <label class="control-label"  for="timerange">时间段：</label>
+						 <div class="input-group">
+						 	 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						 	 <input type="text" name="timerange"  value="{{timerange}}" id="timerange" class="form-control" onMouseOver="this.title=this.value"/>
+						 </div><br>
+						  <button style="margin-left:10px;" id="btnPbsearch" name="btnPbsearch" class="btn btn-primary model-from" ><i class="fa fa-search"></i> 查看 </button>
+						  <button id="btnRestore" name="btnRestore" class="btn btn-success model-from" ><i class="fa fa-refresh"></i> 恢复</button>
+						  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+	</div>
+	<div class="left-control"> <i class="fa fa-caret-left"></i> </div>
+	<div id="right" class="pull-right">
+		<div class="panel-group" id="itemSection">
+            <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="itemSection-toggle" data-parent="#itemSection2" data-toggle="collapse" href="#issue_list">
+                      	机械问题</a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse in" id="issue_list">
+                  <div class="panel-body">
+					 <table class="table">
+
+					 </table>
+                  </div>
+                </div>
+            </div>
+			<div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="itemSection-toggle" data-parent="#itemSection3" data-toggle="collapse" href="#cm_list">
+                      	机械待检</a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse in" id="cm_list">
+                  <div class="panel-body">
+					 <table class="table">
+					 	{% for eachItem in cm_list %}
+					 	<tr>
+						 	<td style="width:50%;"><a href="/task/issue/read/{{eachItem.id}}/" target="_blank" >{{eachItem.name}}</a></td>
+						 	<td style="background:red; color:ghostwhite; cursor:pointer; " title="点击处理">
+						 		<a onclick="dealIssue(3,{{eachItem.id}},this)" href="/task/issue/biaodan3/" target="_blank" style="color:white;">待检</a>
+						 	</td>
+					 	</tr>
+					 	{% endfor %}
+					 </table>
+                  </div>
+                </div>
+            </div>
+        </div>
+		<button class="newIssue" onclick="location.href='/task/anquan/jixie/list/'">机械<br>管理</button>
+	</div>
+	<div class="right-control"> <i class="fa fa-caret-right"></i> </div>
+	<div id="viewerContent" >
+		<div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+			<div id="viewer">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="form-group">
+	<textarea class="form-control"  name="sqllist" id="sqllist" rows="100" style="display:none"></textarea>
+</div>
+
+<script type="text/javascript" src="/js/common/filerelate.js" ></script>
+<script src="js/datastruct.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.Sample/Autodesk.ADN.Viewing.Extension.Sample.js"></script>
+<script src="js/web3d/scripts/LoadModel.js"></script>
+<script src="js/web3d/scripts/getObjectTree_sheshi.js"></script>
+
+<script type="text/javascript">    
+	var flagLeft=true;
+	var flagRight=true;
+	$(".left-control").click(function(){
+		if(flagLeft){
+			$("#left").animate({marginLeft:"-200px"},800);
+			$(".left-control").html("<i class='fa fa-caret-right'></i>");
+			$(".left-control").animate({left:"0px"},800);
+			$("#viewerContent").animate({width: $("#viewerContent").width()+202},800);
+			flagLeft=false;
+		}else{
+			$("#viewerContent").animate({width: $("#viewerContent").width()-198},800);
+			$("#left").animate({marginLeft:"0px"},800);
+			$(".left-control").html("<i class='fa fa-caret-left'></i>");
+			$(".left-control").animate({left:"200px"},800);
+			
+			flagLeft=true;
+		}
+	})
+	
+	$(".right-control").click(function(){
+		if(flagRight){
+			$(".more").css("display","none");
+			$("#right").animate({marginRight:"-200px"},800);
+			$(".right-control").html("<i class='fa fa-caret-left'></i>");
+			$(".right-control").animate({right:"0px"},800);
+			$("#viewerContent").animate({width: $("#viewerContent").width()+202},800);
+			flagRight=false;
+		}else{
+			$("#viewerContent").animate({width: $("#viewerContent").width()-198},800);
+			$("#right").animate({marginRight:"0px"},800);
+			$(".right-control").html("<i class='fa fa-caret-right'></i>");
+			$(".right-control").animate({right:"200px"},800);
+			$(".more").css("display","inline-block");
+			
+			flagRight=true;
+		}
+	})
+
+    $(document).ready(function() {
+		$('#timerange').daterangepicker({
+	     ranges: {
+                '今天': [moment(), moment()],
+                '昨天': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                '最近7天': [moment().subtract('days', 6), moment()],
+                '最近30天': [moment().subtract('days', 29), moment()],
+                '本月': [moment().startOf('month'), moment().endOf('month')],
+                '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+            },
+        locale : {
+                   applyLabel : '确定',
+                   cancelLabel : '取消',
+                   fromLabel : '起始时间',
+                   toLabel : '结束时间',
+                   customRangeLabel : '自定义',
+                   daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                   monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',
+                       '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                   firstDay : 1
+               },
+		});
+		
+		initialize();
+		LoadAllCustomTrees();
+		
+    });
+
+	function initialize() {
+		var options = {
+			'document': "http://cocc.bimsheng.com/js/web3d/jinying_model/T2/Resource/____/_3D_/_3D_.svf",
+			'env': 'Local'
+		};
+
+		var viewerElement = document.getElementById('viewer');
+
+		//		    viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {});
+		viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {
+			extensions: ['BasicExtension']
+		});
+
+		Autodesk.Viewing.Initializer(options, function() {
+			viewer.start();
+			//					viewer.initialize();
+			viewer.load(options.document);
+			//					viewer.start();
+			//					loadDocument(viewer, options.document);
+		});
+
+	}
+		function PrintPbQrcode()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function TracePbStatus()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/trace/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/trace/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	
+	function PrintPbQrcode2()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(selPbtypes.length>0 || selElevations.length>0)
+		{
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function changepage2Page(page){
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,},
+			  success: function(data){
+				$("#pbtable tbody").html(data.pblist);
+				$("#pagebar").html(data.pageinfo);
+			  }
+		});
+	}
+	
+	
+    function changepage2PageStatus(page){
+			var pbstatus=$("#pbstatussel").val();
+			var timerange=$("#timerange").val();
+	
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist2",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,"pbstatus": pbstatus,"timerange":timerange},
+			  success: function(data){
+				if(data.issuc=="true")
+				{
+					$("#pbtable tbody").html(data.pblist);
+					$("#pagebar").html(data.pageinfo);
+				}
+				else
+				{
+					alert(data.error);
+				}
+			  }
+		});
+	}
+
+	
+	function changefunction()
+	{
+		var str="";
+        $("input[type='radio'][name='pbcheck']:checked").each(function(){ 
+             str = $(this).val();
+			 _viewer.select(parseInt(str));
+        })
+	}
+</script>
+
+
+{% endblock %}

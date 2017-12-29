@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>
+			智慧建造平台
+		</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="/css/bootstrap/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+		<link href='/css/bootstrap/bootstrapValidator.css' rel='stylesheet' />
+		<link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+		<link href="/css/project/base_web.css?version=(2017-08-27)" media="all" rel="stylesheet" type="text/css" />
+		<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+		<link rel="shortcut icon" href="/images/ico/title.ico" type="image/x-icon">
+		<link href="../static/css/loaders.css" rel="stylesheet" type="text/css" />
+
+		<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+		<script src="/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+		<script src="/js/common/base.js?version=1.1(2016-06-17)" type="text/javascript"></script>
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<script type="text/javascript" src='/js/bootstrap/bootstrapValidator.js'></script>
+		
+		<link href="/js/customalert/customalert.css" media="all" rel="stylesheet" type="text/css" />
+		<script src="/js/customalert/customalert.js" type="text/javascript"></script>
+		<link href="/js/zeroModal/css/zeroModal.css" media="all" rel="stylesheet" type="text/css" />
+		<script src="/js/zeroModal/zeroModal.min.js" type="text/javascript"></script>
+
+		
+		{% block ownerhead %} {% endblock %}
+	</head>
+	<style type="text/css">
+		.navbar .nav > li .dropdown-menu {
+			margin: 0;
+		}
+
+		.navbar .nav > li:hover .dropdown-menu {
+			display: block;
+		}
+		select {
+			/*统一边框*/
+			border: solid 1px #000;
+			/*将默认的select选择框样式清除*/
+			appearance: none;
+			-moz-appearance: none;
+			-webkit-appearance: none;
+			/*替换选择框的最右侧显示小箭头图片*/
+			background: url("/images/select.png") no-repeat scroll right center transparent;
+			/*为下拉小箭头留出一点位置，避免被文字覆盖*/
+			padding-right: 22px;
+		}
+		/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+
+		select::-ms-expand {
+			display: none;
+		}
+		
+		.user-image {
+		    float: left;
+		    width: 30px;
+		    height: 30px;
+		    border-radius: 50%;
+		    margin-right: 10px;
+		    margin-top: -2px;
+		}
+	</style>
+
+	<body class="page-header-fixed bg-1">
+		<div class="modal-shiftfix">
+			<!-- Navigation -->
+			<div class="navbar navbar-fixed-top scroll-hide">
+				<div class="container-fluid top-bar">
+					<span><img id="titleimg" style="height: 45px;padding-left: 5px;margin-top:-3px;}" src=""/></span>
+					<div class="pull-right">
+						<ul class="nav navbar-nav pull-right">
+							<i class="fa fa-th-large" style="font-size:15px; "></i>
+							<div class="prochoose">
+								<select class="proselector selectpicker">
+								</select>
+							</div>
+							<li class="dropdown user hidden-xs pull-right">
+								<div style="padding-top: 7px;min-width: 120px;" data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">
+									<img src="/images/avatar.png" class="user-image" /> <span id="username" class="{{user.name}}" style="">{{user.truename}} </span>
+								</div>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="#">
+											<img src="/images/base/icon_2.png">消息提醒</a>
+									</li>
+									<li>
+										<a href="/user/">
+											<img src="/images/base/icon_5.png">账户设置</a>
+									</li>
+									<li>
+										<a href="/logout/">
+											<img src="/images/base/quit.png">退出系统</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<!--<a class="brand" href="/"><span class="icon-bar"><img src="/images/base/title.png" title="微信二维码" alt="微信二维码"/></span></a>-->
+				</div>
+				<div class="container-fluid main-nav clearfix">
+					<div class="nav-collapse" style="font-family:'微软雅黑';">
+						<ul class="nav" style="margin-top: 8px;" id="navigation">
+							<div class="loader">
+								<div class="loader-inner ball-pulse">
+									<div style="background-color: white"></div>
+									<div style="background-color: white;"></div>
+									<div style="background-color: white;"></div>
+								</div>
+							</div>
+						</ul>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- End Navigation -->
+			<div class="container-fluid main-content">
+				{% block content %} {% endblock %}
+			</div>
+
+			<footer style="padding: 20px 0 0 0;">
+				<div class="footer02" style=" text-align:center;">
+					<p class="footer_text">Copyright @ 2015-2025 <span id="development_units">上海筑众信息科技有限公司</span>，All rights reserved. <a href="# " target="_blank">沪ICP备 </a></p>
+				</div>
+			</footer>
+			<div class="qrcode">
+				<img src="/images/base/qrcode.jpg" />
+			</div>
+
+		</div>
+		<script type="text/javascript">
+			$(document).ready(function() {
+					$.ajax({
+					type: "get",
+					url: "/xadmin/prjconfig/baseinfo/",
+					async: true,
+					//cache:false,
+					success: function(data) {
+						document.title=data.project_title;
+						$("#titleimg").attr('src',data.logo); 
+						$("#development_units").html(data.development_units);
+					},
+					error: function(data) {
+						console.log("错误");
+					}
+				});
+				
+				$.ajax({
+					type: "get",
+					url: "/xadmin/navigat/prjmenujson/",
+					async: true,
+					//cache:false,
+					success: function(data) {
+						for (var i in data.menulist) {
+							var tmp = "<li class='dropdown'>"
+							tmp += "<a data-hover='dropdown' class='dropdown-toggle' href='"
+							tmp += data.menulist[i].url
+							tmp += "'><p class='dropdowntext_"
+							tmp += i
+							tmp += "' style='font-size:2.1vh;'>"
+							tmp += data.menulist[i].name
+							tmp += "</p></a>"
+							tmp += "<ul class='dropdown-menu menu_"
+							tmp += i
+							tmp += "'>"
+							tmp += "</ul>"
+							tmp += "</li>"
+							$("#navigation").append(tmp);
+							if (data.menulist[i].submenu == undefined || data.menulist[i].submenu.length == 0) {
+								$(".menu_" + i).remove();
+							} else {
+								for (var j in data.menulist[i].submenu) {
+
+									if(typeof data.menulist[i].submenu[j].url=="undefined"){
+										continue;
+									}
+
+									var tmp = "<li class='menutext_"
+									tmp += j
+									tmp += "'>"
+									tmp += "<a href='"
+									tmp += data.menulist[i].submenu[j].url
+									tmp += "' style='color:"
+									tmp += data.menulist[i].submenu[j].color
+									tmp += ";'>"
+									tmp += "<i class='"
+									tmp += data.menulist[i].submenu[j].icon
+									tmp += "'></i>"
+									tmp += data.menulist[i].submenu[j].name
+									tmp += "</a></li>"
+									$(".menu_" + i).append(tmp);
+								}
+							}
+							$(".loader").hide();
+						}
+						$('.dropdown').click(function() {
+							var obj = this;
+							$('.dropdown').each(function(index, nvaObj) {
+								if (obj === nvaObj) {
+									sessionStorage.setItem("current_nav_li", index);
+								}
+							});
+						});
+						var index = sessionStorage.getItem("current_nav_li");
+						if (index) {
+							$($(".dropdown")[index]).addClass("current");
+						} else {
+							$($(".dropdown")[0]).addClass("current");
+						}
+					},
+					error: function(data) {
+						console.log("错误");
+					}
+				});
+			});
+		</script>
+	</body>
+<div class="pro-loading" style="
+	display:none;
+	position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    background-color: rgba(41, 41, 41, 0.92);
+    z-index: 100001;
+    opacity: 0.5;
+    text-align: center;
+    padding-top: 20%;">
+	<img src="/images/loading.gif" width="50px" />
+</div>
+</html>

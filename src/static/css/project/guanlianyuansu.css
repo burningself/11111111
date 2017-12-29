@@ -1,0 +1,67 @@
+	.guanlianyuansuTab{
+		overflow:auto;
+	}
+	.left_panel{
+		float: left;
+	    width: 46%;
+	    margin: 1%;
+	}
+	
+	.left_panel .onlytree{
+	    width: 100%;
+	    border: 1px solid darkgrey;
+	    overflow: auto;
+	    height: 422px;
+	    text-align: left;
+	}
+	
+	.left_panel .toptree{
+	    width: 100%;
+	    border: 1px solid darkgrey;
+	    overflow: auto;
+	    height: 200px;
+	    text-align: left;
+	}
+	
+	.left_panel .bottomlist{
+	    width: 100%;
+	    border: 1px solid darkgrey;
+	    overflow: auto;
+	    height: 200px;
+	    text-align: left;
+	    margin-top: 22px;
+	}
+	
+	.middle_panel{
+		float: left;
+		width: 4%;
+		height: 422px;
+		padding-top: 175px;
+    	font-size: 25px;
+	}
+	
+	.right_panel{
+		float: left;
+	    width: 46%;
+		margin: 1%;
+	}
+	.right_panel select{
+		width: 100%;
+		height: 422px;
+	}
+
+#guanlianyuansumajor{
+	margin-top: 5px;
+	margin-right: 15px;
+	line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}

@@ -1,0 +1,395 @@
+{% extends "base.html" %} 
+
+{% block ownerhead %}
+
+<link rel="stylesheet" href="/js/web3d/style.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/bootstrap-treeview/bootstrap-treeview.min.css" />
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<script src="/js/web3d/viewer3D.js"></script>
+<script src="/js/web3d/three.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/bootstrap-treeview/bootstrap-treeview.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+
+{% endblock %} 
+
+{% block content %}、
+<style type="text/css">
+.main-content{margin-top:114px;}
+#left {width:200px;  height:calc(100vh - 140px); display:inline-block; background:white;}
+#right {width:200px; height:calc(100vh - 140px); display:inline-block; background:white;}
+#viewerContent{ width: calc(100% - 400px); height:calc(100vh - 140px); display:inline-block; border:solid 1px#ddd; }
+#viewer{width:100%; height:calc(100vh - 142px); }
+
+.panel-group {padding-top:0px;}
+.panel-group .panel{border:none;}
+.panel-group .panel-heading{background: darkseagreen; }
+.panel-group .panel-heading .caret {float:none!important; margin-left:10px;}
+.panel-group .panel-body{background: honeydew; padding:5px 0px;}
+
+
+.left-control{position: fixed;
+    top: 50%;
+    left: 200px;
+    height: 30px;
+    z-index: 1500;
+    margin-top: -25px;
+    padding: 8px 0px;
+    padding-right:2px;
+    font-size: 25px;
+    height: 50px;
+    border: solid 1px #ddd;
+    border-left: 0px;
+    border-top-right-radius:5px;
+    border-bottom-right-radius:5px;
+    background: white;
+}
+
+.right-control{position: fixed;
+    top: 50%;
+    right: 200px;
+    height: 30px;
+    z-index: 1500;
+    margin-top: -25px;
+    padding: 8px 0px;
+    padding-left:2px;
+    font-size: 25px;
+    height: 50px;
+    border: solid 1px #ddd;
+    border-right: 0px;
+    border-top-left-radius:5px;
+    border-bottom-left-radius:5px;
+    background: white;
+}
+
+footer{display:none;}
+
+</style>
+<div style="margin-top: -3px; height:calc(100vh - 140px);">
+	<div id="left" class="pull-left" >
+		<div class="col-lg-12" style="overflow-y:auto; padding:0px;">
+            <div class="panel-group" id="accordion">
+              <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+                      	空间结构<div class="caret pull-right"></div></a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse in" id="collapseOne">
+                  <div class="panel-body">
+					 <div id="jstree_div" style="max-height:400px; overflow-x:auto;"> </div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">
+                      <span>构件类型</span><div class="caret pull-right"></div></a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseTwo">
+                  <div class="panel-body">
+					 <div id="jstree_div_pbtype" style="max-height:400px; overflow-x:auto;"> </div>
+                  </div>
+                </div>
+              </div>
+			  
+			  <div class="panel">
+                <div class="panel-heading">
+                  <div class="panel-title">
+                    <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseThree">
+                      <span>状态查看</span><div class="caret pull-right"></div></a>
+                  </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseThree">
+                  <div class="panel-body">
+						<label class="control-label" align="right">状态：</label>
+						<div>
+								<select name="pbstatussel" id="pbstatussel" class="form-control">
+								{% for status in PBStatusChoices %}
+									{% ifequal status.id pbstatus %}
+										<option value="{{status.id}}" selected>{{status.statusname}}</option>
+									{% else %}
+										<option value="{{status.id}}">{{status.statusname}}</option>
+									{% endifequal %}
+								{% endfor %}
+							</select>
+						</div>
+						  <div class="form-group">
+						 <label class="control-label"  for="timerange">时间段：</label>
+						 <div class="input-group">
+						 	 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+						 	 <input type="text" name="timerange"  value="{{timerange}}" id="timerange" class="form-control" onMouseOver="this.title=this.value"/>
+						 </div>
+						  <button id="btnPbsearch" name="btnPbsearch" class="btn btn-primary model-from" ><i class="fa fa-search"></i> 查看 </button>
+						  <button id="btnRestore" name="btnRestore" class="btn btn-success model-from" ><i class="fa fa-refresh"></i> 恢复</button>
+						  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+	</div>
+	<div class="left-control"> <i class="fa fa-caret-left"></i> </div>
+	<div id="right" class="pull-right">
+		<div>
+			<button class="btn btn-primary">发起问题</button>
+			<button class="btn btn-primary">整改单</button>
+		</div>
+		<table class="table">
+			<div class="title">
+				<h4 style="color: black;">安全问题</h2>
+				<hr>
+			</div>
+			<thead>
+				<tr>
+					<th>
+						编号
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<td>
+						1
+					</td>
+					<td>
+						已处理
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table">
+			<div class="title">
+				<hr>
+				<h4 style="color: black;">待检事务</h2>
+				<hr>
+			</div>
+			<thead>
+				<tr>
+					<th>
+						构件编号
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<td>
+						1
+					</td>
+					<td>
+						安装完成
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table">
+			<div class="title">
+				<hr>
+				<h4 style="color: black;">危险源列表</h2>
+				<hr>
+			</div>
+			<thead>
+				<tr>
+					<th>
+						构件编号
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="success">
+					<td>
+						1
+					</td>
+					<td>
+						安装完成
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+	</div>
+	<div class="right-control"> <i class="fa fa-caret-right"></i> </div>
+	<div id="viewerContent" >
+		<div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+			<div id="viewer">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="form-group">
+	<textarea class="form-control"  name="sqllist" id="sqllist" rows="100" style="display:none"></textarea>
+</div>
+
+<script type="text/javascript" src="/js/common/filerelate.js" ></script>
+<script src="js/datastruct.js"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.Sample/Autodesk.ADN.Viewing.Extension.Sample.js"></script>
+<script src="js/web3d/scripts/LoadModel.js"></script>
+<script src="js/web3d/scripts/getObjectTree_anquan.js"></script>
+
+<script type="text/javascript">    
+    $(document).ready(function() {
+		$('#timerange').daterangepicker({
+	     ranges: {
+                '今天': [moment(), moment()],
+                '昨天': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                '最近7天': [moment().subtract('days', 6), moment()],
+                '最近30天': [moment().subtract('days', 29), moment()],
+                '本月': [moment().startOf('month'), moment().endOf('month')],
+                '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+            },
+        locale : {
+                   applyLabel : '确定',
+                   cancelLabel : '取消',
+                   fromLabel : '起始时间',
+                   toLabel : '结束时间',
+                   customRangeLabel : '自定义',
+                   daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                   monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',
+                       '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                   firstDay : 1
+               },
+		});
+		
+		initialize();
+    });
+
+	function initialize() {
+		var options = {
+			'document': "/js/web3d/nanxiangmodels/1haolou/Resource/____/_3D_/_3D_.svf",
+			'env': 'Local'
+		};
+
+		var viewerElement = document.getElementById('viewer');
+
+		//		    viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {});
+		viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerElement, {
+			extensions: ['BasicExtension']
+		});
+
+		Autodesk.Viewing.Initializer(options, function() {
+			viewer.start();
+			//					viewer.initialize();
+			viewer.load(options.document);
+			//					viewer.start();
+			//					loadDocument(viewer, options.document);
+		});
+
+	}
+		function PrintPbQrcode()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function TracePbStatus()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(arguments[0])
+		{
+			var pbid = arguments[0];
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/trace/?pbid="+pbid, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/trace/?pbid="+pbid, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	
+	function PrintPbQrcode2()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+		if(selPbtypes.length>0 || selElevations.length>0)
+		{
+			if(window.ActiveXObject)
+			{ //IE  
+					var dlgResult = window.showModalDialog("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+			}
+			else
+			{  //非IE  
+				window.open("/task/goujian/qrcode/?selPbtypes="+selPbtypes+"&selElevations="+selElevations, 'newwindow',"width="+dwidth+",height="+dheight+",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");  
+			} 	
+		}
+	}
+	
+	function changepage2Page(page){
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,},
+			  success: function(data){
+				$("#pbtable tbody").html(data.pblist);
+				$("#pagebar").html(data.pageinfo);
+			  }
+		});
+	}
+	
+	
+    function changepage2PageStatus(page){
+			var pbstatus=$("#pbstatussel").val();
+			var timerange=$("#timerange").val();
+	
+			$.ajax({
+			  type:"get",
+			  url:"/task/modelview/getpblist2",
+			  cache:false,
+			  dataType:"json",
+			  data:{"page": page,"selPbtypes":selPbtypes,"selElevations":selElevations,"curUnitId": curUnitId,"pbstatus": pbstatus,"timerange":timerange},
+			  success: function(data){
+				if(data.issuc=="true")
+				{
+					$("#pbtable tbody").html(data.pblist);
+					$("#pagebar").html(data.pageinfo);
+				}
+				else
+				{
+					alert(data.error);
+				}
+			  }
+		});
+	}
+
+	
+	function changefunction()
+	{
+		var str="";
+        $("input[type='radio'][name='pbcheck']:checked").each(function(){ 
+             str = $(this).val();
+			 _viewer.select(parseInt(str));
+        })
+	}
+	
+	function wgetFit(){
+		$(".content-row").height($(window).height() -150);
+		$(".content-row > div").height($(window).height() -160);
+	}
+</script>
+
+
+{% endblock %}

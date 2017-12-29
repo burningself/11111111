@@ -1,0 +1,4 @@
+th,td{ text-align:center; }
+.row{width:98%; margin:20px 0 0 0; padding: 0; border-radius:15px; display:inline-block; color:#337ab7; background:white;}
+.row h3 {text-align:center;}
+.row table {margin-top:10px; font-size:1.2em;}

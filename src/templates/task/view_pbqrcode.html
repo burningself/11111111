@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset='utf-8'/>	
+<script type="text/javascript" language="javascript"> 
+	function btnPrintClick(){
+		//document.getElementById("btnPrint").style.display='none';
+		document.getElementById("btnPrint").style.visibility="hidden";
+		window.print();
+		//document.getElementById("btnPrint").style.display='block';
+		document.getElementById("btnPrint").style.visibility="visible";
+	}
+</script>
+<link rel="stylesheet" type="text/css" href="/css/print.css" media="print">
+
+<style type="text/css">
+
+#parent {
+padding: 5% 0;
+}
+#child {
+padding: 10% 0;
+}
+</style>
+
+</head>
+<body>
+<div  align="center">
+<input id="btnPrint"  align="right"  value="        点击打印        " type="button" onclick="btnPrintClick()";/>  
+</div>
+<div id="parent">
+<div id="child">
+		<table border="1" align="center" cellpadding="0" cellspacing="0" style="width:80%">
+					  <tr height="30px"> 
+					    <td nowrap align="center" width="16%">桥  名</td>
+					    <td nowrap width="32%" align="center">虎门二桥</td>
+						<td nowrap align="center" width="20%">箱梁编号</td>
+					    <td nowrap align="center" width="32%">S3-3-1-LW-8</td>
+											 
+						<td align="center" rowspan="5" ><img src='/images/pbqrcode/{{qrname}}.png' width="120px" height="120px"> </img></td>
+				
+					   </tr>
+					  <tr height="30px">
+					    <td nowrap align="center">拼装部位</td>
+						<td nowrap align="center">西引桥</td>
+						<td align="center" >跨径</td>
+						<td align="center">62.5m</td>
+					  </tr>
+					<tr height="30px">
+					    <td nowrap align="center">施工单位</td>
+						<td nowrap align="center" colspan=3>中交第二航务工程局有限公司</td>
+					  </tr>
+					<tr height="30px">
+					    <td nowrap align="center">监理单位</td>
+						<td nowrap align="center" colspan=3>中铁武汉大桥工程咨询监理有限公司</td>
+					  </tr>
+					  <tr height="30px">
+						<td nowrap align="center" width="16%">浇注日期</td>
+					    <td nowrap width="26%" align="center">2015年06月12日</td>
+						<td nowrap align="center" width="20%">拼装方向</td>
+					    <td nowrap align="center" width="38%">番禺→东莞</td>
+					  </tr>
+
+					  </table>
+</div>
+</div>
+</body>
+</html>

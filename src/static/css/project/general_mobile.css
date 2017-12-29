@@ -1,0 +1,198 @@
+/*td ,th{text-align:center; font-size:15px; padding:0px 0px 0px 0px!important; vertical-align:middle!important; border:none!important;}
+tr{border-bottom: solid 1px #ddd;}*/
+
+	.row-fluid{
+		background-color:white;
+		margin-top:3px;
+		/*height:240px;*/
+		display:inline-block; 
+		/*border: 1px solid gainsboro;*/
+		width:100%;
+		vertical-align: top; 
+		text-align:left;
+	}
+	
+	.row-fluid .title_row {height:20px;}
+	.row-fluid .title_row h3, #notice > div > h3 {
+			font-size:1em;
+			margin-top:5px; 
+			margin-left:5%; 
+			text-align:center; 
+			color: #1B9BCA;
+			font-weight:bold;}
+	.row-fluid table {width:95%; height:190px;font-size:0.85em;}
+	.row-fluid .label_row {height:25px;}
+	.row-fluid .draw_row  {height:205px;}
+	.row-fluid .draw_row #month-line,#week-line {height:100%; width:100%; }
+	.row-fluid .list_row {height:205px;}
+	.row-fluid .list_row .data_draw{ height:205px; margin-left:2%; text-align:center; width:100%; line-height:100%; display:inline-block;}
+	#taskProject table td {padding: 8px 0 8px 0px; line-height:1em;}
+	
+	#exportReport {position: relative; top:0px; right:20px;}
+
+/*----------------------------------------------------------------------------------- */
+/*  Notice */
+/*----------------------------------------------------------------------------------- */
+	.custom_row_basic {margin-left:2%;}
+	.notice{
+		margin-left:2%;
+		width:100%;
+		display:inline-block;
+		height:150px;
+		border-radius: 20px;
+		background-color:white;
+	}
+	
+	#carousel-example-generic{
+		height:150px;
+		width:100%;
+		margin:0;
+	}
+	
+	.carousel-inner{
+		height:120px;
+		width:100%;
+	}
+	
+	.carousel-indicators{
+		bottom:0px;
+	}	
+	
+	.carousel-indicators li{
+		background-color:white;
+		border: #5BC0DE solid 1px;
+		margin-top:100px;
+	}
+	
+	.carousel-indicators .active{
+		background-color: #5BC0DE;
+	}
+	
+	.carousel-control{
+		height: 150px;
+		background-color:white !important;
+		border-radius: 20px;
+	}
+	
+	.carousel-control .glyphicon{
+		margin-left:-25%;
+		background-color:inherite;
+		color:#5BC0DE;
+		font-size:1em;
+	}
+
+/*----------------------------------------------------------------------------------- */
+/*  Modal_Container */
+/*----------------------------------------------------------------------------------- */
+.modal_container {
+	height:720px;
+	width:47%;
+	margin-right:2%;
+	background: white;
+	
+}
+.modal_container .modal_draw_body{height:680px; width:96%;}
+
+
+/*----------------------------------------------------------------------------------- */
+/*  Table duichang */
+/*----------------------------------------------------------------------------------- */
+.table-filters {
+  margin-bottom: 20px; }
+  .table-filters tbody tr td.filter-category {
+    text-align: center;
+    color: white;
+    border-bottom: 1px solid white; }
+    .table-filters tbody tr td.filter-category [class^="fa"], .table-filters tbody tr td.filter-category [class*="fa"] {
+      font-size: 24px; }
+  .table-filters tbody tr td.blue {
+    background: #5bc0de; }
+  .table-filters tbody tr td.green {
+    background: #60c560; }
+  .table-filters tbody tr td.orange {
+    background: #f59b3b; }
+  .table-filters tbody tr td.red {
+    background: #d9534f; }
+  .table-filters tbody tr td.magenta {
+    background: #d94084; }
+  .table-filters tbody tr td.inactive {
+    background: #8e8e93; }
+  .table-filters tbody tr td h3 {
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 18px;
+    font-weight: 300 !important; }
+  .table-filters tbody tr td .success {
+    color: #60c560; }
+  .table-filters tbody tr td .danger {
+    color: #d9534f; }
+  .table-filters tbody:last-child td.filter-category {
+    border-bottom: 0; }
+
+.filter-categories .btn-group {
+  margin: 0;
+  display: block; }
+  .filter-categories .btn-group .btn {
+    font-size: 14px;
+    font-weight: 300 !important;
+    text-align: left;
+    border-radius: 4px !important;
+    margin: 0 0 10px; }
+    .filter-categories .btn-group .btn [class^="fa"], .filter-categories .btn-group .btn [class*="fa"] {
+      margin: 0 5px 0 0;
+      width: 45px;
+      font-size: 20px;
+      vertical-align: middle;
+      text-align: center; }
+  
+  
+   
+/*----------------------------------------------------------------------------------- */
+/*  Table pandian */
+/*----------------------------------------------------------------------------------- */
+    .materialTab{
+    	width:100%;
+    	display:inline-block;
+    	vertical-align:top;
+    }
+
+    
+    .materialTab table thead tr th{ text-align:center; font-size:1em; color:dodgerblue; font-weight:bold;}
+    #pandianDate{
+    	font-size:14px;
+    	margin-left:1%;
+    }
+    
+/*----------------------------------------------------------------------------------- */
+/*  configPageModal */
+/*----------------------------------------------------------------------------------- */
+
+	#configPage {padding-top:10%; height:100%; width:100%; border:none!important;}
+	#configPage .modal-dialog {height:100%;}
+	#configPage .modal-dialog .modal-content{ padding-left:10px; font-size:1em;}
+	#configPage .modal-dialog .modal-content form {padding-left:5%;}
+	#configPage .modal-dialog .modal-content form label {width:45%;}
+	#configPage .modal-dialog .modal-content form input {width:50%;max-width:150px;}
+	#configPage .modal-dialog .modal-content form label input{min-width:20px; max-width:30px;} 
+
+.custom_row_data .swiper-slide{width:50%!important; 
+			display:inline-block;
+	}
+
+#pbSect, #taskProject , #duichang{height:270px;}
+#div-todolist{min-height:270px;}
+.donut_unit{width:100%; display:inline-block; height:250px;}
+.custom_row_data h4{text-align:center; margin: 10px 0px; padding:0px;}
+.custom_row_data .donut-draw {height:100%; margin-top: -40px; padding:0px; }
+
+#calendar {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    min-height:270px;
+}
+
+.fc-list-table{
+	table-layout: fixed;
+}

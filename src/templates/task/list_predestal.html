@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<div class="container-fluid" align="center">
+	<style>
+	.predestalView{
+		background-color:white;
+		height:620px;
+		width:95%;
+		margin-left:0px;
+		margin-top:-15px;
+		padding-top:5px;
+		border-bottom-right-radius: 20px;
+		border-bottom-left-radius: 20px;
+	}
+	
+	h3{
+		height:50px;
+		background-color:white;
+		margin-top:-5px;
+		padding-top:10px;
+		border-top-right-radius: 20px;
+		border-top-left-radius: 20px;
+		color: #007AFF;
+	}
+	
+	.span3{
+		width:15%;
+		display:inline-block;
+	}
+	
+	.col-sm-6{
+		width:100%;
+	}
+	
+	.col-sm-6 > label{
+		font-size:20px;
+		width:60%; 
+		height:30px;
+		color:black; 
+		font-weight:bold;
+		text-align: center ;
+	}
+	
+	.row-fluid{
+		width:99%;
+		height:30px;
+		margin-top:1%;
+		text-align:center
+	}
+	
+	.liangxiang_view{
+		width:10%;
+		display: inline-block;
+		margin-right:1%;
+		height:100%;
+		vertical-align: middle;	
+	}
+	
+	.liangxiang_view > div {
+		width:100%;
+		border: solid 1px;
+		text-align:center;
+		height:15%;
+		margin-top:2%;
+	}
+	
+	.viewTai{
+		height:30%;
+		padding-right:3%;
+		margin-top:1%;
+	}
+	
+	.yuzhitai_title{
+		height: 90%;
+		width:20%;
+		display:inline-block;
+		vertical-align: top;
+		text-align: center;
+	}
+	
+	.yuzhitai_title >  h4{	
+
+		padding-top:20%;
+		width:60%;
+		font-size:20px;
+		font-style: italic;
+		font-weight: bold;
+		text-align:center;
+		display:inline-block;
+	}
+	
+	.extraArea{
+		width:10%;
+		display: inline-block;
+		margin-right:1%;
+		height:100%;
+		border: dashed 1px;
+		vertical-align: top;
+	}
+	
+	.extraArea >  div{	
+		height:20%;
+		text-align:center;
+		vertical-align: bottom;
+		font-weight: bold;
+		font-size:20px;
+		color:black;
+	}
+	
+	.listArea{
+		width:11%;
+		height:100%;
+		margin-right:1%;
+		display: inline-block;
+		border: dashed 1px;
+		vertical-align: middle;
+		text-align:center;
+	}
+	.listArea > div {
+		height:30%; 
+		width:100%;  
+		text-align:center; 
+		margin-top:10%;
+	}
+	
+	.listArea > div > label{
+		margin-top:0;
+		width: 100%;
+		position: relative;
+		top:30%;
+		font-weight: bold;
+		text-align: center;
+		font-size:16px;
+		font-weight:bold;
+	}
+
+	.listArea > .pdID{
+		margin-top:0;
+		text-align:center;
+		border: none;
+		font-weight: bold;
+		font-size:20px;
+		color: black;
+		position: relative;
+		top:3%;
+	}
+	
+	.extraArea > .pdID{
+		position: relative;
+		top:4%;
+	}
+	
+	.paintView_rumo{
+			background-color:#FCD209;
+			color:black
+		}	
+	.paintView_yanshouhege{
+			background-color:#39BBF8;
+			color:black
+		}	
+	.paintView_jiaozhuwancheng{
+			background-color:#6AEC87;
+			color:black
+		}
+	.paintView_yanghuzhong{
+			background-color:#FCD209;
+			color:black
+		}
+	
+	.paintView_weiqiyong{
+			background-color:#A2B5CD;
+			color:black
+		}	
+	.paintView_pipei{
+			background-color:#7F50A9;
+			color:black;
+		}	
+	
+	</style>
+	<div>
+	<h3 align="center" style= "width: 95%;"><i class="fa fa-signal">&nbsp</i>预制台状态图</h3>
+	
+	<div class="predestalView">
+		{% for item in list_items.object_list %}
+			{% if forloop.counter = 1 %}
+				<div class="viewTai" align="right" style="margin-top:0">   
+					<div class="liangxiang_view" valign="middle">
+						<div style="margin-top:0"></div><div></div><div></div><div></div><div></div><div></div>
+					</div>	
+			{% elif forloop.counter = 7 %}
+				<div class="viewTai" align="right">   
+					<div class="liangxiang_view">
+						<div style="margin-top:0"></div><div></div><div></div><div></div><div></div><div></div>
+					</div>	
+			{% elif forloop.counter = 13 %}
+				<div class="viewTai" align="right">   
+					<div class= "yuzhitai_title">
+						<h4 >预制台状态 </h4>
+						<a href="javascript:PrintPbAll()" class="btn btn-success btn"><i class="fa fa-qrcode"></i>&nbsp&nbsp打印预制台二维码&nbsp&nbsp </a>
+					</div>
+					
+					<div class="liangxiang_view" >
+						<div style="margin-top:0"></div><div></div><div></div><div></div><div></div><div></div>
+					</div>	   
+			{% endif %}
+		  		<div class="listArea" align="center" >							
+					{% if item.count == 2 %}
+						{% for each in item.precastbeam %}
+							{% if each.status_id = 7 or each.status_id = 8%}
+								<div class="paintView_pipei" >
+									<label>{{each.number}}</label>
+								</div>
+							{% endif%}
+						{% endfor %}
+						{% for each in item.precastbeam %}
+							{% if each.status_id = 4  %}
+								<div class="paintView_rumo" >
+									<label>{{each.number}}</label>
+								</div>
+							{% elif each.status_id = 5 %}
+								<div class="paintView_yanshouhege">
+									<label>{{each.number}}</label>
+								</div>		
+							{% elif each.status_id = 6 %}
+								<div class="paintView_jiaozhuwancheng">
+									<label>{{each.number}}</label>
+								</div>		
+							{% endif %}
+						{% endfor %}
+					{% elif item.count = 1 %}	
+						{% for each in item.precastbeam %}
+							{% if each.status_id = 7 or each.status_id = 8%}
+								<div class="paintView_pipei" >
+									<label>{{each.number}}</label>
+								</div>
+								<div class="paintView_weiqiyong">
+									<label>空闲</label>
+								</div>
+							{% elif each.status_id = 4 %}
+								<div class="paintView_weiqiyong" >
+									<label>空闲</label>
+								</div>
+								<div class="paintView_rumo">
+									<label>{{each.number}}</label>
+								</div>
+							{% elif each.status_id = 5 %}
+								<div class="paintView_weiqiyong" >
+									<label>空闲</label>
+								</div>
+								<div class="paintView_yanshouhege">
+									<label>{{each.number}}</label>
+								</div>
+							{% elif each.status_id = 6 %}
+								<div class="paintView_weiqiyong" >
+									<label>空闲</label>
+								</div>
+								<div class="paintView_jiaozhuwancheng">
+									<label>{{each.number}}</label>
+								</div>
+							{% else %}
+								<div class="paintView_weiqiyong">
+									<label>空闲</label>
+								</div>
+								<div class="paintView_weiqiyong">
+									<label>空闲</label>
+								</div>
+							{% endif %}				
+						{% endfor %}
+					{% else %}
+						{% if item.factoryarea_id = 4 %}
+							<div class="paintView_yanghuzhong">	
+								<label>养护</label>
+							</div>
+							<div class="paintView_yanghuzhong">
+								<label>养护</label>
+							</div>
+						{% else %}
+							<div class="paintView_weiqiyong">	
+								<label>空闲</label>
+							</div>
+							<div class="paintView_weiqiyong" >
+								<label>空闲</label>
+							</div>
+						{% endif %}
+					{% endif %}
+					<div class="pdID">{{item.name}}</div>						
+				</div>	
+			{% if forloop.counter = 6%}	 
+					<div class="extraArea" >
+						<div style="margin-top:20%;" >预</div><div >留</div><div >区</div>			
+						<div class="pdID">Y1-1</div>						
+					</div>	   
+				</div>
+			{% elif forloop.counter = 12%}
+					<div class="extraArea" >
+						<div style="margin-top:20%;" >预</div><div >留</div><div >区</div>			
+						<div class="pdID">Y2-1</div>						
+					</div>	   
+				</div>
+			{% elif forloop.counter = 16%}
+					<div class="extraArea" >
+						<div style="margin-top:20%;" >预</div><div >留</div><div >区</div>		
+						<div class="pdID">Y3-1</div>						
+					</div>	   
+				</div>
+			{% endif %}
+		 {% endfor %}
+	</div>
+	<div class="row-fluid" >
+		<div class="span3">
+   			<div class="col-sm-6">			
+					<label class="rumo"  style="background-color:#FCD209;overflow:hidden;" >骨架入模</label>
+			</div>
+		</div> 
+		<div class="span3">
+   			<div class="col-sm-6">			
+					<label class="yanshouhege"  style="background-color:#39BBF8;overflow:hidden;" >浇筑验收</label>
+			</div>
+		</div> 
+		<div class="span3">
+   			<div class="col-sm-6">			
+					<label class="jiaozhuwancheng"  style="background-color:#6AEC87; overflow:hidden;" >浇筑完成</label>
+			</div>
+		</div>     
+		<div class="span3" >
+			<div class="col-sm-6">			
+					<label class="pipei" style="background-color:#7F50A9;overflow:hidden;" >匹配修整</label>
+			</div>
+		</div> 
+		<div class="span3">
+			<div class="col-sm-6">			
+					<label class="yanghu" style="background-color:#A2B5CD;overflow:hidden;" >未启用</label>
+			</div>
+		</div>                 
+	</div>
+     
+	<div style="display:none;">
+		<a href="javascript:PrintPbAll()" class="btn btn-success btn"><i class="fa fa-qrcode"></i>&nbsp&nbsp打印预制台二维码&nbsp&nbsp </a>
+		<!-- 注释了，需要在打开。潘古兵 -->
+		<a href="javascript:gen_preqrcode()" class="btn" role="button"><i class="icon-print"></i>&nbsp&nbsp生成预制台二维码&nbsp&nbsp </a> 
+	</div>
+
+</div>
+<script src="/js/yuzhitai.js" type="text/javascript"></script>
+<script type="text/javascript" language="javascript"> 
+	function PrintPbAll()
+	{
+		var dwidth=window.screen.width;
+		var dheight=window.screen.height;
+        //var dlgResult = window.showModalDialog("/task/predestal/printpredestal/", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0");
+		if(window.ActiveXObject)
+		{ //IE  
+			 var dlgResult = window.showModalDialog("/task/predestal/printpredestal/", window, "dialogWidth:"+dwidth+"px;dialogHeight:"+dheight+"px; status:0"); 
+		}
+		else
+		{  //非IE  
+			window.open("/task/predestal/printpredestal/", 'newwindow','height='+dheight+',width='+dwidth+',toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no');  
+		} 	
+	}
+	
+	function gen_preqrcode()
+	{
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+		  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+		  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+		  {
+			var result=xmlhttp.responseText;
+			alert(result);
+		  }
+		}
+		xmlhttp.open("GET","/task/predestal/gen_preqrcode/",true);
+		xmlhttp.send();
+	}
+</script>
+{% endblock %}

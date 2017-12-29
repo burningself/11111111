@@ -1,0 +1,170 @@
+{% extends "base_v2.html" %}
+{% block content %}
+<!--iview-->
+<link href="../../dist_vue/plugin/iview/theme/my-theme/dist/iview.css" rel="stylesheet">
+<script src="../../dist_vue/plugin/iview/iview.min.js"></script>
+<style>
+	.user-form{  width: 506px; margin: 30px;   }
+	.user-card{  font-size: 14px;  line-height: 18px;  width: 600px;  margin: 30px auto 0;  }
+	.user-card li{margin: 25px;}
+	.user-card li p{  display: inline-block;  width: 100px;  text-align: right;  padding-right: 20px; }
+</style>
+<div id="app">
+	<div class="header-v2">
+		<div class="header-bg-v2">
+			<span class="title-v2">个人信息</span>
+		</div>
+	</div>
+	<card class="user-card">
+		<ul>
+			<li><p>用户名 :</p>[[name]]</li>
+			<li><p>实际姓名 :</p>[[truename]]</li>
+			<li><p>联系方式 :</p>[[contract]]</li>
+			<li><p>登录密码 :</p>****** <i-button type="ghost" icon="edit" style="float: right;margin-top: -5px;" @click="editShow = true">修改密码</i-button></li>
+			<i-form v-if="editShow"  ref="formCustom" :model="formCustom" :rules="ruleCustom" :label-width="97" class="user-form">
+				<form-item prop="origin">
+					<i-input type="password" v-model="formCustom.origin" placeholder="请输入原始密码"></i-input>
+				</form-item>
+				<form-item prop="passwd">
+					<i-input type="password" v-model="formCustom.passwd" placeholder="请输入新密码"></i-input>
+				</form-item>
+				<form-item prop="passwdCheck">
+					<i-input type="password" v-model="formCustom.passwdCheck" placeholder="请再次输入新密码"></i-input>
+				</form-item>
+				<form-item>
+					<i-button type="primary" @click="handleSubmit('formCustom')" icon="checkmark">确定</i-button>
+					<i-button type="ghost" @click="handleReset('formCustom')" style="margin-left: 8px" icon="close">取消</i-button>
+				</form-item>
+			</i-form>
+			<li><p>所属企业 :</p>[[companyname]]</li>
+			<li><p>参建方 :</p></li>
+			<li><p>专业 :</p>[[majorname]]</li>
+			<li><p>角色 :</p><tag v-for="item in roles">[[item.rolename]]</tag></li>
+		</ul>
+	</card>
+	<input type="hidden" id="userId" value="{{request.user.id}}" />
+</div>
+<script>
+	var _app = new Vue({
+		el:'#app',
+		delimiters:['[[',']]'],
+		data () {
+            const validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入新密码'));
+                } else {
+                    if (this.formCustom.passwdCheck !== '') {
+                        // 对第二个密码框单独验证
+                        this.$refs.formCustom.validateField('passwdCheck');
+                    }
+                    callback();
+                }
+            };
+            const validatePassCheck = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('新密码和确认密码不一致'));
+                } else if (value !== this.formCustom.passwd) {
+                    callback(new Error('确认密码'));
+                } else {
+                    callback();
+                }
+            };
+            const validateOrigin = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('请输入原始密码'));
+                }else {
+                    callback();
+                }
+            };
+			return{
+				name:null,
+				truename:null,
+                contract:null,
+                companyname:null,
+				division:null,
+                majorname:null,
+                editShow:false,
+				roles:[],
+                formCustom: {
+                    userName:'',
+                    passwd: '',
+                    passwdCheck: '',
+                    origin: ''
+                },
+                ruleCustom: {
+                    passwd: [
+                        { validator: validatePass, trigger: 'blur' }
+                    ],
+                    passwdCheck: [
+                        { validator: validatePassCheck, trigger: 'blur' }
+                    ],
+                    origin: [
+                        { validator: validateOrigin, trigger: 'blur' }
+                    ]
+                }
+			}
+		},
+		methods:{
+            handleSubmit (name) {
+                let that = this;
+                this.$refs[name].validate((valid) => {
+                    if (valid) {
+                        $.ajax({
+                            type: "post",
+                            url: "/changepass/",
+                            cache: false,
+                            dataType: "text",
+                            data: {
+                                "username": that.formCustom.userName,
+                                "oldpass": that.formCustom.origin,
+                                "password1":  that.formCustom.passwd,
+                                "password2":  that.formCustom.passwdCheck
+                            },
+                            success: function(data) {
+                                that.$refs[name].resetFields();
+                                that.editShow = false;
+                                that.$Message.success(data);
+                                setTimeout("window.location.href = '/login/' ",2000);
+                            },
+                            error: function(data) {
+                                that.$Message.error('信息不全');
+                                return false;
+                            }
+                        });
+                    } else {
+                        this.$Message.error('信息不全');
+                    }
+                })
+            },
+            handleReset (name) {
+                this.$refs[name].resetFields();
+                this.editShow = false;
+            }
+		},
+		mounted () {
+		    let that = this;
+            $.ajax({
+                url: "/user/users/"+$("#userId").val()+"/",
+                type: "get",
+                success: function(data) {
+                    that.formCustom.userName = data.name;
+                    that.name = data.name;
+                    that.truename = data.truename;
+                    that.contract = data.contract;
+                    that.companyname = data.companyname;
+                    that.majorname = data.majorname;
+                    if(data.userdivisions.length > 0){
+                        that.division = data.userdivisions[0].divisionname;
+                    }
+                    if(data.userPrjRoles.length > 0){
+                        that.roles = data.userPrjRoles;
+                    }
+                },
+                error: function() {
+                    console.log("错误");
+                }
+            });
+		}
+	})
+</script>
+{% endblock %}

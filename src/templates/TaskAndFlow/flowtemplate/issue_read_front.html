@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>
+			智慧建筑管理平台
+		</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="/css/bootstrap/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+		<link href='/css/bootstrap/bootstrapValidator.css' rel='stylesheet' />
+		<link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+		<link href="/css/project/base_web.css?1111" media="all" rel="stylesheet" type="text/css" />
+		<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+		<link rel="shortcut icon" href="/images/ico/title.ico" type="image/x-icon">
+		<link href="../static/css/loaders.css" rel="stylesheet" type="text/css" />
+
+		<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+		<script src="/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+
+		<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+		<script type="text/javascript" src='/js/bootstrap/bootstrapValidator.js'></script>
+<!--		<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />-->
+		<link href="/css/issue_readstyle.css" media="all" rel="stylesheet" type="text/css" />
+		
+		<script type="text/javascript" src="/js/content-big-show/js/content_zoom.js"></script>
+	</head>
+
+<style>
+	
+	.row {
+	    color: #337ab7; 
+	    background: white;
+	}
+	
+	.container {
+		width: 760px;
+		margin: 5px auto;
+		border: 1px solid #95B8E7;
+		min-height: 850px;
+		padding: 0 10px;
+	}
+	
+	.header-row {
+		width: 758px;
+		font-size: 20px;
+		font-weight: bold;
+		color: #08498E;
+		background-color: #E0ECFF;
+		padding: 5px;
+		margin: 0 -10px 10px -10px;
+		text-align: left;
+		border-bottom: 1px solid #95B8E7;
+	}
+	
+	/*自适应圆角投影*/
+.round_shade_box{width:1px; height:1px; font-size:0; display:none; _background:white; _border:1px solid #cccccc;}
+.round_shade_top{margin:0 12px 0 10px; background:url(/images/zxx_round_shade.png) repeat-x -20px -40px; _background:white; zoom:1;}
+.round_shade_topleft{width:11px; height:10px; background:url(/images/zxx_round_shade.png) no-repeat 0 0; _background:none; float:left; margin-left:-11px; position:relative;}
+.round_shade_topright{width:12px; height:10px; background:url(/images/zxx_round_shade.png) no-repeat -29px 0; _background:none; float:right; margin-right:-12px; position:relative;}
+.round_shade_centerleft{background:url(/images/zxx_round_shade.png) no-repeat 0 -1580px; _background:none;}
+.round_shade_centerright{background:url(/images/zxx_round_shade.png) no-repeat right -80px; _background:none;}
+.round_shade_center{font-size:14px; margin:0 12px 0 10px; padding:10px; background:white; letter-spacing:1px; line-height:1.5;}
+.round_shade_bottom{margin:0 12px 0 11px; background:url(/images/zxx_round_shade.png) repeat-x -20px bottom; _background:white; zoom:1;}
+.round_shade_bottomleft{width:11px; height:10px; background:url(/images/zxx_round_shade.png) no-repeat 0 -30px; _background:none; float:left; margin-left:-11px; position:relative;}
+.round_shade_bottomright{width:12px; height:10px; background:url(/images/zxx_round_shade.png) no-repeat -29px -30px; _background:none; float:right; margin-right:-12px; position:relative;}
+.round_shade_top:after,.round_shade_bottom:after,.zxx_zoom_box:after{display:block; content:"."; height:0; clear:both; overflow:hidden; visibility:hidden;}
+.round_box_close{padding:2px 5px; font-size:12px; color:#ffffff; text-decoration:none; border:1px solid #cccccc; -moz-border-radius:4px; -webkit-border-radius:4px; background:#000000; opacity:0.8; filter:alpha(opacity=80); position:absolute; right:-5px; top:-5px;}
+.round_box_close:hover{opacity:0.95; filter:alpha(opacity=95);}
+/*自适应圆角投影结束*/
+.zxx_zoom_left{width:45%; float:left; margin-top:20px; border-right:1px solid #dddddd;}
+.zxx_zoom_left h4{margin:5px 0px 15px 5px; font-size:1.1em;}
+.zxx_zoom_right{width:50%; float:left; margin-top:20px; padding-left:2%;}
+.zxx_zoom_right h4{margin:5px 0px; font-size:1.1em;}
+.zxx_zoom_right p.zxx_zoom_word{line-height:1.5; font-size:1.05em; letter-spacing:1px; margin:0 0 35px; padding-top:5px;}
+</style>
+<script>
+	$(document).ready(function() {
+		$('div.small_pic a').fancyZoom({scaleImg: true, closeOnClick: true});
+	
+	});
+	function showBigImg(obj){
+		 
+		$("#imgInModalID").attr('src',obj.src); 
+		$("#imgModal").modal("show");
+		
+	}
+</script>
+<body>
+<div class="row">
+	<div class="col-md-12" style="min-height: 83vh">
+		<div class="container">
+			<div class="header-row">
+				问题查看
+			</div>
+			<div align="left" style="margin: 20px auto;">
+				<ul class="breadcrumb">
+					<div>
+							<label>问题编号：</label> <span id="faqiren">{{curprojectevent.number}}</span><span class="spansplit">/</span>
+						    <label>发起人：</label> <span id="faqiren">{{curprojectevent.createuser.truename}}</span><span class="spansplit">/</span>
+							<label>发起时间：</label> <span id="faqishijian">{{curprojectevent.createtime|date:"Y-m-d"}}</span>
+							
+					</div>
+					<div>
+						<label>当前阶段：</label><span id="dangqianjieduan" style="background:{{jieduan.color}};color:white;">{{jieduan.jianduan}}</span><span class="spansplit">/</span>
+
+						<label>当前步骤：</label><span id="dangqianbuzhou">{{curprojectevent.curflowstep.name}}</span><span class="spansplit">/</span>
+
+						<label>截至时间：</label><span id="jiezhishijian">{{curprojectevent.deadline|date:"Y-m-d"}}</span><span class="spansplit">/</span>
+
+						<label>优先级：</label><span id="youxianji">{{priority}}</span>
+					</div>
+					<div>
+						<label>关联元素：</label> <span id="zhuanye">{{guanlianyuansudis}}</span><span class="spansplit">/</span>
+						<label>专业：</label> <span id="zhuanye">{{curprojectevent.template.major}}</span>
+					</div>
+				</ul>
+				<div>
+					<label >问题描述：</label><span>{{curprojectevent.describe}}</span>
+				</div>
+			</div>
+			<header style="text-align: left;">
+				<label>问题处理记录 : </label>
+			</header>
+			{% for each in issueoprlistWithDoc %}
+			<ul class="timeline" style="margin-left: -90%;">
+				<li class="timeline-inverted">
+					<div class="tl-circ"></div>
+					<div class="timeline-panel" style="text-align: left;">
+						<div class="tl-heading">
+							<label style="float: right;">{{each.issueopr.oprtime|date:"Y-m-d H:i:s"}}</label>
+						</div>
+						<div class="tl-body">
+							<p><label>人员：</label>{{each.issueopr.actor.truename}}</p>
+							<p><label>步骤：</label>{{each.issueopr.eventstep.flowstep.name}}</p>
+							<p><label>操作：</label>{{each.issueopr.flowstepoper.name}} </p>
+							<p><label>表单：</label>{% for bd in each.bds %}<a href="/assist/biaodanedit/?bdid={{bd.bdid}}&readonly=true" title="{{bd.bdname}}" target="_blank">{{bd.bdname}}<i class="fa fa-book"></i></a>{% endfor %} </p>
+
+							<p><label>反馈：</label>{% ifequal each.issueopr.comment None %}{% else %}{{each.issueopr.comment}}{% endifequal %}</p>
+							<div style="margin: 10px auto;">
+								{% for doc in each.issueoprimg %}
+								<div class="small_pic" style="float:left">
+									<a href="#pic_{{doc.document.id}}">
+										<img src="/{{doc.document.filepath}}{{doc.document.name}}"   width="150px">
+									</a>
+								</div>
+								<div id="pic_{{doc.document.id}}" style="display:none;"><img src="/{{doc.document.filepath}}{{doc.document.name}}" /></div>
+								{% endfor %}
+							</div>
+							<ul class="list-group ul_biaodan">
+								{% for doc in each.issueoprdoc %}
+								<li class="list-group-item li-magright">
+									<a href="/{{doc.document.filepath}}{{doc.document.name}}">
+									{{doc.document.shortname}}</a> 
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<script>
+						</script>
+					</div>
+				</li>
+
+			</ul>
+
+			{% endfor %}
+			
+			 <div class="modal fade bs-example-modal-lg text-center" style="padding: 30px;" id="imgModal"tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" >
+	          <div class="modal-dialog modal-lg" style="display: inline-block; width: auto;    margin: 30px;">
+	            <div class="modal-content">
+	             <img  id="imgInModalID" src="" >
+	            </div>
+	          </div>
+	        </div>
+        
+        
+	  	</div>
+    </div>
+</div>
+	
+</body>
+</html>

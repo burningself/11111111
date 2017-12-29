@@ -1,0 +1,125 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<link href="/js/web3d/style.min.css" rel="stylesheet" />
+<script src="/js/web3d/three.min.js"></script>
+<script src="/js/web3d/viewer3D.min.js"></script>
+<link rel="stylesheet" href="dist_vue/css/modelview.css">
+<script src="/js/common/resizebar.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				bindResize(document.getElementById('Bottombar1'),"div_jstree");
+				bindResize(document.getElementById('Bottombar2'),"div_pb_type");
+				bindResize(document.getElementById('Bottombar3'),"div_zhiliangwenti");
+				bindResize(document.getElementById('Bottombar4'),"div_zhiliangyanshou");
+			});
+	</script>
+	<style>
+    #btnRestore{
+        position: absolute;
+        z-index: 100;
+        left: 240px;
+        top:10px;
+    }
+</style>
+{% endblock %} 
+
+{% block content %}
+<span class="c-btn-sm c-btn-red" id="btnRestore">显示全部构件</span>
+	<div id="left" class="pull-left" >
+		<div class="panel-group" id="accordion">
+			<div class="panel">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+							空间结构
+							<i class="profont pro-font-xiangyou" style="float: right"></i></a>
+					</div>
+				</div>
+				<div class="panel-collapse collapse" id="collapseOne">
+					<div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_jstree">
+						<div id="jstree_div" > </div>
+					</div>
+					<div class="ResizeBottombar" id="Bottombar1" ></div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">
+							<span>构件分类</span><i class="profont pro-font-xiangyou" style="float: right"></i></a>
+					</div>
+				</div>
+				<div class="panel-collapse collapse" id="collapseTwo">
+					<div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_pb_type">
+						<div id="jstree_div_pbtype" > </div>
+					</div>
+					<div class="ResizeBottombar" id="Bottombar2" ></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="right" class="pull-right">
+		<div class="panel-group" id="itemSection">
+			<div class="panel">
+					<div class="panel-heading">
+						  <div class="panel-title">
+								<a class="itemSection-toggle" data-parent="#itemSection1" data-toggle="collapse" href="#issue_list">
+									质量问题</a>
+								<a class="more pull-right" href="/task/issue/list/?issuetype=zhiliang">详情</a>
+						  </div>
+					</div>
+					<div class="panel-collapse collapse in" id="issue_list">
+						  <div class="panel-body cebiangundong" id="div_zhiliangwenti" style="height: calc(40vh - 42px);overflow:auto; ">
+								 <table class="table issuetable">
+
+								 </table>
+						  </div>
+					  <div class="ResizeBottombar" id="Bottombar3" ></div>
+					</div>
+			</div>
+			<div class="panel" {% if hide_function.zhiliangyanshou %} style="display: none;" {% endif %}>
+					<div class="panel-heading">
+						  <div class="panel-title">
+								<a class="itemSection-toggle" data-parent="#itemSection2" data-toggle="collapse" href="#yanshou_list">
+									质量验收工作</a>
+								<a class="more pull-right" href="/task/zhiliangyanshou/">详情</a>
+						  </div>
+					</div>
+					<div class="panel-collapse collapse in" id="yanshou_list">
+						  <div class="panel-body cebiangundong" id="div_zhiliangyanshou" style="height: calc(59vh - 185px);overflow:auto; ">
+								 <table class="table yanshoutable">
+
+								 </table>
+						  </div>
+						  <div class="ResizeBottombar" id="Bottombar4" ></div>
+					</div>
+			</div>
+		</div>
+	</div>
+	<div id="viewerContent" >
+		<div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
+			<div id="viewer">
+			</div>
+		</div>
+	</div>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleStatus/Autodesk.ADN.Viewing.Extension.SampleStatus.js?ver=1111"></script>
+<script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.Color/Autodesk.ADN.Viewing.Extension.Color.js"></script>
+<script src="js/web3d/scripts/LoadModel.js?version=2227"></script>
+  <script src="js/web3d/scripts/modelcommon.js"></script>
+<script src="js/web3d/scripts/getObjectTreeTaskStatus.js"></script>
+<script src="/js/common/zhilianganquan_general.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">    
+    $(document).ready(function() {
+		getissuelist('zhiliang');
+		getissuelist('zhiliangyanshou');
+		//issuetype = 质量问题 质量验收 安全问题 危险源
+		loadInitialModel();
+    });
+
+</script>
+
+
+{% endblock %}

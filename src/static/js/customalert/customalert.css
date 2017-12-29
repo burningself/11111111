@@ -1,0 +1,13 @@
+	.custom-alert {
+	    display: none;
+	    position: fixed;
+	    top: 15px;
+	    left: 50%;
+	    min-width: 300px;
+	    margin-left: -100px;
+	    z-index: 99999;
+	    padding: 15px;
+	    border: 1px solid transparent;
+	    border-radius: 5px;
+	    
+	}

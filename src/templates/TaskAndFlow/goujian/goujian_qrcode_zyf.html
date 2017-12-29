@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<meta charset='utf-8'/>	
+<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+<script src="/js/jquery/jquery-qrcode-0.14.0.min.js" type="text/javascript"></script>
+<script type="text/javascript" language="javascript"> 
+	function btnPrintClick(){
+		document.getElementById("btnPrint").style.visibility="hidden";
+		window.print();
+		document.getElementById("btnPrint").style.visibility="visible";
+		}
+	
+        $(document).ready(function () {
+			$(".genQrcode").each(function(index){  
+				var text = $(this).attr("id");
+				//alert(text);
+				$(this).qrcode({ 
+					render: "canvas", //table方式 
+					size: 108,
+					left: 2,
+					top: 2,
+					text: text //任意内容 
+				}); 
+			})
+         });
+</script>
+<link rel="stylesheet" type="text/css" href="/css/print_zyf.css" media="print">
+
+<style type="text/css">
+
+.print_pos_fixed
+{
+position:fixed;
+top:0px;
+right:0px;
+}
+
+.print-cnestartup
+{
+    width: 89mm;
+    height: 54mm;
+    margin: auto;
+    position: relative;
+    background-color: #fff;
+    /*overflow: hidden;*/
+}
+
+
+.thtable
+{
+height:8mm;
+vertical-align:middle
+}
+
+.trtable
+{
+height:6mm;
+font-size:10px;
+font-family : 微软雅黑,宋体;
+font-weight:bold;
+vertical-align:middle
+}
+
+.tdlable
+{
+word-break: keep-all;/*必须*/
+width: 40mm;
+text-align:center;
+line-height:100%;
+}
+
+.tdtitle
+{
+Word-break: break-all;/*必须*/ 
+width: 16mm;
+text-align:left;
+line-height:100%;
+}
+
+.tddesc
+{
+Word-break: break-all;/*必须*/ 
+width: 42mm;
+text-align:left;
+line-height:100%;
+}
+
+</style>
+
+</head>
+<body>
+<div class="print_pos_fixed">
+<input id="btnPrint"  align="right"  value="        点击打印        " type="button" onclick="btnPrintClick()";/>  
+</div>
+{% for item in pblist %}
+<div class="print-cnestartup">
+{% if forloop.last %}
+		<table   style="TABLE-LAYOUT:fixed" >
+{% endif %}
+{% if not forloop.last %}
+		<table style="TABLE-LAYOUT:fixed;page-break-after:always;"> 
+{% endif %}
+					 <tr>
+					 		
+							<td colspan="3" class="thtable" ><img src="/img/zyf.png" height="40px" /></td>
+					 </tr>
+					 <tr class="trtable"> 
+							
+							<td   class="tdtitle" >项目名称:</td>
+							<td    class="tddesc">{% ifequal pro.acronym None %} {% else %}{{pro.acronym}}{% endifequal %}</td>
+							<td   class="tdlable" rowspan="5"><canvas class="genQrcode" id="{{item.qrcode}}" width="110px" height="110px"></canvas></td>
+					</tr>
+					
+						<tr class="trtable"> 
+						<td   class="tdtitle" >构件编号:</td>
+						<td class="tddesc">{% ifequal item.sign None %} {% else %}{{item.sign}}{% endifequal %}</td>					
+					  </tr>
+					   
+					<tr class="trtable">
+						<td  class="tdtitle">建&nbsp;设&nbsp;方:</td>
+						<td class="tddesc">
+							{% ifequal pro.builder.name None %} {% else %}{{pro.builder.name}}{% endifequal %}
+						</td>
+					  </tr>
+					  
+					  <tr class="trtable"> 
+						<td   class="tdtitle" >施&nbsp;工&nbsp;方:</td>
+						<td class="tddesc">{% ifequal pro.constrator.name None %} {% else %}{{pro.constrator.name}}{% endifequal %}</td>					
+					   </tr>
+
+					  <tr class="trtable">
+					    <td   class="tdtitle">位&nbsp;&nbsp;&nbsp;&nbsp;置:</td>
+						<td  class="tddesc">{% ifequal pro.address None %} {% else %}{{pro.address}}{% endifequal %}</td>
+					  </tr>
+
+					</table>
+</div>
+</div>
+{% endfor %}
+
+</body>
+</html>

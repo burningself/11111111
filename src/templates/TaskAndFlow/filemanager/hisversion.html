@@ -1,0 +1,41 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link href="/css/project/taskmanager.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+<script type="text/javascript" src="/js/bootstrap/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+	<div class="header-bg-v2">
+		<span class="title-v2">文件历史版本查看</span>
+	</div>
+</div>
+<div class="content-v2">
+		<table class="table table-bordered table-striped " id="monthplan_table">
+			<thead>
+				<tr>
+					<th>编号</th>
+					<th>名称</th>
+					<th>版本</th>
+					<th>上传人</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for each in list_items%}
+				<tr>
+					<td>{{each.id}}</td>
+					<td>{{each.shortname}}</td>
+					<td>{% if each.version %}{{each.version|date:"Y-m-d H:i:s"}}{% else %} 当前版本 {% endif %}</td>
+					<td>{{each.creator.truename}}</td>
+					<td>
+						<a href="/{{each.filepath}}{{each.name}}" download=""><i class="fa fa-download">下载</i></a>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+{% endblock %}

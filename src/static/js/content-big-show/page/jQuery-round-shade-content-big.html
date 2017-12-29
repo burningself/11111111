@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="description" content="jQuery-单击文字或图片内容放大显示且含圆角投影效果" />
+<meta name="description" content="张鑫旭web前端学习之css，jQuery学习实例页面" />
+<meta name="keywords" content="张鑫旭,鑫空间-鑫生活,博客,web前端,css,jQuery,特效,图片投影效果,js插件,demo页面,学习," />
+<meta name="author" content="张鑫旭,zhangxixnu" />
+<title>jQuery-单击文字或图片内容放大显示且含圆角投影效果</title>
+<link rel="shortcut icon" href="http://www.zhangxinxu.com/zxx_ico.png" />
+<link rel="stylesheet" href="../css/common.css" type="text/css" />
+<style type="text/css">
+/*自适应圆角投影*/
+.round_shade_box{width:1px; height:1px; font-size:0; display:none; _background:white; _border:1px solid #cccccc;}
+.round_shade_top{margin:0 12px 0 10px; background:url(../image/zxx_round_shade.png) repeat-x -20px -40px; _background:white; zoom:1;}
+.round_shade_topleft{width:11px; height:10px; background:url(../image/zxx_round_shade.png) no-repeat 0 0; _background:none; float:left; margin-left:-11px; position:relative;}
+.round_shade_topright{width:12px; height:10px; background:url(../image/zxx_round_shade.png) no-repeat -29px 0; _background:none; float:right; margin-right:-12px; position:relative;}
+.round_shade_centerleft{background:url(../image/zxx_round_shade.png) no-repeat 0 -1580px; _background:none;}
+.round_shade_centerright{background:url(../image/zxx_round_shade.png) no-repeat right -80px; _background:none;}
+.round_shade_center{font-size:14px; margin:0 12px 0 10px; padding:10px; background:white; letter-spacing:1px; line-height:1.5;}
+.round_shade_bottom{margin:0 12px 0 11px; background:url(../image/zxx_round_shade.png) repeat-x -20px bottom; _background:white; zoom:1;}
+.round_shade_bottomleft{width:11px; height:10px; background:url(../image/zxx_round_shade.png) no-repeat 0 -30px; _background:none; float:left; margin-left:-11px; position:relative;}
+.round_shade_bottomright{width:12px; height:10px; background:url(../image/zxx_round_shade.png) no-repeat -29px -30px; _background:none; float:right; margin-right:-12px; position:relative;}
+.round_shade_top:after,.round_shade_bottom:after,.zxx_zoom_box:after{display:block; content:"."; height:0; clear:both; overflow:hidden; visibility:hidden;}
+.round_box_close{padding:2px 5px; font-size:12px; color:#ffffff; text-decoration:none; border:1px solid #cccccc; -moz-border-radius:4px; -webkit-border-radius:4px; background:#000000; opacity:0.8; filter:alpha(opacity=80); position:absolute; right:-5px; top:-5px;}
+.round_box_close:hover{opacity:0.95; filter:alpha(opacity=95);}
+/*自适应圆角投影结束*/
+.zxx_zoom_left{width:45%; float:left; margin-top:20px; border-right:1px solid #dddddd;}
+.zxx_zoom_left h4{margin:5px 0px 15px 5px; font-size:1.1em;}
+.small_pic{display:inline-block; width:48%; height:150px; font-size:120px; text-align:center; *display:inline; zoom:1; vertical-align:middle;}
+.small_pic img{padding:3px; background:#ffffff; border:1px solid #cccccc; vertical-align:middle;}
+.zxx_zoom_right{width:50%; float:left; margin-top:20px; padding-left:2%;}
+.zxx_zoom_right h4{margin:5px 0px; font-size:1.1em;}
+.zxx_zoom_right p.zxx_zoom_word{line-height:1.5; font-size:1.05em; letter-spacing:1px; margin:0 0 35px; padding-top:5px;}
+</style>
+<script type="text/javascript" src="../js/jquery-1.2.6.pack.js"></script>
+<script type="text/javascript" src="../js/content_zoom.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('div.small_pic a').fancyZoom({scaleImg: true, closeOnClick: true});
+		$('#zoom_word_1').fancyZoom({width:400, height:200});
+		$('#zoom_word_2').fancyZoom();
+		$('#zoom_flash').fancyZoom();
+	});
+</script>
+</head>
+
+<body>
+	<div class="zxx_out_box">
+    	<div class="zxx_in_box">
+        	<div class="zxx_header">
+                <a href="http://www.zhangxinxu.com/">
+               		<img class="l" src="http://www.zhangxinxu.com/wordpress/wp-content/themes/default/images/index_logo.gif" />
+                </a>
+                <span class="zxx_author_time">by zhangxinxu 2009-08-30 16:11</span>
+            </div>
+            <h3 class="zxx_title">jQuery-单击文字或图片内容放大显示且含圆角投影效果</h3>
+            <div class="tr mb10"><a href="http://www.zhangxinxu.com/study/down/content-big-round-shade-show.zip" class="zxx_btn"><span>实例下载.zip 24.4K</span></a></div>
+            <div class="zxx_main_con fix mb20">
+            	<div class="zxx_zoom_left">
+                    <h4>图片的放大</h4>
+                    <div class="small_pic">
+                        <a href="#pic_one">
+                            <img src="http://image.zhangxinxu.com/image/study/s/s128/mm1.jpg" />
+                        </a>
+                    </div>
+                    <div class="small_pic">
+                        <a href="#pic_two">
+                            <img src="http://image.zhangxinxu.com/image/study/s/s128/mm2.jpg" />
+                        </a>
+                    </div>
+                    <div class="small_pic">
+                        <a href="#pic_three">
+                            <img src="http://image.zhangxinxu.com/image/study/s/s128/mm3.jpg" />
+                        </a>
+                    </div>
+                    <div class="small_pic">
+                        <a href="#pic_four">
+                            <img src="http://image.zhangxinxu.com/image/study/s/s128/mm4.jpg" />
+                        </a>
+                    </div>
+                </div>
+                <div class="zxx_zoom_right">
+                    <h4>文字内容的放大</h4>
+                    <p class="zxx_zoom_word">这里文字内容放大的层的宽度是需要给定值进行控制的，因为图片的高度和宽度可以获取到，而内容不确定的DIV层的高宽是获取不到了，给定高宽值，然后文字内容就会在这块区域内显示。比如说，<a href="#zoom_word_one" id="zoom_word_1">400像素的放大弹出层</a>。<br />如果你觉得这个宽度不够，你可以设置宽度值更大些，例如，<a href="#zoom_word_two" id="zoom_word_2">800像素的宽度</a>。</p>
+                    <h4>视频或flash的放大</h4>
+                    <p class="zxx_zoom_word">
+                        这里还可以以浮动层的形式显示flash动画或者是视频。例如，<a href="#zoom_flash_one" id="zoom_flash">简约时钟(swf)</a>
+                    </p>
+                </div>
+            </div>
+            <div class="zxx_footer">
+            	&copy;<a href="http://www.zhangxinxu.com/">张鑫旭-鑫空间-鑫生活</a>
+                |
+                <a href="http://www.zhangxinxu.com/wordpress/?p=80">该篇相关文章</a>
+            </div>
+        </div>
+    </div>
+    <!-- 要放大显示的div -->
+    <div id="pic_one" style="display:none;"><img src="http://image.zhangxinxu.com/image/study/s/s512/mm1.jpg" /></div>
+    <div id="pic_two" style="display:none;"><img src="http://image.zhangxinxu.com/image/study/s/s512/mm2.jpg" /></div>
+    <div id="pic_three" style="display:none;"><img src="http://image.zhangxinxu.com/image/study/s/s512/mm3.jpg" /></div>
+    <div id="pic_four" style="display:none;"><img src="http://image.zhangxinxu.com/image/study/s/s512/mm4.jpg" /></div>
+    <div id="zoom_word_one" style="display:none;">400像素宽度层示例：这里文字内容放大的层的宽度是需要给定值进行控制的，因为图片的高度和宽度可以获取到，而内容不确定的DIV层的高宽是获取不到了，给定高宽值，然后文字内容就会在这块区域内显示。</div>
+    <div id="zoom_word_two" style="width:800px; display:none;">800像素宽度层示例：这里文字内容放大的层的宽度是需要给定值进行控制的，因为图片的高度和宽度可以获取到，而内容不确定的DIV层的高宽是获取不到了，给定高宽值，然后文字内容就会在这块区域内显示。</div>
+    <div id="zoom_flash_one" style="display:none;">
+      <object id="FlashID" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="550" height="400">
+        <param name="movie" value="../flash/as3_clock_2.swf" />
+        <param name="quality" value="high" />
+        <param name="wmode" value="opaque" />
+        <param name="swfversion" value="9.0.45.0" />
+        <!--[if !IE]>-->
+        <object type="application/x-shockwave-flash" data="../flash/as3_clock_2.swf" width="550" height="400">
+          <!--<![endif]-->
+          <param name="quality" value="high" />
+          <param name="wmode" value="opaque" />
+          <param name="swfversion" value="9.0.45.0" />
+          <param name="expressinstall" value="../../Scripts/expressInstall.swf" />
+          <!--[if !IE]>-->
+        </object>
+        <!--<![endif]-->
+      </object>
+    </div>
+</body>
+</html>

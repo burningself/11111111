@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% include "baseuser.html" %}
+
+{% block content %} 
+<style type="text/css">
+	.dropdown-menu li:hover{
+	}
+	
+	.btn-group{
+		width:100%; 
+		text-align:center; 
+		margin-top:-10px;
+	}
+	
+	#chooseBTN{
+		width:10%; 
+		font-size:1.5em;
+		margin-left:-1px; 
+		border-left:solid 1px;
+	}
+	
+	.btn-group > .dropdown-menu li a{
+		font-size:1.5em; 
+		color:white; 
+		padding:0; 
+		margin:0;
+	}
+	
+	.btn-group > .dropdown-menu{
+		max-width:700px;
+		width:90%;
+		background-color:#39BBF8;
+	}
+	
+	.paintView_hege{
+			background-color:#6AEC87;
+			color:black
+		}
+	.paintView_cunfang{
+			background-color:#FCD209;
+			color:black
+		}	
+	.paintView_weiqiyong{
+			background-color:#A2B5CD;
+			color:black
+		}	
+	.paintView_yichang{
+			background-color:red;
+			color:black
+		}	
+	
+	.infoState{
+		text-align:center;
+		background-color:whitesmoke;
+	}
+	
+	.infoState thead tr th{
+		text-align:center;
+		font-size:1.2em;
+	}
+	
+	.infoState tbody tr td{
+		font-weight:bold;
+		font-size:1em;
+	}
+	
+	</style>
+	
+</style>
+<div class="btn-group">
+   <button type="button" class="btn btn-primary" style="width:90%;font-size:1.5em;"> &nbsp存梁区信息</button>
+   <button type="button" id="chooseBTN" class="btn btn-primary dropdown-toggle"  data-toggle="dropdown">
+      <span class="caret"></span>
+      <span class="sr-only">切换下拉菜单</span>
+   </button>
+   <ul class="dropdown-menu" role="menu" >
+      <li><a  href="/task/bangzaqu/mobileList/">&nbsp绑扎台座信息</a></li>
+      <li><a  href="/task/predestal/mobileList/">&nbsp预制台座信息</a></li>
+   </ul>
+</div>
+
+<div style="margin-top:5px; width:100%;">
+   <table class="table table-striped infoState">
+   	   {% if count > 0 %}
+		   <thead>
+		      <tr>
+		         <th>编号</th>
+		         <th>当前状态</th>
+		         <th>最新变更</th>
+		      </tr>
+		   </thead>
+		   <tbody>
+		   {% for item in list_items %} 
+		      <tr>
+		         <td><a href="/task/precastbeam/trace/{{item.id}}/">{{item.number}}</a></td>
+		         <td>{{item.status}}</td>
+		         <td>{{item.time}}</td>
+		      </tr>
+		   {%endfor%}   
+		   </tbody>
+	   {% else %}
+	   	  <div style="height:30%; padding-top:20%;text-align:center; font-weight:bold; font-size:2em;">无相关梁段</div>
+	   {% endif %}
+	</table>
+</div>
+		
+
+
+
+{% endblock %}

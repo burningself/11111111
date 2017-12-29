@@ -1,0 +1,424 @@
+
+{% extends "baseadmin.html" %}
+
+{% block ownerhead %} 
+<link href="/css/project/common.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/box.css" media="all" rel="stylesheet" type="text/css" />
+<link href="/css/project/flowtemplate.css" media="all" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="/js/jquery-ui-1.11.4/jquery-ui.css">
+<script src="/js/jquery-ui-1.11.4/jquery-ui.js"></script>
+<script src="/js/jquery/jquery.form-3.51.0.js"></script>
+<script src="/js/app.js"></script>
+<script type="text/javascript" src="/js/bootstrap-multiselect/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="/js/bootstrap-multiselect/css/bootstrap-multiselect.css" type="text/css"/>
+
+<script src="/js/common/flowtemplate.js"></script>
+
+<style>
+	.modal-body {
+    padding: 8px 15px;
+}
+
+	.updateStepForm th{
+		text-align: right;
+		padding: 3px;
+	}
+	.updateStepForm td{
+		text-align: left;
+		padding: 3px;
+	}
+	.col-lg-7>select{width: 100%;}
+</style>
+
+{% endblock %}
+
+{% block content %} 
+<div class="row content-tab" >
+	<div class="header-row"><i class="fa fa-retweet"></i>阶段模板编辑</div>
+	<div class="btn-row" style="margin-bottom: 10px;">
+		<a class="btn btn-primary" href="/task/flowtemplate/list/"><i class="fa fa-refresh"></i> 返回模版列表</a>
+		<a class="btn btn-success infoBtn" onclick="javascript: infoControl({{flowtemplate_instance.id}});"><i class="fa fa-cog"></i> 编辑基本信息</a>
+		<a href="#" class="btn btn-success" data-toggle="modal" data-target="#addTemplateStep"><i class="fa fa-plus"></i> 新建阶段</a>
+		{% if TemplateSteplist %}
+			<a class="btn btn-success lockBtn" onclick="javascript: lockControl(this);"><i class="fa fa-unlock"></i> 解锁阶段排序</a>
+			<a class="btn btn-primary savequeueBtn" disabled="disabled"><i class="fa fa-save"></i> 保存排序 </a>
+		{% endif %}
+	</div>
+	
+	<div class="panel panel-default panel-main">
+	   <div class="panel-heading">
+	      <h3 class="panel-title">
+	         	<i class="fa fa-tasks"></i> 基本信息
+	      </h3>
+	   </div>
+	   <div class="panel-body basicTab">
+	   		<form class="infoForm">
+	   	 		模板名称：<input type="text" id="templateName" name="templateName" value="{{flowtemplate_instance.name}}" maxlength="60"  />
+				专业：
+				<select name="templateMajor" id="templateMajor" >
+					{% for major in MajorChoices %}
+						{% ifequal major flowtemplate_instance.major %}
+							<option value="{{major.id}}" selected="">{{major.name}}</option>
+						{% else %}
+							<option value="{{major.id}}">{{major.name}}</option>
+						{% endifequal %}
+					{% endfor %}
+				</select>
+							
+				流程类型：
+				<select name="templateType" id="templateType" >
+					{% for type in TypeChoices %}
+						{% ifequal type flowtemplate_instance.flowtype %}
+							<option value="{{type.id}}" selected>{{type.name}}</option>
+						{% else %}
+							<option value="{{type.id}}">{{type.name}}</option>
+						{% endifequal %}
+						
+					{% endfor %}
+				</select>
+							
+			      浏览者：
+					<select name="templateuser" id="templateuser" multiple> 
+						{% for user in memberList %}
+							{% if user.selected %}
+								<option value="{{user.id}}" selected="">{{user.truename}}</option>
+							{% else %}
+								<option value="{{user.id}}">{{user.truename}}</option>
+							{% endif %}
+							
+						{% endfor %}
+					</select>
+	   	 	</form>
+	   </div>
+	   <div class="panel-heading">
+	      <h3 class="panel-title">
+	         	<i class="fa fa-barcode"></i> 阶段详情
+	      </h3>
+	   </div>
+	   <div class="panel-body flowTab">
+			<div class="sortTab">
+				<div class="row sortable col-md-10">
+				{% for item in TemplateSteplist %}
+					 {% if item.isendstep %} 
+						<div class="span3 state-end  col-md-4"  style="float:left"  id={{item.id}}>
+				      {% else %}
+						<div class="span3 state  col-md-4"  style="float:left"  id={{item.id}}>
+					 {% endif %}
+					<!-- Calendar -->
+				          <div class="box">
+				            <div class="box-header">
+				<!--              <i class="fa fa-tag"></i>-->
+				              <h3 class="box-title" id="{{item.id}}_name">
+				              	<div class="queueLabel">
+							  	  <p>{{forloop.counter}}</p> <span>{{item.name}}</span>
+							    </div>	</h3>
+				              <!-- tools box -->
+				              <div class="pull-right box-tools">
+				                <!-- button with a dropdown -->
+				                <div class="btn-group">
+				                  <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown">
+				                    <i class="fa fa-bars"></i></button>
+				                  <ul class="dropdown-menu pull-right" role="menu">
+				                    <li><a href="#"  onclick="FunChangeTemplateStepInfo({{item.id}})"><i class="fa fa-edit"></i>修改阶段信息</a></li>
+									<li><a href="#"  onclick="FunTemplateStepConfig({{item.id}})"><i class="fa fa-cog"></i>阶段高级设置</a></li>
+				                  </ul>
+				                </div>
+				                <a class="btn btn-info btn-sm" onclick="removeStep({{item.id}})"><i class="fa fa-times"></i>
+				                </a>
+				              </div>
+				              <!-- /. tools -->
+				            </div>
+				            <!-- /.box-header -->
+				            <div class="box-body no-padding">
+				              <!--The calendar -->
+					            <div class="panel panel-default infoPanel">
+								   <div class="panel-heading">
+								      <h3 class="panel-title">
+								         	已指派执行人
+								      </h3>
+								   </div>
+								   <div class="panel-body assign-panel-body" align="center">
+				
+								     {% for eachActor in item.actors %}
+										<a class="keyword">{{eachActor}}</a>&emsp;
+									{% endfor %}
+		
+								   </div>
+								   
+								   <div class="panel-heading">
+								      <h3 class="panel-title">
+								         	已指派观察者
+								      </h3>
+								   </div>
+								   <div class="panel-body observer-panel-body" align="center">
+								     {% for eachObserver in item.observer %}
+										<a class="keyword">{{eachObserver}}</a>&emsp;
+									{% endfor %}
+								   </div>
+								   
+								   <div class="panel-heading">
+								      <h3 class="panel-title">
+								         	步骤操作规则
+								      </h3>
+								   </div>
+								   <div class="panel-body rule-body">
+								     {% for eachRule in item.rules %}
+										<div class="ruleContent" align="left">
+											{{forloop.counter}}.
+											<a class="keyword">{{eachRule.actortype}}</a>执行者
+											<a class="keyword">{{eachRule.stepname}}</a>,将移至
+											<a class="keyword">{{eachRule.nextstep}}</a>
+										</div>
+									{% endfor %}
+								   </div>
+								   
+								</div>
+					            <!-- /.col -->
+				            </div>
+				            <!-- /.box-body -->
+				          </div>
+				          <!-- /.box -->
+				          {% if not item.isendstep %} 
+				          	<label><i class='fa fa-forward'></i></label>
+				          {% endif %}
+					</div> 
+					
+				{% endfor %}
+				</div>  
+			</div> 
+		</div> 
+</div> 
+
+ 	<div class="modal fade" id="addTemplateStep" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4>新建阶段</h4>
+            </div>
+            <div class="modal-body">
+	          <form class="newStepForm">
+<!--				   	 	{{flowTemplateStepform.as_ul}}-->
+				   	 	{% for field in flowTemplateStepform %}
+
+						      <div class="col-lg-12">
+						      	 <div class="col-lg-5" style="text-align: right;margin-bottom: 10px;"> {{ field.label }}</div>
+						      	 <div class="col-lg-7" style="text-align: left;margin-bottom: 10px;">{{ field }} </div>
+						      </div>
+
+					    {% endfor %}
+				   	 	<label class="newStepMsg" style="color:red;"></label>
+			   	  </form>            
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnAddTemplateStepCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" id="btnAddTemplateStep" aria-hidden="true">新建</button>
+            </div>
+    </div>
+    </div>
+    </div>
+
+<div class="modal fade" id="ChangeTemplateStepInfo" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4>修改阶段信息</h4>
+            </div>
+            <div class="modal-body">
+			          <form class="updateStepForm">
+						   	 	
+					   	  </form> 
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"  id="btnChangeTemplateStepInfoCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+								<button class="btn btn-primary" id="btnChangeTemplateStepInfo" data-dismiss="modal" aria-hidden="true">修改</button>
+            </div>
+    	</div>
+    </div>
+</div>
+	
+	
+<div class="modal fade" id="TemplateStepConfig" aria-hidden="true">
+	<div class="modal-dialog" >
+	    <div class="modal-content">
+            <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal">×</button>
+	            <h4>阶段高级设置</h4>
+            </div>
+            <div class="modal-body">
+				<div class="mod-panel-setting"> 
+				<div class="block">
+				<span class="assign-btn opt-item"><i class="fa fa-user"></i><span>指派执行人</span>&nbsp;<i class="fa fa-angle-down"></i></span> <span class="title">启动阶段高级设置，必须指派执行人并设置步骤的相关执行规则</span> 
+					<div class="assign-member-select" style="display: none;">
+						<div class="mod-member-select">  
+						<div class="member-search actor-search"> 
+							<div class="member-search-wrap"> 
+							 <!--<input type="text" name="name" placeholder="请输入您要选择的成员">   
+							 <label ><i class="fa fa-search"></i></label>  -->
+							</div>
+						</div>  
+						<ul class="member-select-list actor-select">
+							{% for each in memberList %}
+								<li class="member-item" > 
+									<label class="checkbox-inline">
+										<input type="checkbox" name="actor-checkbox" value="{{each.name}}_{{each.truename}}">
+										<span>{{each.truename}}</span>
+									</label>
+								</li>
+							{% endfor %}
+						</ul>  
+						<div class="member-select-confirm" style="display: block;">   
+						<button type="button" id="btnActorConfim" class="btn btn-primary btn-sm"><i class="fa fa-check"></i>确认</button>  
+						<button type="button" id="btnActorCancle" class="btn btn-danger btn-sm"><i class="fa fa-times"></i>取消</button>  
+						</div>
+						</div>
+					</div> 
+					<div class="assign-member-panel">
+						
+					</div>  
+				</div>  
+				
+				<div class="block">    
+				<span class="observer-btn opt-item"><i class="fa fa-user"></i><span>指派观察者</span>&nbsp;<i class="fa fa-angle-down"></i></span>  
+				<div class="observer-member-select" style="display: none;">
+						<div class="mod-member-select">  
+						<div class="member-search observer-search"> 
+							<div class="member-search-wrap"> 
+							 <!--<input type="text" name="name" placeholder="请输入您要选择的成员">   
+							 <button type="button" class="btn btn-info btn-sm" disabled="disabled"><i class="fa fa-search"></i></button>  -->
+							</div>
+						</div>  
+						<ul class="member-select-list observer-select">
+							{% for each in memberList %}
+								<li class="member-item" > 
+									<label class="checkbox-inline">
+										<input type="checkbox" name="observer-checkbox" value="{{each.name}}_{{each.truename}}">
+											<span>{{each.truename}}</span>
+									</label>
+								</li>
+							{% endfor %}
+						</ul>  
+						<div class="member-select-confirm" style="display: block;">   
+						<button type="button" id="btnObserverConfim" class="btn btn-primary btn-sm"><i class="fa fa-check"></i>确认</button>  
+						<button type="button" id="btnObserverCancle" class="btn btn-danger btn-sm"><i class="fa fa-times"></i>取消</button>  
+						</div>
+						</div>
+				</div>    
+				<div class="observer-member-panel">
+				</div>   
+				</div>  
+				<div class="block action-title">
+					<a  href="javascript:AddAction();" class="action-new-btn"><i class="fa fa-plus"></i>新建步骤操作规则</a><span class="pull-right">最多可设置三个规则</span>
+				</div> 
+				<div class="block action-list" id="action-list">
+
+				</div>
+			</div>
+            </div>
+            <div class="modal-footer">
+            	<label id="templateStepId" style="display:none;"></label>
+                <a class="btn btn-default btn" role="button"  id="stepConfigCancel" data-dismiss="modal" aria-hidden="true">取消</a>
+				<button class="btn btn-primary" role="button" id="stepConfigConfirm" >设置</button>
+            </div>
+    </div>
+    </div>
+    </div>
+	
+	<select class="actorMode" style="display:none;">
+		{% for eachOpt in actorMode %}
+			<option value={{eachOpt.id}}>{{eachOpt.name}}</option>
+		{% endfor %}
+	</select>
+	<select class="srcStepList" style="display:none;">
+	</select>
+	<select class="tgtStepList" style="display:none;">
+		{% for eachOpt in TemplateSteplist %}
+			<option value={{eachOpt.id}}>{{eachOpt.name}}</option>
+		{% endfor %}
+	</select>
+	
+  <script>
+//makes elements soratble, elements that sort need to have id attribute to save the result
+	var newQueue=new Array();
+	$('.sortable').sortable({
+		items: ".state",
+		revert:true,
+		cancel:'.btn,.box-content,.nav-header',
+//		 placeholder: "box-placeholder box",
+		start:function(event,ui){
+			$(".span3 > label").each(function(){
+				$(this).css("display","none");
+			})
+		},
+	
+		update:function(event,ui){
+			//line below gives the ids of elements, you can make ajax call here to save it to the database
+			$(".queueLabel p").each(function(index){
+				$(this).html((index+1).toString());
+			})
+			newQueue=$(this).sortable('toArray');
+			
+			$(".savequeueBtn").attr("onclick","saveQueue();");
+			$(".savequeueBtn").removeAttr("disabled");
+		},
+		
+		stop: function(event, ui) { 		
+			$(".span3 > label").each(function(){
+				$(this).css("display","inline-block");
+			})
+		},	
+	});
+
+	function saveQueue(){
+		var queueStr="";
+		for(each in newQueue){queueStr=queueStr+"," + newQueue[each].toString();}
+		queueStr = queueStr+"," +$(".state-end").attr("id");
+		
+		$.ajax({
+			type:"post",
+			url:"/task/flowtemplate/update/",
+			cache:false,
+			dataType:"json",
+			data:{"queueStr":queueStr, "flowtemplate":{{flowtemplate_instance.id}}},
+			success: function(data){
+				if(data.status==1)
+				{
+					alert("保存成功！");
+					$(".savequeueBtn").removeAttr("onclick");
+					$(".savequeueBtn").attr("disabled","disabled");
+				}
+				else
+				{
+					alert(data.error);
+				}
+			}
+		});
+	}	
+	
+	$().ready(function(){
+		$('.sortable').sortable( 'disable' ) ;
+		$('.basicTab input').attr('readonly',"true");
+		$('.basicTab select').attr('readonly',"true");
+		$('.newStepForm #id_template').val('{{flowtemplate_instance.id}}');
+		$('.newStepForm #id_template').find("option[value='{{flowtemplate_instance.id}}']").attr("selected",true);
+		$('.newStepForm #id_template').attr("disabled","true");
+		
+					var selCfg = {
+				disableIfEmpty: true,
+				nonSelectedText : '请选择浏览者', 
+				nSelectedText: ' - 浏览者',
+				allSelectedText: '全选',
+				maxHeight : 350,   
+				numberDisplayed : 3,
+				onInitialized: function(select, container) {
+				        
+				   }
+				};
+
+			$('#templateuser').multiselect(selCfg);
+			$('.multiselect-native-select .btn-group button').css("text-align","left");
+	});
+
+  </script>
+{% endblock %}

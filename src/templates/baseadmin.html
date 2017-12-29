@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      	智慧建造信息平台
+  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link href="/css/bootstrap/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+  <link href='/css/bootstrap/bootstrapValidator.css' rel='stylesheet' />
+  <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link href="/css/project/baseadmin.css" media="all" rel="stylesheet" type="text/css" />
+	<link rel="shortcut icon" href="/images/ico/title.ico" type="image/x-icon">
+
+	<script src="/js/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+	<script src="/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <script  type="text/javascript" src='/js/bootstrap/bootstrapValidator.js'></script>
+	{% block ownerhead %} {% endblock %}
+  </head>
+  <style type="text/css">
+    .navbar .nav > li .dropdown-menu {
+        margin: 0;
+    }
+    .navbar .nav > li:hover .dropdown-menu {
+        display: block;
+    }
+    select {
+		  /*统一边框*/
+		  border: solid 1px #000;
+		  /*将默认的select选择框样式清除*/
+		  appearance:none;
+		  -moz-appearance:none;
+		  -webkit-appearance:none;
+		  /*替换选择框的最右侧显示小箭头图片*/
+		  background: url("/images/select.png") no-repeat scroll right center transparent;
+		  /*为下拉小箭头留出一点位置，避免被文字覆盖*/
+		  padding-right: 22px;
+		}
+		/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+		select::-ms-expand { display: none; }
+</style>
+
+  <body class="page-header-fixed bg-1" >
+    <div class="modal-shiftfix">
+	  <div class="main-content">
+	  	{% block content %}
+
+			{% endblock %}
+    </div>
+
+		<footer style="padding: 20px 0 0 0;">
+				<div class="footer02" style="color:white; text-align:center;">
+							<p class="footer_text">Copyright @ 2015-2025 上海建工四建集团有限公司，All rights reserved. <a href="# " target="_blank">沪ICP备 </a></p>
+				</div>
+		</footer>
+
+
+  </div>
+
+  </body>
+</html>

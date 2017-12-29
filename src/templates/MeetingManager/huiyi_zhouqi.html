@@ -1,0 +1,448 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<link rel="stylesheet" href="/js/daterangepicker/daterangepicker-bs3.css" />
+<link rel="stylesheet" href="/css/bootstrap/bootstrap-clockpicker.min.css" />
+<script src="/js/daterangepicker/daterangepicker.js"></script>
+<script src="/js/daterangepicker/moment.min.js"></script>
+<script src="/js/bootstrap/bootstrap-clockpicker.min.js"></script>
+<script type="text/javascript" src="/js/jquery/jquery.serializejson.min.js"></script>
+<script src="/js/mdialog/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/mdialog/mdialog.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="/css/mdialog/mdialog.css">
+<link href="/js/jQuery.filer-1.3.0/css/jquery.filer.css" rel="stylesheet">
+<script src="/js/jQuery.filer-1.3.0/js/jquery.filer.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/css/jquery/jquery-labelauty.css">
+<script src="/js/jquery/jquery-labelauty.js" type="text/javascript"></script>
+<!-- jsTree library -->
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/project/huiyi_zhouqi.css?555" />
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2 line_height32">会议模板</span>
+        <button type="button" class="btn btn-danger pull-right" id="btn_addzhouqihuiyi"><i class="glyphicon glyphicon-plus"></i>新增会议模板 </button>
+    </div>
+</div>
+
+
+<div class="widget-container fluid-height clearfix">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th width="5%">编号</th>
+                <th>会议名称</th>
+                <th>发起人</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>会议室</th>
+                <th>会议类型</th>
+                <th>模板类型</th>
+                <th  width="15%">创建时间</th>
+                <th>会议附件</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% ifequal listcount 0 %}
+            <tr>
+                <td colspan="11" align="center">
+                    <h3>没有相关记录！</h3></td>
+            </tr>
+            {% endifequal %}
+             {% for item in issuelist %}
+             {% if item.tishi == 1 %}
+                <tr class="tishi">
+             {% else %}
+                <tr>
+             {% endif %}
+                <td width="5%">{{ forloop.counter }}</td>
+                <td>{{item.title}}</td>
+                <td>{{item.hostuser}}</td>
+                <td>{{item.begin}}</td>
+                <td>{{item.end}}</td>
+                <td>{{item.room}}</td>
+                <td>{{item.meetingtype}}</td>
+                <td  width="15%">
+                    {% if item.zhouqitype == 1 %}
+                        日会议
+                    {% elif item.zhouqitype == 2  %}
+                        周会议
+                    {% elif item.zhouqitype == 3  %}
+                        月会议
+                    {% endif %}
+                </td>
+                <td>{{item.create_time}}</td>
+                <td>
+                    {% if item.docsnum > 0 %}
+                        <a onclick="huiyizhouqi.edithuiyi({{item.id}})" title="查看" style="cursor: pointer;" target="_blank">{{item.docsnum}}</a>
+                    {% else %}
+                        {{item.docsnum}}
+                    {% endif %}
+                </td>
+                <td>
+                    <a {% if item.canupdate == 1 %} onclick="huiyizhouqi.deletehuiyi({{item.id}})" style="cursor: pointer;" {% else %} herf="javascript:void(0)" style="cursor: pointer;color: #b9b9b9;" {% endif%} title="删除"  target="_blank"> [删除] </a>
+                    {% if item.canupdate == 1 %}
+                    <a  onclick="huiyizhouqi.edithuiyi({{item.id}},1)"  style="cursor: pointer;" style="cursor: pointer;color:"  title="查看"target="_blank"> [编辑] </a>
+                    {% else %}
+                    <a  onclick="huiyizhouqi.edithuiyi({{item.id}},0)"  style="cursor: pointer;" style="cursor: pointer;color: #b9b9b9;"  title="查看"target="_blank"> [查看] </a>
+                    {% endif%}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% ifnotequal issuelist.paginator.num_pages 1%}
+    <div class="widget-content padded text-center" >
+        <ul class="pagination pagination-lg">
+            <li>
+                <a href="?page=1">首页</a>
+            </li>
+            {% if issuelist.has_previous %}
+            <li>
+                <a href="?page={{ issuelist.previous_page_number }}">前一页</a>
+            </li>
+            {% endif %}
+            <li>
+                <a>第 {{ issuelist.number }} 页，共 {{ issuelist.paginator.num_pages }}页</a>
+            </li>
+            <li>
+                <a>
+                    <input id="pageJump" style="width:30px;border:0; font-size: 18px;text-align:center; color:#007aff; border-bottom: solid 1px;margin-bottom: -1px;" />
+                </a>
+                <a id="jumpBTN">
+                    跳转
+                </a>
+            </li>
+            {% if issuelist.has_next %}
+            <li>
+                <a href="?page={{ issuelist.next_page_number }}">下一页</a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="?page={{paginator.num_pages}}">尾页</a>
+            </li>
+
+        </ul>
+    </div>
+{% endifnotequal %}
+
+<input type="text" value="" id="currhyid" style="display:none" />
+<div class="modal fade" tabindex="-1" role="dialog" id="deletehuiyiModal">
+  <div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <input type="text" value="" id="currhyid" style="display:none" />
+        <h4 class="modal-title">确定删除</h4>
+      </div>
+      <div class="modal-body">
+        <p>确定要删除该会议吗</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="truedelhuiyi" data-dismiss="modal">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="common_show">
+  <div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="commonModal_title">确定删除</h4>
+      </div>
+      <div class="modal-body">
+        <p  id="commonModal_desc">确定要删除该会议吗</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addzhouqihuiyi" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 align="left" style="font-weight: bold; " id="hhuititle">
+                    添加会议模板
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="widget-content padded">
+                    <form class="form-horizontal" id="addhuiyiForm" action="#" align="left">
+                        <div class="form-group">
+                            <label class="control-label  col-md-3">模板类型：</label>
+                            <div class="col-md-7">
+                                <select class="form-control" name="zhouqitype" id="zhouqitype">
+                                    <option value="1">每天会议</option>
+                                    <option value="2">每周会议</option>
+                                    <option value="3">每月会议</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group createtimediv unactive">
+                            <label class="control-label  col-md-3">创建时间：</label>
+                            <div class="col-md-7">
+                                <input type="text" name="createtime" style="min-width: 260px;" id="createtime" readonly="true" class="form-control" placeholder="请选择时间" >
+                                    <div class="zhoutimeselect unactive" >
+                                        <ul class="time-week unactive">
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Monday" data="星期一" style="display: none;" data-labelauty="星期一">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Tuesday" data="星期二"  style="display: none;" data-labelauty="星期二">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Wednesday" data="星期三"  style="display: none;" data-labelauty="星期三">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Thursday" data="星期四"  style="display: none;" data-labelauty="星期四">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Friday" data="星期五"  style="display: none;" data-labelauty="星期五">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Saturday" data="星期六"  style="display: none;" data-labelauty="星期六">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-Sunday" data="星期日"  style="display: none;" data-labelauty="星期日">
+                                            </li>
+                                            <li><a class="btn btn-default time-week-btn" role="button" style="padding: 2px;padding-left: 11px;padding-right: 11px;font-size: 11px; margin-bottom: 25px;margin-left: 110px;background-color: #3498db;color: white;">确定</a></li>
+                                        </ul>
+                                        <ul class="time-day unactive">
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d1" data="01"  style="display: none;" data-labelauty="01">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d2" data="02" style="display: none;" data-labelauty="02">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d3" data="03" style="display: none;" data-labelauty="03">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d4" data="04" style="display: none;" data-labelauty="04">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d5" data="05" style="display: none;" data-labelauty="05">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d6" data="06" style="display: none;" data-labelauty="06">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d7" data="07" style="display: none;" data-labelauty="07">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d8" data="08" style="display: none;" data-labelauty="08">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-0d9" data="09" style="display: none;" data-labelauty="09">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d10" data="10" style="display: none;" data-labelauty="10">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d11" data="11" style="display: none;" data-labelauty="11">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d12" data="12" style="display: none;" data-labelauty="12">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d13" data="13" style="display: none;" data-labelauty="13">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d14" data="14" style="display: none;" data-labelauty="14">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d15" data="15" style="display: none;" data-labelauty="15">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d16" data="16" style="display: none;" data-labelauty="16">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d17" data="17" style="display: none;" data-labelauty="17">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d18" data="18" style="display: none;" data-labelauty="18">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-1d19" data="19" style="display: none;" data-labelauty="19">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d20" data="20" style="display: none;" data-labelauty="20">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d21" data="21" style="display: none;" data-labelauty="21">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d22" data="22" style="display: none;" data-labelauty="22">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d23" data="23" style="display: none;" data-labelauty="23">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d24" data="24" style="display: none;" data-labelauty="24">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d25" data="25" style="display: none;" data-labelauty="25">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d26" data="26" style="display: none;" data-labelauty="26">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d27" data="27" style="display: none;" data-labelauty="27">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d28" data="28" style="display: none;" data-labelauty="28">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d29" data="29" style="display: none;" data-labelauty="29">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-2d30" data="30" style="display: none;" data-labelauty="30">
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" name="checkbox" class="labelauty" id="labelauty-3d31" data="31" data="01" style="display: none;" data-labelauty="31">
+                                            </li>
+                                            <li><a class="btn btn-default time-day-btn" href="#" role="button" style="padding: 2px;padding-left: 11px;padding-right: 11px;font-size: 11px; margin-bottom: 25px;margin-left: 108px;background-color: #3498db;color: white;">确定</a></li>
+                                        </ul>
+
+                                        <small id="createtime-small" class="help-block"  style="text-align: center;color: #a94442;display:none;">时间段不能为空</small>
+                                    </div>
+                                </input>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label  col-md-3">会议名称：</label>
+                            <div class="col-md-7">
+                                <input type="text" name="meetname" style="min-width: 260px;" id="meetname" class="form-control" placeholder="输入会议名称" >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label  col-md-3">会议类型：</label>
+                            <div class="col-md-7">
+                                <select class="form-control" name="issuePriority" id="issuePriority">
+                                    {% for meetingtypemodel in meetingtype_list %}
+                                        <option value="{{meetingtypemodel.id}}">{{meetingtypemodel.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">会议主题：</label>
+                            <div class="col-md-7">
+                                <textarea name="hyzt" class="form-control" placeholder="输入会议主题" name="qdescribe" id="hyzt" rows="3" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label  col-md-3">会议室：</label>
+                            <div class="col-md-7">
+                                <input type="text" name="meetroon" style="min-width: 260px;" id="meetroon" class="form-control" placeholder="输入会议室" >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">参会人员：</label>
+                            <!--<div class="col-md-7">
+                                <label for="" style="width: 40%;">可选人员</label>
+                                <label for="" style="width: 40%;margin-left: 10%;">已选人员</label>
+                            </div>-->
+                            <!--<div class="col-md-7">
+                                <select multiple name="left" id="left" size="6" style="width: 40%;height: 122px;border: solid 1px #ccc;" ondblclick="huiyizhouqi.moveOption(document.getElementById('left'), document.getElementById('right'),'right','addhuiyiForm')">
+                                    {% for attendusermodel in meetingusers_array %}
+                                    <option value="{{attendusermodel.user_id}}">{{attendusermodel.user_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <select multiple name="right" id="right" size="6" style="width: 40%;margin-left: 10%;height: 122px;border: solid 1px #ccc;" ondblclick="huiyizhouqi.moveOption(document.getElementById('right'), document.getElementById('left'),'right','addhuiyiForm')">
+                                </select>
+                            </div>-->
+                           <div class="col-md-7">
+								<label for="" style="width: 50%;">可选人员</label>
+								<label for="" style="width: 40%;padding-left: 14%;">已选人员</label>
+							</div>
+							<div class="col-md-7">
+								<div id="left" style="width: 60%;height: 200px;border: solid 1px #ccc;float: left;overflow: scroll;"></div>
+								<select multiple name="right" id="right" size="6" style="width: 35%;margin-left: 5%;height: 200px;border: solid 1px #ccc;" ondblclick="huiyizhouqi.deleteOption(document.getElementById('right'), 'right','addhuiyiForm')">
+								</select>
+							</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3" style=" padding-left: 0px;padding-right: 0px;padding-top: 2px;">开始时间：</label>
+                            <div class="col-md-7 clockpicker" style="padding-left: 15px;padding-right: 15px;">
+                                <!--<input class="large" data-format="hh:mm" type="time"  placeholder="开始时间">-->
+                                <input type="text" class="form-control" value="09:30" id="hysrq" name="hysrq" readonly="readonly" >
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3" style=" padding-left: 0px;padding-right: 0px;padding-top: 2px;">结束时间：</label>
+                            <div class="col-md-7  clockpicker" style="padding-left: 15px;padding-right: 15px;">
+                                <input type="text" class="form-control" value="09:30" name="hyerq" id="hyerq"  readonly="readonly" >
+                            </div>
+
+                        </div>
+
+                        <div class="form-group huiyifiles unactive">
+                            <label class="control-label col-md-3" style="padding-right: 0px;">会议附件：</label>
+                            <div class="col-md-7">
+                                <table class="table table-striped" id="hyinfo_files">
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="control-label col-md-3 ">添加附件</label>
+                            <div class="col-md-7">
+                                <input type="file" name="files" id="uploadfile_fujian" multiple="multiple" style="max-width: 300px;margin: 10px;">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default btn" role="button" id="btnFaqiWenTiCancle" data-dismiss="modal" aria-hidden="true">取消</a>
+                    <button class="btn btn-primary" type="button" id="btnAddhuiyi">确定</button>
+                </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="edithuiyicid" style="display:none">
+
+<div class="modal fade" id="jiyaodlg" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 align="left">上传纪要</h4>
+            </div>
+            <div class="modal-body">
+                <div class="widget-content padded">
+                    <form class="form-horizontal" id="jiyaoForm" align="left">
+                        <div class="form-group">
+                            <label for="" class="control-label col-md-3 ">添加附件</label>
+                            <div class="col-md-7">
+                                <input type="file" name="files" id="uploadfile_jiyao" multiple="multiple" style="max-width: 300px;margin: 10px;">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-default btn" role="button"   id="addjiyaofile">确定</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/common/huiyi_zhouqi.js?7777" type="text/javascript"></script>
+{% endblock %}

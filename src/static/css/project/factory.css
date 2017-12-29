@@ -1,0 +1,58 @@
+.content-row{background: white; 
+			width:98%; 
+			min-height:700px;
+			max-height:100%;
+			margin:20px auto 10px auto; 
+			padding:10px 0 0px 0;
+			border-radius:15px; 
+			display:inline-block;
+}
+
+h2{font-weight:bold; color:cornflowerblue;}
+
+#factoryTab{padding:0 100px 0;}
+#factoryTab li a{line-height:40px; border-top-right-radius: 20px; border-top-left-radius: 20px;}
+.areaTab{height:100%; min-height:700px;}
+.area-row ul li{line-height:60px; font-size:25px; }
+.area-content { margin-top: 0px; min-height:700px; height:100%; border-right: 1px solid #ddd; padding:0;}
+
+.donutTab{min-height:350px; text-align:center; border-bottom:solid 1px #ddd;}
+.donutTab .areaDonut{height:220px; display:inline-block; width:33%; margin:0 auto; float:none;}
+.sysMsg span{font-size:20px;}
+#sysAdvice {color:brown; text-decoration:underline;}
+
+.positionList h2{margin:20px 0 0px 0;}
+.donutTab h2{margin:20px 0 10px 0;}
+.area-content .positionList{padding:0px 0px 20px 0px;}
+
+.search{line-height:60px; font-size:20px;}
+.search input{height:40px; margin-top:10px; line-height:40px; border-radius:10px; padding-left:15px; width:200px;}
+.full{background:red; color:whitesmoke;}
+.normal{background: lightblue;}
+.unuse{background:gainsboro;}
+.navTab{overflow:hidden; width:100%;}
+
+@media (max-width: 767px) {
+	.topnav button{width:150px; display:inline-block; float:none!important;}
+	.topnav {white-space:nowrap; }
+	.btn-primary:hover,.btn-primary:focus{background-color:#337ab7; border-color:#337ab7;}
+	.areaPosition{display:inline-block; float:none;height:65px;width:45%; margin-left:3%;text-align:center; padding:20px 0; cursor:pointer; }
+	.swiper-container-content{background: white; margin:10px 0px !important; padding:0 0 20px 0;}
+	.areaDonut{width:100%; display:inline-block; min-height:200px; margin-top:10px;}
+	.areaPosition .positionCount{height: 40px;line-height:30px; width:100%; max-width:200px; border-radius:10px;font-size:20px; margin:0 auto;}
+	.areaPosition .positionNum{height:25px; line-height:25px; font-size:18px;}
+	.areaPosition .positionCount:hover{background: whitesmoke;}
+	.sumContent{min-height:400px; padding:0;}
+	#pbTable{margin-bottom:0px;}
+	.modal-dialog{margin-top:50px; height:100%; overflow:scroll;}
+	td,th{text-align:center; font-size:1.2em;}
+}
+
+@media (min-width: 767px) {
+	.areaPosition{display:inline-block; float:none; width:33% ;height:100px;text-align:center; padding:20px 0; cursor:pointer; }
+	.areaPosition .positionCount{height: 60px;line-height:50px; width:100%; max-width:200px; border-radius:25px;font-size:30px; margin:0 auto;}
+	.areaPosition .positionNum{height:40px; line-height:40px; font-size:25px;}
+	.areaPosition .positionCount:hover{background: whitesmoke;}
+	.sumContent{min-height:400px; padding:0;}
+	td,th{text-align:center; font-size:1.5em;}
+}

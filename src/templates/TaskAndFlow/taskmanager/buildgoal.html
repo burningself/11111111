@@ -1,0 +1,172 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<script src="js/web3d/scripts/libs/jscolor/jscolor.js"></script>
+<!-- prism syntax higlighting library -->
+<link href="js/web3d/scripts/libs/prism/prism.css" rel="stylesheet" />
+<script src="js/web3d/scripts/libs/prism/prism.min.js"></script>
+
+
+<link rel="stylesheet" href="js/web3d/scripts/libs/jstree/dist/themes/default/style.min.css" />
+<script src="js/web3d/scripts/libs/jstree/dist/jstree.min.js"></script>
+
+<link rel="stylesheet" href="dist_vue/css/modelview.css">
+<link href="/js/web3d/style.min.css" rel="stylesheet" />
+<script src="/js/web3d/three.min.js"></script>
+<script src="/js/web3d/viewer3D.min.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.pie.js"></script>
+<script language="javascript" type="text/javascript" src="js/flot/jquery.flot.resize.js"></script>
+<style>
+	.panel{
+		border-radius: 0px;
+	}
+	.panel-heading{
+		border-bottom: 1px solid #DDDDDD;
+	}
+</style>
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2" style="line-height: 32px;">{{title}}</span><a class="margin_left15"  id="btnGoalMgr" >工作目标管理</a>
+        <div class="form-inline pull-right">
+            <div class="input-group">
+                <label class="input-group-addon"  for="timerange">工作目标</label>
+                <select id="build-goal" class="form-control" style="min-width: 200px;">
+                    {% for goal in workgoallist %}
+                    {% ifequal goal.id curWorkGoal.id %}
+                    <option value="{{goal.id}}" selected>{{goal.label}}</option>
+                    {% else %}
+                    <option value="{{goal.id}}">{{goal.label}}</option>
+                    {% endifequal %}
+
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="btnGetTaskStatus" class="btn btn-danger" style="min-width: 100px;">查看 </button>
+        </div>
+    </div>
+</div>
+<div>
+    <div id="left" class="pull-left" >
+    <div class="panel-group" id="accordion">
+         <div class="panel">
+                <div class="panel-heading">
+                      <div class="panel-title">
+                        <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseOne">
+                            空间结构<i class="profont pro-font-xiangyou" style="float: right"></i>
+                        </a>
+                      </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseOne">
+                      <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_jstree">
+                         <div id="jstree_div" > </div>
+
+                      </div>
+                        <div class="ResizeBottombar" id="Bottombar1" ></div>
+                </div>
+          </div>
+          <div class="panel">
+                <div class="panel-heading">
+                      <div class="panel-title">
+                        <a class="accordion-toggle" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo">
+                          <span>构件分类</span><i class="profont pro-font-xiangyou" style="float: right"></i>
+                        </a>
+                      </div>
+                </div>
+                <div class="panel-collapse collapse" id="collapseTwo">
+                  <div class="panel-body" style="height:34vh; overflow-x:auto;" id="div_pb_type">
+                     <div id="jstree_div_pbtype" > </div>
+
+                  </div>
+                  <div class="ResizeBottombar" id="Bottombar2" ></div>
+                </div>
+          </div>
+    </div>
+</div>
+    <div class="col-lg-9 Div3dViewer" style="padding-left: 0px;padding-right: 0px;height: calc(100vh - 207px);color: white;">
+        <div id="viewer" style="height: calc(100vh - 207px);"></div>
+    </div>
+    <div class="col-lg-3" style="background-color:#E7E0DC;padding-right: 0px;">
+        <div class="panel" style="height: 300px;overflow: auto;">
+            <div class="panel-heading">{{curWorkGoal.label}}</div>
+            <div class="panel-body">
+            <div class="pbwell-property" ><label>时间段：</label><span id="timerange" >{{curWorkGoal.begin_date|date:"Y/m/d"}}-{{curWorkGoal.end_date|date:"Y/m/d"}}</span > </div>
+            <div class="pbwell-property" ><label>目标描述：</label><span id="description" >{{curWorkGoal.description}}</span ></div>
+            </div>
+            </div>
+        <div class="panel" style="margin-bottom: 0px;height:calc(100vh - 527px);overflow: auto;">
+            <div class="panel-heading">进度信息</div>
+            <div class="col-lg-12" id="item-donut" style="height:37vh;padding:0px; overflow: hidden;"></div>
+            <div style="margin-top:20px;margin-left: 10px;">
+                <p  id="progressdsc"></p>
+            </div>
+        </div>
+
+    </div>
+</div>
+  <script src="js/datastruct.js"></script>
+  <script src="js/web3d/Extension/Autodesk.ADN.Viewing.Extension.SampleTaskGoal/Autodesk.ADN.Viewing.Extension.SampleTaskGoal.js?ver=(2017-10-31)"></script>
+  <script src="js/web3d/scripts/LoadModelTaskGoal.js"></script>
+  <script src="js/web3d/scripts/getObjectTree.js"></script>
+  <script src="js/web3d/scripts/modelcommon.js"></script>
+  
+  <script type="text/javascript">
+	$(document).ready(function(){
+
+		loadInitialModel();
+		$("#selFloor").change(function() {
+			var selFloor = $("#selFloor option:selected").val();
+			if(selFloor!=""){
+				_selElevations = selFloor+",";
+			}else{
+				_selElevations = "";
+
+			}
+			 filterPblist();
+		});
+        $("#btnGetTaskStatus").click(function(){
+            getpbstatuslist();
+
+            getgoaldesc();
+        });
+
+});
+
+function getgoaldesc(){
+	
+	var goal = $("#build-goal").val();
+	
+	$.ajax({
+	  type:"get",
+	  url:"/task/projecttask/getgoalproperty",
+	  cache:false,
+	  dataType:"json",
+	  data:{"goal": goal},
+	  success: function(data){
+		if(data.issuc=="true")
+		{
+			$("#desc-title").text(data.name);
+			$("#description").text(data.description);
+			$("#timerange").text(data.timerange);
+		}
+		else
+		{
+			$("#description").text("获取目标信息失败");	
+			$("#timerange").text("");
+			$("#desc-title").text("");
+		}
+
+	  }
+	});
+}
+
+$("#btnGoalMgr").click(function(){
+	window.open("/task/projecttask/buildgoalmgr/");
+});
+
+
+  </script>
+  
+{% endblock %}
+

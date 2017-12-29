@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %} 
+<style>
+.form-group{
+	width:70%;
+	text-align:center;
+}
+</style>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="widget-container fluid-height clearfix">
+      <div class="heading">
+        <i class="fa fa-user"></i>用户工作日志
+      </div>
+    <ul class="nav nav-tabs" id="notes_tabs">
+      <li class="active"><a href="#history" data-toggle="tab">查看历史日志</a></li>
+      <li><a href="#profile" data-toggle="tab">创建日志</a></li>
+    </ul>
+	<div id="notes_tabs" class="tab-content">
+	    <div class="tab-pane fade" id="profile">
+		   <form id="tab" class="form-horizontal"  method="post" class="notes">
+			  <div class="widget-content padded">
+				 <div align="center">
+	            	<div class="form-group">
+			            <label class="control-label col-md-2">标题:</label>
+			            <div class="col-md-7">
+			              <input class="form-control"  type="text" name="title">
+			            </div>
+			        </div>
+	                <div class="form-group">
+			            <label class="control-label col-md-2">工作日志内容：</label>
+			            <div class="col-md-7">
+			              <textarea class="form-control" rows="3" name="content"></textarea>
+			            </div>
+		            </div>
+		            <div class="form-group" >
+						<button class="btn btn-primary" style="margin-right:5%;" onclick = "$('.notes').submit();" >保存</button>
+						<a class="btn btn-default btn" style="margin-left:0%;">放弃</a>
+					</div>
+		         </div>
+		      </div>
+		   </form>
+		</div>
+	
+		<div class="tab-pane fade in active" id="history">
+		   <form id="tab" class="form-horizontal">
+			  <div class="widget-content padded">
+			    <table class="table table-striped" >
+			      <thead>
+			        <tr>
+			          <th>编号</th>
+			          <th>日志主题</th>
+					  <th>日志内容</th>
+					  <th>记录时间</th>
+					  <th>编辑</th>
+			          <th style="width: 26px;"></th>
+			        </tr>
+			      </thead>
+			      <tbody>
+			      	{% for each in list_items%}
+						<tr id="tr_{{each.id}}">
+							<td>{{each.id}}</td>
+							<td>{{each.name}}</td>
+							<td>{{each.content}}</td>
+							<td>{{each.submittime|date:"Y-m-d"}}</td>
+							<td>			  
+								<a data-target='#EditNote' id="{{each.id}}" data-toggle='modal' onClick="refreshEditModal(this.id)"><i class="fa fa-pencil"></i></a>
+								<a data-target='#DelNote' id="{{each.id}}" data-toggle='modal' onClick="refreshDelModel(this.id)"><i class="glyphicon glyphicon-remove"></i></a>
+							</td>
+						</tr>
+					{% endfor %}
+			      </tbody>
+			    </table>
+				    
+			    <div class="widget-content padded text-center" >
+				    <ul class="pagination pagination-lg">
+						{% if list_items.has_previous %}
+						<li><a href="?page={{ list_items.previous_page_number }}">前一页</a></li>
+						{% endif %}
+				        <li><a>第 {{ list_items.number }} 页，共 {{ list_items.paginator.num_pages }}页</a></li>
+						{% if list_items.has_next %}
+				         <li><a href="?page={{ list_items.next_page_number }}">下一页</a></li>
+						{% endif %}
+				    </ul>
+			    </div>
+		      </div>
+		   </form>
+		</div>
+	</div>
+  </div>
+ </div>
+
+<div class="modal fade" id="DelNote" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header" align="center">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               	删除日志确认框
+            </h4>
+         </div>
+         <div class="modal-body" id="body-del" align="center" style="vertical-align:middle; font-size:25px;">
+
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">返回
+            </button>
+            <button type="button" class="btn btn-danger" id="delBtn">确认</button>
+         </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditNote" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="title-edit" align="center">
+               	
+            </h4>
+         </div>
+         <div class="modal-body">
+        	<div align="center">
+	            <label class="control-label col-md-2" align="center" style="width:100%;">日志主题</label>
+	            <input class="form-control"  type="text" id="title">
+	            <br>
+	            <label class="control-label col-md-3" align="center" style="width:100%;">日志内容：</label>
+	            <textarea class="form-control" rows="4" id="content"></textarea>
+	        </div>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+            	返回
+            </button>
+            <button type="button" class="btn btn-primary" id="editBtn">更新</button>
+         </div>
+      </div>
+    </div>
+</div>
+<script type="text/javascript">
+		function refreshEditModal(id){
+			parObj = $("#tr_" + id.toString()).find("td");
+		
+			var title = parObj[1].firstChild.data;
+			var content = parObj[2].firstChild.data;
+			
+			$("#title").val( title );
+			$("#content").html(content);
+			$("#title-edit").html("日志编号:"+ id.toString());
+			$("#editBtn").attr("onclick","editNote("+ id + ")");
+		}
+	
+		function refreshDelModel(id){
+			$("#body-del").html("确认删除日志：" + id.toString() + " ?");
+			$("#delBtn").attr("onclick","delNote("+ id + ")")
+		}
+	
+        function delNote(id){
+        	$.ajax({ 
+        	type:"POST",
+            url: "/notes/delete/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":id},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("删除成功!");
+            		self.location='/notes/';
+                }
+                else{
+                	alert("服务器错误，稍后再试.");
+                }
+                
+                
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+        
+        };
+        
+        function editNote(id){
+        	var title = $("#title").val();
+        	var content = $("#content").val();
+        	
+        	$.ajax({ 
+        	type:"POST",
+            url: "/notes/update/", 
+            cache:false,    
+            dataType: "json",
+            data: {"id":id,"title":title,"content":content},
+            success: function(data) { 
+                if (data.status=="Succeed") {
+            		alert("更新成功!");
+            		self.location='/notes/';
+                }
+                else{
+                	alert("服务器错误，稍后再试.");
+                }    
+            },
+            error: function(){
+        		alert("连不上服务器,网络错误！");
+       		}
+       		
+        	});
+        	
+        
+        }
+
+        
+      
+        
+
+</script>
+
+{% endblock %}
+
+
+

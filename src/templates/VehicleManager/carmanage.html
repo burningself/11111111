@@ -1,0 +1,249 @@
+{% extends "base_v2.html" %}
+{% block ownerhead %}
+<script type="text/javascript" src="dist_vue/plugin/amcharts/amcharts.js"></script>
+<script type="text/javascript" src="dist_vue/plugin/amcharts/pie.js"></script>
+<script type="text/javascript" src="dist_vue/plugin/amcharts/themes/light.js"></script>
+<style>
+    .today1{
+        display: inline-block;
+        margin:20px;font-weight: 600;
+    }
+    #cartype,#units{
+        width: 50%;height:400px;
+        float: left;
+        margin-top: 30px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="header-v2">
+    <div class="header-bg-v2">
+        <span class="title-v2 line_height32">车辆管理</span>
+        <div class="btn btn-danger pull-right" data-toggle="modal" data-target="#myModal">登记</div>
+    </div>
+</div>
+<div style="padding: 10px;">
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active"><a href="#statistics" data-toggle="tab">车辆统计</a></li>
+        <li><a href="#enterCar" data-toggle="tab">进场车辆列表</a></li>
+        <li><a href="#register" data-toggle="tab">登记车辆信息</a></li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="statistics">
+            <div style=" clear: both;">
+                <h4 class="today1">当日进车数量：<span id="today-car"></span></h4>
+                <h4 class="today1">当前场内车辆：<span id="yard-car"></span></h4>
+            </div>
+            <div id="cartype"></div>
+            <div id="units"></div>
+        </div>
+        <div class="tab-pane fade" id="enterCar">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>车牌号</th>
+                        <th>车辆类型</th>
+                        <th>进场时间</th>
+                        <th>所属单位</th>
+                    </tr>
+                </thead>
+                <tbody class="car-manage">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane fade" id="register">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>车牌号</th>
+                    <th>车辆类型</th>
+                    <th>所属单位</th>
+                </tr>
+                </thead>
+                <tbody class="car-register">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">登记车辆信息</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="carid" class="col-sm-2 control-label">车牌</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carid">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carname" class="col-sm-2 control-label">车型</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="carname">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="carunit" class="col-sm-2 control-label">所属单位</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="carunit">
+                                <option>1</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addcar()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    shuaxinRegister();
+    var typecount = []; var companycount = [];
+    $.ajax({
+        type: "get",
+        url: "/vehiclemanager/carinfocount/",
+        async: true,
+        success: function(data) {
+            if( data.res == "sucess"){
+                $("#today-car").html( data.todaytotal );
+                $("#yard-car").html( data.curenttotal );
+                for( var i = 0 ; i < data.typecount.length; i ++){
+                    typecount.push( {"category" : data.typecount[i].type,"column-1" : data.typecount[i].value});
+                }
+                for( var j = 0 ; j < data.typecount.length; j ++){
+                    companycount.push( {"category" : data.companycount[j].type,"column-1" : data.companycount[j].value});
+                }
+                makePie("cartype","进场车辆类型统计" , typecount);
+                makePie( "units","进场车辆单位统计" , companycount);
+            }
+        },
+        error: function() {
+            console.log("错误");
+        }
+    });
+
+    $.ajax({
+        type: "get",
+        url: "/vehiclemanager/alarmInfoplates/",
+        dataType:"json",
+        async: true,
+        success: function(data) {
+            var temp ="";
+           for(var n = 0;n < data.results.length;n ++){
+               temp +='<tr><td>'+ data.results[n].id + '</td><td>' + data.results[n].license +'</td><td>'+data.results[n].devicename +'</td><td>'+data.results[n].recotime +'</td><td>'+ data.results[n].company+'</td></tr>';
+           }
+           $(".car-manage").html( temp );
+        },
+        error: function() {
+            console.log("错误");
+        }
+    });
+    $.ajax({
+        type: "get",
+        url: "/user/companys/",
+        dataType:"json",
+        async: true,
+        success: function(data) {
+            var temp ="";
+            for(var n = 0;n < data.results.length;n ++){
+               temp += '<option value="'+data.results[n].url +'">'+ data.results[n].name + '</option>';
+            }
+            $("#carunit").html( temp );
+        },
+        error: function() {
+            console.log("错误");
+        }
+    });
+    function shuaxinRegister() {
+        $.ajax({
+            type: "get",
+            url: "/vehiclemanager/vehicles/",
+            dataType:"json",
+            async: true,
+            success: function(data) {
+                var temp ="";
+                for(var n = 0;n < data.results.length;n ++){
+                    temp +='<tr><td>'+ data.results[n].id + '</td><td>' + data.results[n].plate +'</td><td>'+data.results[n].cartype +'</td><td>'+ data.results[n].companyname+'</td></tr>';
+                }
+                $(".car-register").html( temp );
+            },
+            error: function() {
+                console.log("错误");
+            }
+        });
+    }
+    function addcar() {
+        var id = $("#carid").val();
+        var name = $("#carname").val();
+        var company = $("#carunit  option:selected").val();
+        if( id && name && company){
+            $.ajax({
+                type: "post",
+                url: "/vehiclemanager/vehicles/",
+                dataType:"json",
+                data:{ plate:id,
+                    cartype:name,
+                    company:company
+                },
+                async: true,
+                success: function() {
+                    alert("添加成功！");
+                    $("#myModal").modal('hide');
+                    shuaxinRegister();
+                },
+                error: function() {
+                    console.log("错误");
+                }
+            });
+        }else {
+            alert("信息不完整！");
+        }
+    }
+    function makePie( pieName , pieTitle , typecount) {
+            AmCharts.makeChart(pieName,
+                {
+                    "type": "pie",
+                    "angle": 35.1,
+                    "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+                    "depth3D": 25,
+                    "labelRadius": -60,
+                    "labelText": "[[title]]:[[value]]",
+                    "titleField": "category",
+                    "valueField": "column-1",
+                    "theme": "light",
+                    "allLabels": [],
+                    "balloon": {},
+                    "legend": {
+                        "enabled": true,
+                        "align": "center",
+                        "equalWidths": false,
+                        "markerType": "circle"
+                    },
+                    "titles": [
+                        {
+                            "bold": false,
+                            "id": "Title-1",
+                            "size": 20,
+                            "text": pieTitle
+                        }
+                    ],
+                    "dataProvider": typecount
+                }
+            );
+    }
+</script>
+{% endblock %}

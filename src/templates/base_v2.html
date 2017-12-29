@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>智慧建造平台</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2" />
+	<link href="/dist_vue/icon/icon2/iconfont.css" type="text/css"  rel="stylesheet">
+	<link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+	<script src="/dist_vue/plugin/jquery/jquery-2.2.3.min.js"></script>
+	<script src="/js/vue/vue.min.js" type="text/javascript"></script>
+	<!-- boot -->
+	<link href="/dist_vue/plugin/bootstrap/bootstrap.min.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="/dist_vue/plugin/bootstrap/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen and (min-width:767px)">
+	<link href='/dist_vue/plugin/bootstrap/bootstrapValidator.css' rel='stylesheet' />
+	<script src="/dist_vue/plugin/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src='/dist_vue/plugin/bootstrap/bootstrapValidator.js'></script>
+	<script type="text/javascript" src="/dist_vue/plugin/bootstrap/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="/dist_vue/plugin/bootstrap/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+	<link href="/dist_vue/css/base2.css?ver=(20171225)" type="text/css"  rel="stylesheet">
+	<link href="../static/css/loaders.css" rel="stylesheet" type="text/css" />
+	<!--zeroModal-->
+	<link href="/js/zeroModal/css/zeroModal.css" media="all" rel="stylesheet" type="text/css" />
+	<script src="/js/zeroModal/zeroModal.min.js" type="text/javascript"></script>
+    <script src="/js/common/alert.js"></script>
+    <link href="/js/customalert/customalert.css" media="all" rel="stylesheet" type="text/css" />
+	<script src="/js/customalert/customalert.js" type="text/javascript"></script>
+	{% block ownerhead %} {% endblock %}
+</head>
+<style type="text/css">
+    .pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+        background-color: #d05354!important;
+        border-color: #d05354!important;
+    }
+    .pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+		background-color: #d05354!important;
+		border-color: #d05354!important;
+	}
+	.vakata-context, .vakata-context ul {
+		border: 0px solid #979797;
+		box-shadow: 0px 0px 0px #999;
+	  }
+	  .vakata-context li>a{
+		line-height: 1.8em;
+		padding: 0 2.4em;
+		background-color: rgba(51, 122, 183, 0.69);
+		color: #efefef;
+		text-shadow: 0px 0px 0 #fff;
+		border-radius: 1px;
+	  }
+	  .vakata-context li>a:hover{
+		background-color: rgba(51, 122, 183, 0.69);
+		text-shadow: 0px 0px 0 #fff;
+	  }
+	  .vakata-context .vakata-context-hover>a{
+		background-color: rgba(51, 122, 183, 0.69);
+	  }
+	  .vakata-context-hover{
+		background-color: rgba(51, 122, 183, 0.69);
+		text-shadow: 0px 0px 0 #fff;
+	  }
+	  .vakata-context li>a>i{
+		display: none;
+	  }
+	  .vakata-context li>a .vakata-contextmenu-sep{
+		display: none;
+	  }
+</style>
+<body>
+	<div id="wrap">
+			<header>
+				<div class="logo_title float_left theme_background_color">
+					<img src="../../dist_vue/images/sijian.png" alt="logo" title="logo">
+					<div>
+						<p>智慧建造管理平台</p>
+						<p class="font10" id="sysunit">上海建工四建集团有限公司</p>
+					</div>
+				</div>
+				<p class="company_name float_left grade-font2" id="projectname"></p>
+				<div class="weather">
+						<div class="weather-plane3" style="margin-right: 114px"></div >
+				        <div class="weather-plane2"></div >
+				        <div class="weather-plane1" style="color: rgb(208,80,73);"></div >
+				</div>
+				<p class="line_gray"></p>
+			</header>
+			<div id="left_nav">
+					<div id="info">
+						<div>
+							<img src="../../dist_vue/images/default-info.png" alt="默认头像" title="默认头像">
+						</div>
+						<h3 id="username"></h3>
+						<h5 id="userrole"></h5>
+						<p><i class="profont pro-font-xinfeng noSelect"></i><a class="profont pro-font-shenfen pointer" href="/user/userview/"></a>
+							<a class="profont pro-font-tuichu1 pointer" href="/logout/"></a></p>
+					</div>
+					<ul id="left_menu">
+						<li v-for="site in sites" @mouseenter="leftChange(site,$event)"  @mouseleave="leaveChange($event)">
+							<p class="leftLi" :class="{active:site.name===pop}">
+								<i class="left_icon profont" v-bind:class="[site.icon ,{activeFont:site.name===pop}]"></i>
+								<a :href="site.url" v-bind:class="{activeFont:site.name===pop}">[[site.name]]</a>
+								<i class="profont pro-font-arrow_down down1" :class="{whiteBlock:white}"></i>
+							</p>
+							<div class="childMenu">
+								<p v-for="submenu in submenus" @mouseenter="leftMenu(submenu.name)">
+									<a :href="submenu.url||'#'" :class="{activeBack_a:submenu.name===popMenu}">[[submenu.name]]</a>
+								</p>
+							</div>
+						</li>
+					</ul>
+			</div>
+			<div  id="right_sidebar" class="right_sidebar theme_background_color trans" :class="{'trans-active':isTrue}">
+				<ul class="trans" :class="{'right-width':isTrue}">
+					<li @click="rightFun"><i class="profont pro-font-18window"></i></li>
+					<li v-for="rightData in shortData"  >
+						<a :href="rightData.url">
+							<i class="iconfont" :class="rightData.icon"></i>
+							<p class="right_font">[[rightData.name]]</p>
+						</a>
+					</li>
+					<li v-for="n in few" ></li>
+					<li v-for="n in li" ></li>
+					<!--<li class="last_btn" :class="{'right-width':isTrue}"><i class="profont pro-font-tianjia"></i></li>-->
+				</ul>
+				<p class="last_btn" @click="keyboard"><i class="profont pro-font-tianjia"></i></p>
+			</div>
+		</div>
+			<div class="content_section">
+			{% block content %} {% endblock %}
+			</div>
+			<footer class="wrap-footer">
+				<p class="footer_text">Copyright &copy; 2015-2025 <span id="development_units">上海筑众信息科技有限公司</span>，All rights reserved. <a href="# " target="_blank">沪ICP备 </a></p>
+			</footer>
+			<div class="modal fade" id="myModals" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog col-md-12" style="width:100%;    text-align: center;" >
+					<div class="modal-content" style="width:990px;background:url(../../static/images/demon_07.png); float:none; margin: 0 auto;">
+						<div class="modal-header" style="background:#2E82B3;color:#fff;">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+								&times;
+							</button>
+							<div class="modal-title" id="myModalLabel" style="font-size: 24px;">
+								功能磁贴
+							</div>
+						</div>
+						<div class="modal-body" style="padding:0px;">
+							<div class="affix">
+
+								<ul id="tab" style="padding:0px;text-align: center;">
+									<li id="alls_modal" style="font-size:20px;"><a data-toggle="item" ><img src="../../static/images/all_03.png" alt="" style="position: relative;right:25px;"/>全部</i></a></li>
+								</ul>
+							</div>
+							<div class="containers" style="padding:0px;position: relative;" id="containers">
+
+
+
+								<ul style="list-style:none;overflow: hidden;margin-top:20px;" class="changyong box active" id="changyong">
+								</ul>
+
+
+
+								<div class="modal-footer" style="margin-right: 10px;">
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="closes" >关闭</button>
+								</div>
+							</div>
+						</div>
+						<!--<div style="height:40px;line-height: 30px;background: #333333;"></div>-->
+						<div class="modal-footer">
+							<!--	<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+								<button type="button" class="btn btn-primary">
+									提交更改
+								</button>-->
+						</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal -->
+			</div>
+</body>
+<div class="pro-loading" style="
+    display:none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    background-color: rgba(41, 41, 41, 0.92);
+    z-index: 100001;
+    opacity: 0.5;
+    text-align: center;
+    padding-top: 20%;">
+    <img src="/images/loading.gif" width="50px" />
+</div>
+<script>
+var wrap = new Vue({
+    el:'#wrap',
+    delimiters:['[[',']]'],
+    data:{
+        li:'',
+        pop:'',
+        popMenu:'',
+		few:0,
+        isTrue:false,
+		show:false,
+		white:false,
+        sites:[],
+        submenus:[],
+        shortData:[],
+		timer:''
+    },
+	methods:{
+        leftChange:function(value,that){
+            this.pop = value.name;
+            if( value.submenu.length === 0){
+            	this.submenus = [];
+                this.white = false;
+            }else{
+                this.white = true;
+                this.submenus = value.submenu;
+                this.timer = setTimeout(function(){
+                    $(that.target.children[1]).slideDown();
+                },500);
+            }
+		},
+        leaveChange:function (that) {
+            this.pop = '';
+            clearTimeout( this.timer );
+            $(that.target.children[1]).slideUp();
+        },
+        leftMenu:function (data) {
+            this.popMenu = data;
+        },
+        rightFun:function () {
+            if( this.isTrue ){
+                this.show = true;
+                if( this.few > 0 ){
+                    this.show = true;
+                }else{
+                    this.show = false;
+                }
+                this.isTrue = false;
+                this.li = 0;
+            }else {
+                this.isTrue = true;
+                this.show = true;
+                this.li = parseInt( $(document).height()/84 - 1 );
+			}
+        },
+        editWidth:function ( extent ){
+			$(".header-v2").width( extent )
+        },
+        keyboard:function () {
+//            获取到所有快捷键
+			var wrapTemp = '<div class="wrap-keyboard"><ul class="keyboard-menu"><li onclick="searchAll()">'
+				+'<i class="profont pro-font-18window" style="font-size: 18px"></i>全部</li>';
+            $.ajax({
+                type: 'get',
+                url: '/assist/shortcut/getcategorylist/',
+                dateType: 'json',
+                success: function(datas) {
+                    if( datas.issuc == "true"){
+                        for(var j=0;j<datas.categorylist.length;j++){
+                            wrapTemp += '<li id="'+datas.categorylist[j].categoryname+'" onclick="sendKey(this)">'+
+								'<i class="'+ datas.categorylist[j].icon+'"></i>'+datas.categorylist[j].categoryname+'</li>';
+                        }
+                        wrapTemp += '</ul><ul class="keyboard-li">';
+//						调取li
+                        $.ajax({
+                            type: 'get',
+                            url: '/assist/shortcut/getcategoryfunction/',
+                            dateType: 'json',
+                            success: function(data) {
+                                if( data.issuc == "true"){
+                                    for(var i = 0; i < data.functionlist.length; i++){
+                                        if( data.functionlist[i].isselect == "true"){
+                                            wrapTemp += '<li class="key-is-select" id="'+ data.functionlist[i].name +'" onclick="changeKey(this)"><i class="'+ data.functionlist[i].icon+'"></i>'+data.functionlist[i].name+'</li>';
+                                        }else {
+                                            wrapTemp += '<li class="key-no-select" id="'+ data.functionlist[i].name +'" onclick="changeKey(this)"><i class="'+ data.functionlist[i].icon+'"></i>'+data.functionlist[i].name+'</li>';
+                                        }
+                                    }
+                                    wrapTemp += ' </ul></div>';
+                                    zeroModal.show({
+//                                        title: '功能磁贴',
+                                        content: wrapTemp,
+                                        dragHandle: 'container',
+                                        width:'825px',
+                                        height:'60%',
+                                        buttons: [{ className: 'zeromodal-btn zeromodal-btn-default', name: '关闭', fn:function( opt ){
+
+                                             }
+                                        }]
+                                    });
+                                }
+                            },
+                            error: function() {
+                                console.log('调用失败');
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    console.log('调用失败');
+                }
+            });
+        },
+		rightMenu:function () {
+            const that = this;
+            $.ajax({
+				url:"/assist/shortcut/getusershortcutlist/",
+				dataType:"json",
+				type:"get",
+				success:function( dataMenu ){
+					if( dataMenu.issuc == "true" ){
+							var menu = JSON.stringify( dataMenu );
+							menu = JSON.parse(menu)
+							that.shortData = menu.shortcutlist;
+							//        计算右边格子大小
+							that.few =	parseInt( $(document).height()/84 - 2 );
+							if( that.few >= that.shortData.length ){
+								that.few = that.few - that.shortData.length;
+							}else{
+								that.show = true;
+							}
+					}
+				},
+				error:function () {
+					console.log("加载失败");
+				}
+
+			});
+        }
+	},
+    mounted:function(){
+        this.rightMenu();
+        const that = this;
+        $.ajax({
+					type: "get",
+					url: "/xadmin/prjconfig/baseinfo/",
+					async: true,
+					success: function(data) {
+						document.title=data.project_title;
+						$("#titleimg").attr('src',data.logo);
+
+						$("#projectname").html(data.project_name);
+						$("#development_units").html(data.development_units);
+					},
+					error: function() {
+						console.log("错误");
+					}
+		});
+		$.ajax({
+					type: "get",
+					url: "/userinfo/",
+					async: true,
+					success: function(data) {
+						$("#userrole").html(data.userinfo.role);
+						$("#username").html(data.userinfo.name);
+					},
+					error: function(data) {
+						console.log("错误");
+					}
+				});
+        $.ajax({
+            url:"/xadmin/navigat/prjmenujson/",
+            dataType:"json",
+            type:"get",
+            success:function( datas ){
+                if( datas.issuc == 'true'){
+                    that.sites = datas.menulist;
+                    //that.pop = datas.menulist[0].name;
+                }
+            },
+            error:function () {
+                console.log("加载失败");
+            }
+        });
+         $.ajax({
+				type          : 'get',
+				url           : '/assist/loadweather/',
+				dataType:"json",
+				success       : function( data ){
+					if(data.issuc!='true'){
+						console.log(data.error);
+						return;
+					}
+					//遍历
+					var description = "";
+					for( var i=0; i < 3 ; i++ ){
+						 var property=data.result[i];
+							if(property.weather.indexOf("多云")!=-1 || property.weather.indexOf("阴")!=-1){
+                                description = '<i class="profont pro-font-yintian weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+							}else if( property.weather.indexOf("晴")!=-1){
+                                description = '<i class="profont pro-font-sun weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }else if( property.weather.indexOf("雪")!=-1 ){
+                                description = '<i class="profont pro-font-xue weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }else if( property.weather.indexOf("雨")!=-1 ){
+                                description = '<i class="profont pro-font-yu weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }else if( property.weather.indexOf("雷")!=-1 ){
+                                description = '<i class="profont pro-font-leidian weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }else if( property.weather.indexOf("阵雨")!=-1 ){
+                                description = '<i class="profont pro-font-zhenyu-copy weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }else {
+                                description = '<i class="profont pro-font-sun weather-size"></i><span class="weather-span">'+property.days+'</span><span class="weather-bottom">'+property.temperature+'</span>';
+                            }
+                        	$(".weather-plane"+(i+1)).html(description);
+					}
+				},
+				error:function(){
+					alert('fail');
+				}
+			});
+    }
+})
+function sendKey( obj ) {
+    var obj2 = obj.id;
+    var keyTemp = "";
+    $.ajax({
+        type: 'get',
+        url: '/assist/shortcut/getcategoryfunction/',
+        data: {
+            'categoryname': obj2,
+        },
+        dateType: 'json',
+        success: function(datas) {
+            if( datas.issuc == "true"){
+				for(var n = 0; n < datas.functionlist.length; n ++){
+                    if( datas.functionlist[n].isselect == "true"){
+                        keyTemp += '<li class="key-is-select" id="'+datas.functionlist[n].name+'" onclick="changeKey(this)"><i class="'+ datas.functionlist[n].icon+'"></i>'+ datas.functionlist[n].name +'</li>';
+                    }else {
+                        keyTemp += '<li class="key-no-select" id="'+datas.functionlist[n].name+'" onclick="changeKey(this)"><i class="'+ datas.functionlist[n].icon+'"></i>'+ datas.functionlist[n].name +'</li>';
+                    }
+				}
+				$(".keyboard-li").html( keyTemp );
+			}
+        },
+        error: function() {
+            console.log('调用失败');
+        }
+    });
+}
+function searchAll() {
+    var temp ="";
+    $.ajax({
+        type: 'get',
+        url: '/assist/shortcut/getcategoryfunction/',
+        dateType: 'json',
+        success: function(data) {
+            if( data.issuc == "true"){
+                for(var i = 0; i < data.functionlist.length; i++){
+                    if( data.functionlist[i].isselect == "true"){
+                        temp += '<li class="key-is-select" id="'+data.functionlist[i].name+'" onclick="changeKey(this)"><i class="'+ data.functionlist[i].icon+'"></i>'+data.functionlist[i].name+'</li>';
+                    }else {
+                        temp += '<li class="key-no-select" id="'+data.functionlist[i].name+'" onclick="changeKey(this)"><i class="'+ data.functionlist[i].icon+'"></i>'+data.functionlist[i].name+'</li>';
+                    }
+                }
+                $(".keyboard-li").html( temp );
+            }
+        },
+        error: function() {
+            console.log('调用失败');
+        }
+    });
+}
+function changeKey( obj ) {
+    var mark = 0;
+    var functionname = obj.id;
+    if( $( obj ).hasClass("key-is-select") ){
+        $( obj ).removeClass("key-is-select");
+        mark = 0;
+	}else {
+        $( obj ).addClass("key-is-select");
+        mark = 1;
+    }
+    $.ajax({
+        type: 'get',
+        url: '/assist/shortcut/setusershortcut/',
+        data: {
+            'functionname': functionname,
+            "ischeck":mark
+        },
+        dateType: 'json',
+        success: function(data) {
+            if(data.issuc == "true"){
+                wrap.rightMenu();
+			}
+        },
+        error: function() {
+            console.log('调用失败');
+        }
+    })
+}
+</script>
+</html>
